@@ -1,0 +1,151 @@
+{% extends 'DAM_base.html' %}
+{% load static %}
+{% block body %}
+
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'dataManager_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Allocated By Date</li>
+        </ol>
+      </nav>
+</div>
+
+<div class="row ">
+    <div class="col-12 grid-margin">
+      <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between">
+                <h4 class="card-title">Allocated Leads  List</h4>
+                <div class="add-items d-flex ">
+                  <input  class="form-control text-offwhite" name="#" id="search-data" placeholder="search here..">
+                  <button class="btn btn-outline-danger mdi mdi-close" id="closeBtn" type="button"></button> 
+                  
+                </div>
+                
+                
+                
+            </div>
+
+            
+         
+                <div class="table-responsive">
+                    <table class="table" id="lead-details">
+                        <thead>
+                            <tr>
+                                <th> No </th>
+                               
+                                <th> Date </th>
+                                <th> Full name </th>
+                                <th> Email </th>
+                                <th> Phone </th>
+                                <th> Lead Head </th>
+                                <th> Source </th>
+                            
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            {% for l in DATE_leadS %}
+                            <tr class="clickable-row" data-href="#">
+                                <td>
+                                    {{forloop.counter}}
+                                </td>
+
+                                <td>{{l.Genarated_date}}</td>
+                                <td>
+                                    <span class="pl-2"> {{l.lead_Id.lead_name}} </span>
+                                </td>
+                               
+                                <td> {{l.lead_Id.lead_email}} </td>
+                                <td> {{l.lead_Id.lead_contact}} </td>
+                                <td> {{l.lead_Id.lead_category_id.lead_collection_for}} </td>
+                                <td> {{l.lead_Id.lead_source}} </td>
+                                
+                        
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+           
+        </div>
+      </div>
+    </div>
+</div>
+
+<script>
+   
+    const inputField = document.getElementById('search-data');
+    const closeBtn = document.getElementById('closeBtn');
+    const empTable = document.getElementById('lead-details');
+    closeBtn.style.display = 'none';
+  
+    inputField.addEventListener('input', function() {
+        filterTable();
+    });
+  
+    function filterTable() {
+        const filterValue = inputField.value.toLowerCase();
+        const rows = empTable.getElementsByTagName('tr');
+  
+        for (let i = 1; i < rows.length; i++) {
+            const Cell1 = rows[i].getElementsByTagName('td')[1];
+            const Cell2 = rows[i].getElementsByTagName('td')[2];
+            const Cell3 = rows[i].getElementsByTagName('td')[3];
+            const Cell4 = rows[i].getElementsByTagName('td')[4];
+            const Cell5 = rows[i].getElementsByTagName('td')[5];
+            const Cell6 = rows[i].getElementsByTagName('td')[6];
+          
+
+            
+  
+            if (Cell1 || Cell2 || Cell3 || Cell4|| Cell5 || Cell6 ) {
+  
+                const datacell1 = Cell1.textContent || Cell1.innerText;
+                const datacell2 = Cell2.textContent || Cell2.innerText;
+                const datacell3 = Cell3.textContent || Cell3.innerText;
+                const datacell4 = Cell4.textContent || Cell4.innerText;
+                const datacell5 = Cell5.textContent || Cell5.innerText;
+                const datacell6 = Cell6.textContent || Cell6.innerText;
+              
+               
+                
+                
+  
+                if (datacell1.toLowerCase().includes(filterValue) ||
+                 datacell2.toLowerCase().includes(filterValue) || 
+                 datacell3.toLowerCase().includes(filterValue) ||
+                 datacell4.toLowerCase().includes(filterValue) || 
+                 datacell5.toLowerCase().includes(filterValue) ||
+                 datacell6.toLowerCase().includes(filterValue))
+               
+                {
+                    rows[i].style.display = '';
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+        }
+    }
+  
+     // To display the close button and hide the close button based on the search input 
+    inputField.addEventListener('input', function() {
+    if (inputField.value == '') {
+        closeBtn.style.display = 'none';
+       
+    } else {
+        closeBtn.style.display = 'block';
+        
+    }
+    });
+  
+    closeBtn.addEventListener('click', function() {
+    inputField.value = '';
+    closeBtn.style.display = 'none';
+    filterTable(); // Display the full table data
+    });
+</script>
+
+{% endblock %}

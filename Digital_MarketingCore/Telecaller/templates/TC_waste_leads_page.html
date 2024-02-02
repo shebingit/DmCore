@@ -1,0 +1,91 @@
+{% extends 'TC_base.html' %}
+{% load static %}
+{% block body %}
+<div class="container-fluid">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'TC_dashboard' %}">Dashboard</a></li>
+        <li class="breadcrumb-item " aria-current="page"><a class="text-underline-remove" href="{% url 'TC_waste_leads' %}">Waste Leads</a></li>
+        <li class="breadcrumb-item active text-md" aria-current="page"> View Leads</li>
+      </ol>
+    </nav>
+  </div>
+
+  <div class="row mt-5">
+    <div class="col-md-4 mb-4" id="card1">
+      <a href="{% url 'TC_pending_waste_leads' id %}" style="text-decoration: none;">
+        <div class="card">
+          <div class="card-body">
+
+
+
+
+            <div class="row">
+              <div class="col-md-9">
+
+                <h4 class="card-title mb-9 fw-semibold"
+                  style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;"><b>PROCESSING WASTE LEADS</b>
+                </h4>
+
+                <p style="color: rgb(255, 255, 255,0.7);">pending leads</p>
+
+
+
+
+              </div>
+              <div class="col">
+
+
+                <i class="icon-lg mdi mdi-account-clock text-danger ml-auto" style="font-size: 40px;"></i>
+
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </a>
+
+    </div>
+
+  
+    <div class="col-md-4 grid-margin" style="width: 100%;">
+      <a href="{% url 'TC_waste_leads_details' id %}" style="text-decoration: none;">
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-9">
+              
+
+                <h4 class="card-title mb-9 fw-semibold"><b>ALL  WASTE  LEADS</b></h4>
+                <p style="color: rgb(255, 255, 255,0.7);">useless leads</p>
+              
+
+
+            </div>
+            <div class="col">
+              
+                <i class="icon-lg mdi mdi-account-card-details text-primary ms-auto" style="font-size: 40px;"></i>
+              
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </a>
+    </div>
+  </div>
+
+
+
+
+
+</div>
+
+
+
+
+
+
+{% endblock %}

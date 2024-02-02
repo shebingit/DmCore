@@ -1,0 +1,167 @@
+{% extends 'DAM_base.html' %}
+{% load static %}
+{% block body %}
+
+
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'dataManager_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Clients </li>
+        </ol>
+      </nav>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h6 class="card-title text-offwhite mb-4">Search Section  </h6>
+        <form action="{% url 'DAM_Dashboard_clients' %}" method="post">
+            {% csrf_token %}
+            <div class="row ">
+                <div class="col-xl-1 col-lg-4  col-md-4  col-sm-12 grid-margin">
+                    <div class="form-group mt-4">
+                        <a href="{% url 'DAM_Dashboard_clients' %}" class="btn btn-outline-secondary"><span class="text-small"> All Data</span></a>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-4  col-md-4  col-sm-12 grid-margin">
+                    <div class="form-group">
+                        <label class="text-offwhite">Clients Name *</label>
+                        <select class=" form-control text-offwhite" id="client-change" name="clientid" >
+                            <option value="0"> Select all clients </option>
+                            {% for client in clients_objs %}
+                            <option value="{{ client.client_Id.id }}"> {{ client.client_Id.client_name }}</option>
+                            {% endfor %}
+                        </select>
+            
+                        </div>
+                </div>
+                <div class="col-xl-3  col-lg-4  col-md-4  col-sm-12 grid-margin ">
+                    <div class="form-group">
+                        <label class="text-offwhite">Leads Collected For *</label>
+                        <select class="form-control text-offwhite" id="lead-category" name="categoryid">
+                            <option value="0">Select Categories</option>
+                        </select>
+            
+                    </div>
+                </div>
+                <div class="col-xl-3  col-lg-4  col-md-4  col-sm-12 grid-margin ">
+                    <div class="form-group mt-4">
+                      <button type="submit" class="btn btn-outline-primary"><span class="mdi mdi-magnify"></span></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        {% if dataBank_objs %}
+        <h6 class="card-title text-offwhite mb-4">Leads - ( {{dataBank_count}} ) </h6>         
+        <div class="table-responsive">
+          
+          <table class="table" id="table-details">
+            <thead>
+              <tr>
+                <th> No </th>
+               <th>Follow Up</th>
+                <th> Allocation  Status </th> 
+                <th> Lead Details </th>
+                
+                <th> Current  Status </th>
+               
+              </tr>
+            </thead>
+            <tbody id="lead-data">
+
+                {% for d in dataBank_objs %}
+
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td> <a href="{% url 'DAM_dataBnak_followup' d.id %}" class="text-primary"><span class="mdi mdi-file-check"></span> Followup Details</a></td>
+                    <td> 
+                        <p> {{ d.allocated_date}}</p>
+                       
+                        
+                        {% if d.lead_status == 'Not Attended' %}
+                          <p>Status :
+                              <span class="mdi mdi-information-outline text-warning mr-1"></span>
+                              {{ d.lead_status }}</p>
+                          {% elif  d.lead_status == 'Allocated' %}
+                          <p>Status : <span class="mdi mdi-check text-primary mr-1"></span>  {{ d.lead_status }}</p> 
+                          {% elif  d.lead_status == 'Opend' %}
+                          <p> Status : <span class="mdi mdi-file-check text-success mr-1"></span>  {{ d.lead_status }}</p> 
+                          {% else %}
+                          <p> Status : <span class="mdi mdi-check-circle text-success mr-1"></span>  {{ d.lead_status }} </p> 
+                      
+                          {% endif %}
+                      </td>  
+                      <td><p class="h6">{{ d.lead_Id.lead_name }}</p> 
+                               
+                        <p>{{ d.lead_Id.lead_email }}</p>
+                        <p>{{ d.lead_Id.lead_contact }}</p>
+                        <p>Data Sourse : {{ d.lead_Id.lead_source }}</p>
+                      </td>
+                     
+                    <td>{{ d.current_status }}</td>
+                    
+                </tr>
+
+                {% endfor %}
+            
+            
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+          <div class="d-flex justify-content-center">
+            <img src="{% static 'images\file-icons\no-data-file.png' %}">
+          </div>
+        {% endif %}
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script>
+    $("#client-change").on("change", function () {
+        // Get the selected client ID
+        var selectedClientId = $(this).val();
+      
+        
+        $.ajax({
+            url: "{% url 'fetch_lead_categories' %}",
+            type: 'GET',
+            dataType: 'json',
+            data: {
+                client_id: selectedClientId
+            },
+            success: function (data) {
+              
+                if (data.success) {
+                    
+                    var leadCategorySelect = $("#lead-category");
+                  
+                    leadCategorySelect.empty(); 
+      
+                    var option = '<option value="'+ '0' + '">' + 'Select Categories' + '</option>';
+                    leadCategorySelect.append(option);
+                    data.lead_categories.forEach(function (category) {
+                        var option = '<option value="' + category.id + '">' + category.name + '</option>';
+                        leadCategorySelect.append(option);
+                    });
+                    updateTable(data.leads_data);
+                    document.getElementById("db-count").innerText =data.dataBank_count;
+                    
+                } else {
+                    
+                    console.error('Error: ' + data.message);
+                }
+               
+            },
+            error: function (xhr, status, error) {
+                // Handle Ajax errors (optional)
+                console.error('Ajax Error: ' + status + ' - ' + error);
+            }
+        });
+      });
+  
+</script>
+
+{% endblock %}

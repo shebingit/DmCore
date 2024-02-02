@@ -1,0 +1,438 @@
+{% extends 'TL_base.html' %}
+{% load static %}
+{% block body %}
+
+<style>
+  .custom-width {
+  max-width: 60%; 
+  margin: auto; 
+}
+</style>
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'tl_work_section' %}">Work</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Completed Works</li>
+        </ol>
+      </nav>
+</div>
+
+
+<div class="row ">
+  <div class="col-12 grid-margin">
+    <div class="card">
+      <div class="card-body">
+        
+        <!-- <div class="d-flex justify-content-between mb-3">
+          <h4 class="card-title">Tasks To Assign</h4>
+         
+        </div> -->
+          <div class="d-flex justify-content-between mb-3">
+            <h4 class="card-title">Completed Works</h4>
+          </div>
+
+          {% if work_assign %}
+        <div class="add-items d-flex ">
+              
+          <input  class="form-control text-offwhite" name="#" id="search-data" placeholder="search here..">
+          <button class="btn btn-outline-danger mdi mdi-close" id="closeBtn" type="button"></button> 
+        </div>
+        
+        <div class="table-responsive">
+          <table class="table" id="work-allocate">
+            <thead>
+              <tr>
+                <th> Client Name </th>
+                <th> Tasks </th>
+                <th> Start Date </th>
+                <th> Due Date </th>
+                <th> Target </th>
+                <th> Achieved Target </th>
+                <th> Progress </th>
+               
+              </tr>
+            </thead>
+            <tbody>
+              {% for wa in work_assign %}
+              <tr >
+                <td>
+                  {% if wa.wa_clientId.client_profile %}
+                  <img src="{{wa.wa_clientId.client_profile.url}}" alt="Profile" />
+                  {% else %}
+                  <img src="{% static 'images/faces/profile-icon.png' %}" alt="image" />
+                  {% endif %}
+                  <span class="pl-2">{{wa.wa_clientId.client_name}}</span>
+                </td>
+                <td> 
+                  <ul >
+                    {% for task in wa.wa_tasksId.all %}
+                      <li class="mt-2 " data-toggle="tooltip" data-placement="top" title="Click To View Task Assign Details">
+                        <a href="" class="text-muted" data-toggle="modal" data-target="#assign_details{{task.id}}" style="text-decoration: none;">
+                          {{ task.task_name }}</a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </td>
+                <td> {{ wa.wa_from_date }} </td>
+                <td> {{ wa.wa_due_date }} </td>
+                <td> {{ wa.wa_target }} </td>
+                <td> {{ wa.wa_target_achived }} </td>
+                <td> 
+                  {% if wa.work_assign_progress <= 10 %}
+                      <div class="progress progress-sm">
+                          <div class="progress-bar bg-danger progress-bar-animated progress-bar-striped" role="progressbar" aria-valuenow="{{ wa.work_assign_progress }}" style="width: {{ wa.work_assign_progress }}%" aria-valuemin="0" aria-valuemax="100">
+                              {{ wa.work_assign_progress }}%
+                          </div>
+                      </div>
+                  {% elif wa.work_assign_progress >= 10 and wa.work_assign_progress <= 80 %}
+                      <div class="progress progress-sm">
+                          <div class="progress-bar bg-warning progress-bar-animated progress-bar-striped" role="progressbar" aria-valuenow="{{ wa.work_assign_progress }}" style="width: {{ wa.work_assign_progress }}%" aria-valuemin="0" aria-valuemax="100">
+                              {{ wa.work_assign_progress }}%
+                          </div>
+                      </div>
+                  {% else %}
+                      <div class="progress progress-sm">
+                          <div class="progress-bar bg-success progress-bar-animated progress-bar-striped" role="progressbar" aria-valuenow="{{ wa.work_assign_progress }}" style="width: {{ wa.work_assign_progress }}%" aria-valuemin="0" aria-valuemax="100">
+                              {{ wa.work_assign_progress }}%
+                          </div>
+                      </div>
+                  {% endif %}
+                </td>
+                
+               
+                
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="d-flex justify-content-center">
+          <img src="{% static 'images\file-icons\no-data-file.png' %}">
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- work assign_details Modal-->
+{% for wa in work_assign %}
+{% for task in wa.wa_tasksId.all %}
+<div class="modal fade" id="assign_details{{task.id}}" >
+  <div class="modal-dialog modal-lg " >
+    <div class="modal-content">
+
+      <div class="card">
+        <div class="card-head d-flex justify-content-between align-items-center mt-3 mb-0 ">
+          <h4 class="card-title mt-3 ml-3">Task Assigned</h4>
+          <span class="mdi mdi-close-box mdi-18px text-danger mr-2"  data-dismiss="modal"></span>
+        </div>
+        <!-- <p class="mt-1 ml-3"> * You can individually allocate tasks to the selected team leads here.</p> -->
+        
+        <div class="card-body mt-0">
+              <div class="table-responsive">
+                <table class="table" id="work-allocate">
+                  <thead>
+                    <tr>
+                      <th> Assigned To </th>
+                      <th> Start Date </th>
+                      <th> Due Date </th>
+                      <th> Target </th>
+                      <th> Achieved Target </th>
+                      <th> Progress </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for ta in task_assign %}
+                    {% if ta.ta_taskId_id == task.id %}
+      
+                      <tr>
+                        <td>
+                          {% if ta.ta_workerId.emp_profile %}
+                          <img src="{{ta.ta_workerId.emp_profile.url}}" alt="Profile" />
+                          {% else %}
+                          <img src="{% static 'images/faces/profile-icon.png' %}" alt="image" />
+                          {% endif %}
+                          <span class="pl-2">{{ta.ta_workerId.emp_name}}</span>
+                        </td>
+                        <td>{{ta.ta_start_date}}</td>
+                        <td>{{ta.ta_due_date}}</td>
+                        <td>{{ta.ta_target}}</td>
+                        <td>
+                          {{ta.ta_target_achived}}
+                        </td>
+                        <td>
+                          {% if ta.ta_progress <= 10 %}
+                              <div class="progress progress-sm">
+                                  <div class="progress-bar bg-danger progress-bar-animated progress-bar-striped" role="progressbar" aria-valuenow="{{ ta.ta_progress }}" style="width: {{ ta.ta_progress }}%" aria-valuemin="0" aria-valuemax="100">
+                                      {{ ta.ta_progress }}%
+                                  </div>
+                              </div>
+                          {% elif ta.ta_progress >= 10 and ta.ta_progress <= 80 %}
+                              <div class="progress progress-sm">
+                                  <div class="progress-bar bg-warning progress-bar-animated progress-bar-striped" role="progressbar" aria-valuenow="{{ ta.ta_progress }}" style="width: {{ ta.ta_progress }}%" aria-valuemin="0" aria-valuemax="100">
+                                      {{ ta.ta_progress }}%
+                                  </div>
+                              </div>
+                          {% else %}
+                              <div class="progress progress-sm">
+                                  <div class="progress-bar bg-success progress-bar-animated progress-bar-striped" role="progressbar" aria-valuenow="{{ ta.ta_progress }}" style="width: {{ ta.ta_progress }}%" aria-valuemin="0" aria-valuemax="100">
+                                      {{ ta.ta_progress }}%
+                                  </div>
+                              </div>
+                          {% endif %}
+                        </td>
+                       
+                      </tr>
+                      {% endif %}
+                      {% endfor %}
+
+                  </tbody>
+                </table>
+              </div>
+     
+        </div>
+
+      </div>
+    
+    </div>
+  </div>
+</div>
+{% endfor %}
+{% endfor %}
+
+
+<!--Edit work assign Modal-->
+{% for wa in work_assign %}
+{% for taskAS in task_assign %}
+<div class="modal fade" id="editAssign{{taskAS.id}}{{wa.id}}">
+  <div class="modal-dialog  ">
+    <div class="modal-content">
+
+      <div class="card">
+        <div class="card-head d-flex justify-content-between align-items-center mt-3 mb-0 ">
+          <h4 class="card-title mt-3 ml-3">Edit Task Assign </h4>
+          <span class="mdi mdi-close-box mdi-18px text-danger mr-2"  data-dismiss="modal"></span>
+        </div>
+        <!-- <p class="mt-1 ml-3"> * You can individually allocate tasks to the selected team leads here.</p> -->
+        
+        <div class="card-body mt-0">
+
+          <form action="{% url 'tl_edit_taskAssign' taskAS.id %}" method="post"  enctype="multipart/form-data">
+           
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-xl-12 col-sm-12 grid-margin ">
+                    <div class="card">
+                        
+                        <div class="card-body">
+                            <div class="form-group add-items"> 
+                              <input type="hidden" value="{{wa.id}}"  name="Workassign_id">
+                                <label>Tasks</label>
+                                <select class="form-control text-offwhite" name="selected_task" id="#" required>
+                                  <option value="">--- select Task --- </option>
+                                  {% for ta in wa.wa_tasksId.all %}
+                                  {% if taskAS.ta_taskId_id == ta.id %}
+                                  <option value="{{ta.id}}" selected>{{ta.task_name}}</option>
+                                  {% else %}
+                                  <option value="{{ta.id}}" >{{ta.task_name}}</option>
+                                  {% endif %}
+                                  {% endfor %}
+                                </select>  
+                                 
+                            </div>
+        
+                            <div class="form-group mt-2">
+                                <label>Select Employees</label>
+                            </div>
+                            <div class="row">
+                                {% for tm in team %}
+                                <div class="col-xl-6 col-sm-12 grid-margin ">
+                                    {% if taskAS.ta_workerId.id == tm.allocatEmp_id_id %}
+                                    <div class="form-check ">
+                                        <label class="form-check-label">
+                                            <input type="checkbox" class="form-check-input" name="emp" value="{{tm.allocatEmp_id_id}}" checked >{{tm.allocatEmp_id.emp_name}}
+                                        </label>
+                                    </div>
+                                    {% else %}
+                                    <div class="form-check ">
+                                      <label class="form-check-label">
+                                          <input type="checkbox" class="form-check-input" name="emp" value="{{tm.allocatEmp_id_id}}"  >{{tm.allocatEmp_id.emp_name}}
+                                      </label>
+                                  </div>
+                                  {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="form-group add-items ">
+                                <label>Start Date</label>
+                                <input type="date" class="form-control text-offwhite" name="fDate" value="{{ taskAS.ta_start_date|date:'Y-m-d' }}" required>
+                              </div>
+                            <div class="form-group add-items">
+                                <label>Due Date</label>
+                                <input type="date" class="form-control text-offwhite" name="dueDate" value="{{ taskAS.ta_due_date|date:'Y-m-d' }}" required>  
+                            </div>
+                            <div class="form-group add-items">
+                              <label>Target</label>
+                              <input type="number" class="form-control text-offwhite" name="target" value="{{ taskAS.ta_target }}"  required>  
+                          </div>
+                            <div class="form-group add-items mt-3">
+                                <label>More about work</label>
+                                <textarea class="to-do-textarea  text-offwhite" name="discription_data"  placeholder="enter more...">{{taskAS.ta_discription}}  </textarea>
+                            </div>
+                            <div class="form-group add-items mt-3">
+                              <label>File</label><br>
+                              {% if taskAS.ta_file %}
+                                <a href="{{ taskAS.ta_file.url }}" class="btn btn-outline-success mb-2 " download>Download</a>
+                                <input type="file" class="form-control text-offwhite" name="wFile" >
+                              {% else %}
+                              <input type="file" class="form-control text-offwhite" name="wFile">
+                              {% endif %}
+                              
+                          </div>
+                        </div>
+                    </div>
+                </div>
+               
+            </div>
+        
+            <div class="add-items d-flex justify-content-center ">
+                <button class=" btn btn-outline-primary " type="submit">Update</button> 
+            </div>
+        
+        </form>
+
+        </div>
+
+      </div>
+    
+    </div>
+  </div>
+</div>
+{% endfor %}
+{% endfor %}
+
+<script>
+  $(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+</script>
+
+
+
+<script>
+   
+  const inputField = document.getElementById('search-data');
+  const closeBtn = document.getElementById('closeBtn');
+  const empTable = document.getElementById('work-allocate');
+  closeBtn.style.display = 'none';
+
+  inputField.addEventListener('input', function() {
+      filterTable();
+  });
+
+  function filterTable() {
+      const filterValue = inputField.value.toLowerCase();
+      const rows = empTable.getElementsByTagName('tr');
+
+      for (let i = 1; i < rows.length; i++) {
+          const Cell1 = rows[i].getElementsByTagName('td')[1];
+          const Cell2 = rows[i].getElementsByTagName('td')[2];
+          const Cell3 = rows[i].getElementsByTagName('td')[3];
+          const Cell4 = rows[i].getElementsByTagName('td')[4];
+          const Cell5 = rows[i].getElementsByTagName('td')[5];
+          
+
+          if (Cell1 || Cell2 || Cell3 || Cell4|| Cell5) {
+
+              const datacell1 = Cell1.textContent || Cell1.innerText;
+              const datacell2 = Cell2.textContent || Cell2.innerText;
+              const datacell3 = Cell3.textContent || Cell3.innerText;
+              const datacell4 = Cell4.textContent || Cell4.innerText;
+              const datacell5 = Cell5.textContent || Cell5.innerText;
+              
+              
+
+              if (datacell1.toLowerCase().includes(filterValue) || datacell2.toLowerCase().includes(filterValue) || datacell3.toLowerCase().includes(filterValue)
+              || datacell4.toLowerCase().includes(filterValue) || datacell5.toLowerCase().includes(filterValue) ) 
+              {
+                  rows[i].style.display = '';
+              } else {
+                  rows[i].style.display = 'none';
+              }
+          }
+      }
+  }
+
+   // To display the close button and hide the close button based on the search input 
+  inputField.addEventListener('input', function() {
+  if (inputField.value == '') {
+      closeBtn.style.display = 'none';
+     
+  } else {
+      closeBtn.style.display = 'block';
+      
+  }
+  });
+
+  closeBtn.addEventListener('click', function() {
+  inputField.value = '';
+  closeBtn.style.display = 'none';
+  filterTable(); // Display the full table data
+  });
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        // Add a change event listener to the client selection dropdown
+        $("#client-change").on("change", function () {
+            var selectedClientId = $(this).val();
+            if (selectedClientId) {
+                // Make an AJAX request to the Django server
+                $.ajax({
+                    type: "GET",
+                    url: "{% url 'get_client_tasks' %}",
+                    data: { client_id: selectedClientId },
+                    dataType: "json",
+                    success: function (data) {
+                        var clientTaskDropdown = $("#client-Task");
+                        clientTaskDropdown.empty(); // Clear existing options
+
+                         // Add the 'form-control' and 'text-offwhite' classes
+                        clientTaskDropdown.addClass("form-control small text-offwhite");
+                        // Populate the client tasks
+                        $.each(data, function (index, task) {
+                            // Create an <option> element with the task details
+                            var option = $("<option>")
+                                .val(task.id)
+                                .text(task.task_name);
+
+                            // Append the option to the task dropdown
+                            clientTaskDropdown.append(option);
+                        });
+                    },
+                    error: function (error) {
+                        console.error("Error:", error);
+                    }
+                });
+            } else {
+                // Clear the task dropdown if no client is selected
+                $("#client-Task").empty();
+            }
+        });
+    });
+</script>
+  
+
+  
+
+
+{% endblock %}

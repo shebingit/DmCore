@@ -1,0 +1,339 @@
+{% extends 'TL_base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block body %}
+
+<style>
+    .bg-transparent
+    {
+        background: transparent;
+    }
+ </style>
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'tl_individualWorks_section' %}">Individual Works</a></li>
+            <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'tl_ongoing_works' %}">Ongoing Works</a></li>
+            <li class="breadcrumb-item active text-md" aria-current="page">Collected Leads </li>
+        </ol>
+      </nav>
+</div>
+
+
+<div class="row mt-1">
+    <div class="col-12 grid-margin">
+        <div class="card">
+            <div class="card-body">
+            
+
+
+                <div class="row">
+                    <div class="col-sm-12 col-lg-6 col-md-6 col-xl-8  grid-margin">
+                    <h5 class="card-title custom-letter-spacing"> {{ works_obj.clientId.client_name }} -  Lead List </h5>
+                    
+                    </div>
+                    
+                    <div class="col-sm-12 col-lg-6 col-md-6 col-xl-4 d-flex justify-content-end  grid-margin">
+                    <div class="d-flex ">
+                        <input  class="form-control text-offwhite mr-1" name="#" id="search-data" placeholder="search here..">
+                        <span class="text-danger mdi mdi-close" id="closeBtn" type="button"></span> 
+                    </div>
+                    </div>
+                    
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-lg-3 col-md-3 col-xl-2  grid-margin">
+                        <div class="badge badge-pill badge-outline-info">
+                            <span id="check-count">Leads -{{  leads_obj_count }}</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-3 col-md-3 col-xl-2  grid-margin">
+                        <a href="#">
+                            <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#singlLead">
+                                <span class="mdi mdi-arrow-expand-up mr-1"></span><span class="small">Data Form</span>
+                            </button>
+                        </a>
+                    </div>
+                    <div class="col-sm-6 col-lg-3 col-md-3 col-xl-2  grid-margin">
+                        <a href="{% url 'tl_duplicate_data' works_obj.id %}">
+                            <button class="btn btn-outline-warning" data-toggle="tooltip" title="To check duplicates data based on email and Contact number">
+                                <span class="mdi mdi-file-multiple mr-1"></span><span class="small">Remove Duplicate</span>
+                            </button>
+                        </a>
+                    </div>
+                    <div class="col-sm-6 col-lg-3 col-md-3 col-xl-2 grid-margin ">
+                        <a href="{% url 'download_excel' works_obj.id %}">
+                            <button class="btn btn-outline-danger" data-toggle="tooltip" title="Excel file format for data upload">
+                                <span class="mdi mdi-file-excel mr-1"></span><span class="small">File Download</span>
+                            </button>
+                        </a>
+                    </div>
+                    <div class="col-sm-6 col-lg-3 col-md-3 col-xl-2  grid-margin">
+                        <a href="#">
+                            <button class="btn btn-outline-primary" data-toggle="modal" data-target="#fileUpload">
+                                <span class="mdi mdi-arrow-expand-up mr-1"></span><span class="small">File Upload</span>
+                            </button>
+                        </a>
+                    </div>
+                </div>
+                    {% if leads_obj %}
+                <div class="table-responsive">
+                    <table class="table" id="leads-data">
+                    <thead>
+                        <tr>
+                        
+                            <th>No</th>
+                            <th>Collected Date</th>
+                            <th>Lead Full Name</th>
+                            <th>Email id  </th>
+                            <th>Contact No </th>
+                            <th> Details  </th>
+                            <th> Verification Status </th>
+                            <!-- <th> Action </th> -->
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lead in leads_obj %}
+                        <tr>
+                        
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ lead.lead_add_date }}</td>
+                        <td>{{ lead.lead_name }}</td>
+                        <td>{{ lead.lead_email }}</td>
+                        <td>{{ lead.lead_contact }}</td>
+                        <td>
+                            
+                            <ol>
+                               
+                                {% for Details in lead_Details_obj %}
+                                {% if Details.leadId.id == lead.id %}
+                                <li>
+                                    <p>
+                                        <span class="mr-1"> {{ Details.lead_field_name }} :</span>
+                                        <span> {{ Details.lead_field_data }} </span>
+                                    </p>
+                                </li>
+                                {% endif %}
+                                {% endfor %}
+                            </ol>
+                           
+                        </td>
+                        <td>
+                            {% if lead.lead_status == 1 %}
+                            <a href="{% url 'head_lead_verify_unverify' lead.id %}" class=" btn btn-outline-success "><span class="mdi mdi-check-all mr-1 small"> Verified</span></a>
+                            {% else %}
+                            <a href="{% url 'head_lead_verify_unverify' lead.id %}" class=" btn btn-danger "><span class="mdi mdi-close mr-1 small"> Unverified</span></a>
+                            {% endif %}
+                           
+                        </td>
+                        <!-- <td>
+                            {% if lead.waste_data == 0 %}
+                            <a href="{% url 'head_lead_mark_waste' lead.id %}" class=" btn btn-outline-warning "><span class="mdi mdi-delete-sweep mr-1 small"> Mark as waste</span></a>
+                            {% else %}
+                            <a href="{% url 'head_lead_mark_waste' lead.id %}" class="text-warning"><span class="small">* Already  marked as waste </span></a>
+                            {% endif %}
+                        </td> -->
+                        
+                        
+                        
+                        </tr>
+                        {% endfor %}
+                    
+                    </tbody>
+                    </table>
+                </div>
+
+            {% else %}
+            
+                <div class="d-flex justify-content-center">
+                <img src="{% static 'images\file-icons\no-data-file.png' %}">
+                </div>
+            
+            {% endif %} 
+                        
+                        
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Multiple Lead  Entry From Ecxel-->
+<div class="modal fade" id="fileUpload">
+    <div class="modal-dialog ">
+      <div class="modal-content">
+  
+        <div class="card">
+          <div class="card-head d-flex justify-content-between align-items-center mt-3 mb-0 ">
+            <h4 class="card-title mt-3 ml-3">Upload Data File </h4>
+            <span class="mdi mdi-close-box mdi-18px text-danger mr-2"  data-dismiss="modal"></span>
+          </div>
+          <p class="mt-1 ml-3"> * You can upload only excel file data here</p>
+          
+          <div class="card-body mt-0">
+  
+            <form action="{% url 'tl_lead_file_upload' works_obj.id %}" method="post"  enctype="multipart/form-data">
+             
+              {% csrf_token %}
+              <div class="form-group add-items mt-3">
+                <label>Upload Yor Data File Here..</label>
+                <input type="file" class="form-control text-offwhite" name="upload_File" accept=".xlsx" />  
+              </div>
+             
+              <div class="add-items d-flex justify-content-center ">
+                  <button class=" btn btn-outline-primary " type="submit">
+                    <span class="mdi mdi-arrow-expand-up mr-1"></span><span class="small">Upload</span>
+                </button> 
+              </div>
+          
+          </form>
+  
+          </div>
+  
+        </div>
+      
+      </div>
+    </div>
+</div>
+
+
+<!--  Single  lead Entry-->
+<div class="modal fade" id="singlLead">
+    <div class="modal-dialog modal-md">
+      <div class="modal-content">
+  
+        <div class="card">
+          <div class="card-head d-flex justify-content-between align-items-center mt-3 mb-0 ">
+            <h4 class="card-title mt-3 ml-3">Lead Details Entry </h4>
+            <span class="mdi mdi-close-box mdi-18px text-danger mr-2"  data-dismiss="modal"></span>
+          </div>
+          <p class="mt-1 ml-3"> * You can add lead data here</p>
+          
+          <div class="card-body mt-0">
+  
+            <form action="{% url 'tl_lead_add' works_obj.id %}" method="post"  enctype="multipart/form-data">
+            
+              {% csrf_token %}
+              <div class="row">
+                <div class="col-xl-6 col-sm-12 col-md-6 col-lg-6 grid-margin">
+                    <div class="form-group add-items">
+                        <label>Full Name</label>
+                        <input type="text" class="form-control text-offwhite" name="leadName" accept=".xlsx" />  
+                    </div>
+                </div>
+                <div class="col-xl-6 col-sm-12 col-md-6 col-lg-6 grid-margin">
+                    <div class="form-group add-items ">
+                        <label>Email id</label>
+                        <input type="email" class="form-control text-offwhite bg-transparent"  name="leadEmail" required>  
+                    </div>
+                </div>
+                <div class="col-xl-6 col-sm-12 col-md-6 col-lg-6 grid-margin">
+                    <div class="form-group add-items">
+                        <label>Contact Number</label>
+                        <input type="tel" class="form-control text-offwhite bg-transparent" name="leadContact" required>  
+                    </div>
+                </div>
+
+                {% for fieldname in lf_obj %}
+                <div class="col-xl-6 col-sm-12 col-md-6 col-lg-6 grid-margin">
+                    <div class="form-group add-items">
+                        <label>{{ fieldname.field_name  }}</label>
+                        <input type="text" class="form-control text-offwhite " name="leadfield">  
+                    </div>
+                </div>
+                {% endfor %}
+              </div>
+              
+                
+                <div class="add-items d-flex justify-content-center ">
+                    <button class=" btn btn-outline-primary " type="submit">
+                        <span class="mdi mdi-plus mr-1"></span><span class="small">ADD</span>
+                    </button> 
+                </div>
+
+            
+          
+          </form>
+  
+          </div>
+  
+        </div>
+      
+      </div>
+    </div>
+</div>
+
+  
+<script>
+   
+    const inputField = document.getElementById('search-data');
+    const closeBtn = document.getElementById('closeBtn');
+    const empTable = document.getElementById('leads-data');
+    closeBtn.style.display = 'none';
+  
+    inputField.addEventListener('input', function() {
+        filterTable();
+    });
+  
+    function filterTable() {
+        const filterValue = inputField.value.toLowerCase();
+        const rows = empTable.getElementsByTagName('tr');
+  
+        for (let i = 1; i < rows.length; i++) {
+            const Cell1 = rows[i].getElementsByTagName('td')[1];
+            const Cell2 = rows[i].getElementsByTagName('td')[2];
+            const Cell3 = rows[i].getElementsByTagName('td')[3];
+            const Cell4 = rows[i].getElementsByTagName('td')[4];
+            const Cell5 = rows[i].getElementsByTagName('td')[5];
+            const Cell6 = rows[i].getElementsByTagName('td')[6];
+            const Cell7 = rows[i].getElementsByTagName('td')[7];
+            
+  
+            if (Cell1 || Cell2 || Cell3 || Cell4|| Cell5 || Cell6 || Cell7) {
+  
+                const datacell1 = Cell1.textContent || Cell1.innerText;
+                const datacell2 = Cell2.textContent || Cell2.innerText;
+                const datacell3 = Cell3.textContent || Cell3.innerText;
+                const datacell4 = Cell4.textContent || Cell4.innerText;
+                const datacell5 = Cell5.textContent || Cell5.innerText;
+                const datacell6 = Cell6.textContent || Cell6.innerText;
+                const datacell7 = Cell7.textContent || Cell7.innerText;
+                
+                
+  
+                if (datacell1.toLowerCase().includes(filterValue) ||
+                 datacell2.toLowerCase().includes(filterValue) || 
+                 datacell3.toLowerCase().includes(filterValue) ||
+                 datacell4.toLowerCase().includes(filterValue) || 
+                 datacell5.toLowerCase().includes(filterValue) ||
+                 datacell6.toLowerCase().includes(filterValue) ||
+                 datacell7.toLowerCase().includes(filterValue)) 
+                {
+                    rows[i].style.display = '';
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+        }
+    }
+  
+     // To display the close button and hide the close button based on the search input 
+    inputField.addEventListener('input', function() {
+    if (inputField.value == '') {
+        closeBtn.style.display = 'none';
+       
+    } else {
+        closeBtn.style.display = 'block';
+        
+    }
+    });
+  
+    closeBtn.addEventListener('click', function() {
+    inputField.value = '';
+    closeBtn.style.display = 'none';
+    filterTable(); // Display the full table data
+    });
+</script>
+
+{% endblock %}

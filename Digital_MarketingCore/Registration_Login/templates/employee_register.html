@@ -1,0 +1,185 @@
+
+{% extends 'RL_base.html' %}
+{% load static %}
+{% block body %}
+
+<div class="container-fluid page-body-wrapper full-page-wrapper">
+  <div class="row w-100 m-0">
+    <div class="content-wrapper full-page-wrapper d-flex align-items-center auth login-bg">
+      <div class="card col-lg-6 col-sm-12 mx-auto">
+        <div class="card-body px-5 py-5">
+          <h3 class="card-title text-left mb-4">Employee Register</h3>
+
+          <form action="{% url 'employee_registration_form_save' %}" method="post">
+            {% csrf_token %}
+
+            <div class="row">
+              <div class="col-sm-12 col-lg-6 col-md-6">
+                <div class="form-group">
+                  <label>Company Identifier ID*</label>
+                  <input type="text" name="companyID" id="companyID" class="form-control text-offwhite" required>
+                  
+                </div>
+              </div>
+              <div class="col-sm-12 col-lg-6 col-md-6">
+                <div class="form-group">
+                  <label>Choose Department *</label>
+                  <select class="form-control text-offwhite" name="emp_dept_name" id="department" required>
+                    <option>-- select --</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-sm-12 col-lg-12 col-md-12">
+                <div class="form-group">
+                  <label>Choose Designation *</label>
+                  <select class="form-control text-offwhite" name="emp_desig_name" id="designation" required>
+                    <option>-- select --</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-sm-12 col-lg-6 col-md-6">
+                <div class="form-group">
+                  <label>Employee Name *</label>
+                  <input type="text" name="emp_name" class="form-control text-offwhite" required>
+                </div>
+              </div>
+              <div class="col-sm-12 col-lg-6 col-md-6">
+                <div class="form-group">
+                  <label>Contact No *</label>
+                  <input type="tel" class="form-control text-offwhite" name="emp_contact" id="phoneInput" pattern="[7896][0-9]{9}" required>
+                  <span id="error-message" class="text-danger text-small text-danger" style="display: none;">Please enter a valid phone number.</span>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Email *</label>
+              <input type="email" class="form-control text-offwhite" name="emp_email" id="email" required>
+              <span id="email-error" class="text-danger text-small text-danger"></span>
+            </div>
+            
+              <div class="form-group">
+                  <label>Username *</label>
+                  <input type="email" class="form-control text-offwhite" name="emp_username" id="username" required>
+                  <span class="mdi mdi-information-outline  text-primary mt-2"> 
+                    <span class="text-small">Info: Use email id as user name</span>
+                  </span>
+              </div>
+              
+              <div class="form-group">
+                  <label>Password *</label>
+                  <input type="password" class="form-control text-offwhite" name="emp_password" required>
+              </div>
+              
+              <div class="text-center">
+                  <button type="submit" class="btn btn-primary btn-block enter-btn">Register</button>
+              </div>
+              
+              <p class="sign-up text-center">Already have an Account?<a href="{% url 'login_page' %}"> Sign In</a></p>
+              <p class="terms">By creating an account you are accepting our<a href="#"> Terms & Conditions</a></p>
+          </form>
+
+        </div>
+      </div>
+    </div>
+    <!-- content-wrapper ends -->
+  </div>
+  <!-- row ends -->
+</div>
+<!-- page-body-wrapper ends -->
+
+
+
+<!-- Department featch-->    
+      
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+<script>
+  $(document).ready(function() {
+    $('#companyID').on('keyup', function() {
+      var companyId = $(this).val().trim();
+
+      // Check if the entered company ID is not empty
+      if (companyId !== '') {
+        // Make an AJAX call to fetch department data based on the entered company identifier ID
+        $.ajax({
+          url: "{% url 'get_departments' %}",
+          type: 'GET',
+          data: {
+            'company_id': companyId
+          },
+          success: function(data) {
+            // Clear previous options
+            $("#department").empty();
+            $("#designation").empty();
+
+            $("#department").append(
+              $("<option>", {
+                value: '',
+                text: '-- select -- '
+              })
+            )
+            $("#designation").append(
+              $("<option>", {
+                value: '',
+                text: '-- select -- '
+              })
+            )
+            // Iterate through the received data and add options to the dropdown
+            $.each(data.departments, function (index, item) {
+              $("#department").append(
+                $("<option>", {
+                  value: item.id,
+                  text: item.name
+                })
+              );
+            });
+          }
+        });
+      } else {
+        // If the entered company ID is empty, clear the department dropdown
+        $("#department").empty();
+      }
+    });
+  });
+</script>
+  
+
+<!--Designation Featch-->
+
+<script>
+  $(document).ready(function() {
+    $('#department').change(function() {
+      var departId = $(this).val();
+  
+      // Make an AJAX call to fetch department data based on the selected company
+      $.ajax({
+        url: "{% url 'get_designation' %}", 
+        type: 'GET',
+        data: {
+          'deptartment_id': departId
+        },
+        success: function(data) {
+          // Clear previous options
+          $("#designation").empty();
+  
+          
+         
+          // Iterate through the received data and add options to the dropdown
+          $.each(data.designation_data, function (index, item) {
+            $("#designation").append(
+              $("<option>", {
+                value: item.id,
+                text: item.name
+              })
+            );
+          });
+        }
+      });
+    });
+  });
+  
+</script>
+   
+{% endblock %}

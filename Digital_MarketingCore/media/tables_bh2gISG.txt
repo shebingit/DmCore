@@ -1,0 +1,23 @@
+ company_identify_Id = models.CharField(max_length=150,default='COMID001',blank=False,null=False)
+
+
+class FollowupStatus(models.Model):
+    status_name = models.CharField(max_length=150,default='')
+    company_Id = models.ForeignKey(BusinessRegister_Details, on_delete=models.CASCADE, null=True,default='')
+
+class FollowupDetails(models.Model):
+    lead_Id = models.ForeignKey(Leads, on_delete=models.CASCADE, null=True,default='')
+    comp_Id = models.ForeignKey(BusinessRegister_Details, on_delete=models.CASCADE, null=True,default='')
+    hr_telecaller_Id = models.ForeignKey(EmployeeRegister_Details, on_delete=models.CASCADE, null=True,default='')
+    response_date = models.DateField(auto_now_add=True,null=True)
+    response = models.TextField(default='',null=True,blank=True)
+    nextfollowup_date = models.DateField(auto_now_add=False,null=True)
+    response_status = models.CharField(max_length=150,default='')
+
+class FollowupHistory(models.Model):
+    hs_lead_Id = models.ForeignKey(Leads, on_delete=models.CASCADE, null=True,default='')
+    hs_comp_Id = models.ForeignKey(BusinessRegister_Details, on_delete=models.CASCADE, null=True,default='')
+    hr_telecaller_Id = models.ForeignKey(EmployeeRegister_Details, on_delete=models.CASCADE, null=True,default='')
+    allocated_date = models.DateField(auto_now_add=False,null=True)
+    note = models.TextField(default='',null=True,blank=True)
+    final_status = models.CharField(max_length=150,default='')

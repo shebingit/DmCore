@@ -1,0 +1,156 @@
+{% extends 'DAM_base.html' %}
+{% load static %}
+{% block body %}
+
+
+<style>
+    ul.timeline {
+      list-style-type: none;
+      position: relative;
+      padding-left: 1.5rem;
+  }
+  
+   /* Timeline vertical line */
+  ul.timeline:before {
+      content: ' ';
+      background: #959494;
+      display: inline-block;
+      position: absolute;
+      left: 16px;
+      width: 4px;
+      height: 100%;
+      z-index: 400;
+      border-radius: 1rem;
+  }
+  
+  li.timeline-item {
+      margin: 20px 0;
+  }
+  
+  /* Timeline item arrow */
+  .timeline-arrow {
+      border-top: 0.5rem solid transparent;
+      border-right: 0.5rem solid #fff;
+      border-bottom: 0.5rem solid transparent;
+      display: block;
+      position: absolute;
+      left: 2rem;
+  }
+  
+  /* Timeline item circle marker */
+  li.timeline-item::before {
+      content: ' ';
+      background: #242222;
+      display: inline-block;
+      position: absolute;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      left: 11px;
+      width: 14px;
+      height: 14px;
+      z-index: 400;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  }
+  
+  
+  /*
+  *
+  * ==========================================
+  * FOR DEMO PURPOSES
+  * ==========================================
+  *
+  */
+  
+  .text-gray {
+      color: #999;
+  }
+  </style>
+
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'DAM_platform_management' %}">Platform Management</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Platform Reports </li>
+        </ol>
+      </nav>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form action="{% url 'DAM_platform_Report' %}" method="post">
+            {% csrf_token %}
+        <div class="row">
+            <div class="col-xl-2 col-sm-12 grid-margin d-flex justify-content-center  align-items-center">
+                       
+                <a href="{% url 'DAM_platform_Report' %}" class="btn btn-outline-secondary " type="submit">
+                    <span class="small">All PlatForm Data</span></a>
+            </div> 
+            <div class="col-xl-4 col-sm-12 grid-margin ">
+                <div class="form-group">
+                    <label>From date</label>
+                    <input type="date" class="form-control text-offwhite" name="fDate" required>                    
+                  </div>
+            </div>
+            <div class="col-xl-4 col-sm-12 grid-margin">
+                <div class="form-group">
+                    <label>To date</label>
+                    <input type="date" class="form-control text-offwhite" name="eDate" required >                    
+                  </div>
+            </div>
+            <div class="col-xl-1 col-sm-12 grid-margin d-flex justify-content-center  align-items-center">
+                       
+            <button class=" btn btn-outline-primary " type="submit"><i class="mdi mdi-magnify mdi-18px"></i></button>
+            </div> 
+   
+        </div>
+        </form>
+    </div>
+
+</div>
+
+      
+
+<div class="row mt-2">
+    <div class="col-xl-12 col-sm-12 grid-margin stretch-card">
+      <div class="card">
+  
+        <div class="card-body">
+          <h5 class="mb-0 text-offwhite">PlatForms -( {{platform_data_count}} ) </h5>
+  
+          <div class="row">
+            <div class="col-xl-12 ">
+                
+               
+                <!-- Timeline -->
+                <ul class="timeline">
+                    {% for platform in platform_data %}
+                    <li class="timeline-item rounded ml-3 p-1 pl-2 shadow">
+                        <div class="timeline-arrow"></div>
+                        <h2 class="h5 mb-2">{{ platform.platform_Name }}</h2>
+                       
+                        <span class="small text-gray "><i class="mdi mdi-clock-o mr-1"></i>Total Leads/ Collected Leads : {{platform_data_sum }}/{{platform.platform_TotalCount}} </span>
+                        {% for pfd in pfd_objs %}
+                        {% if pfd.platform_name == platform.platform_Name %}
+                        <p><span class="small text-gray"><i class="mdi mdi-clock mr-1"></i>{{ pfd.data_add_date }} &nbsp; Data count:- {{pfd.platform_dataCount }}</span></p>
+                        {% endif %}
+                        {% endfor %}
+                        
+                    </li>
+                    {% endfor %}
+                 
+                   
+                </ul><!-- End -->
+                
+  
+            </div>
+          </div>
+  
+        </div>
+      </div>
+       
+    </div>
+</div>
+
+{% endblock %}

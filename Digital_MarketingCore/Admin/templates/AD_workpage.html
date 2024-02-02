@@ -1,0 +1,117 @@
+{% extends 'AD_base.html' %}
+{% load static %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'admin_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'admin_employees_section' %}">Employees</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Works</li>
+        </ol>
+      </nav>
+</div>
+  
+  
+<div class="row">
+
+  <div class="col-sm-4 grid-margin">
+    <a href="{% url 'admin_headwork_page' %}" class="a-hover text-white">
+        <div class="card">
+            <div class="card-body">
+              <h5>Head</h5>
+              <div class="row">
+                <div class="col-8 col-sm-12 col-xl-8 my-auto">
+                  <div class="d-flex d-sm-block d-md-flex align-items-center">
+                    <h2 class="mb-0">{{head_count}}</h2>
+                    <p class="text-success ml-2 mb-0 font-weight-medium"></p>
+                  </div>
+                  <h6 class="text-muted font-weight-normal mt-3">All Works and task details of Head</h6>
+                </div>
+                <div class="col-4 col-sm-12 col-xl-4 text-center text-xl-right">
+                  <i class="icon-lg mdi mdi-account text-primary ml-auto"></i>
+                </div>
+              </div>
+            </div>
+        </div>
+    </a> 
+  </div>
+
+  <div class="col-sm-4 grid-margin">
+    <a href="{% url 'admin_tlwork_page' %}" class="a-hover text-white">
+        <div class="card">
+            <div class="card-body">
+            <h5>Team Leads</h5>
+            <div class="row">
+                <div class="col-8 col-sm-12 col-xl-8 my-auto">
+                <div class="d-flex d-sm-block d-md-flex align-items-center">
+                    <h2 class="mb-0">{{tl_count}}</h2>
+                    <p class="text-success ml-2 mb-0 font-weight-medium"></p>
+                </div>
+                <h6 class="text-muted font-weight-normal mt-3">All Works and task details of  Team Lead</h6>
+                </div>
+                <div class="col-4 col-sm-12 col-xl-4 text-center text-xl-right">
+                <i class="icon-lg mdi mdi-account-multiple text-info ml-auto"></i>
+                </div>
+            </div>
+            </div>
+        </div>
+    </a>
+  </div>
+
+  <div class="col-sm-4 grid-margin">
+    <a href="{% url 'admin_executivework_page' %}" class="a-hover text-white">
+        <div class="card">
+        <div class="card-body">
+            <h5>Executives</h5>
+            <div class="row">
+            <div class="col-8 col-sm-12 col-xl-8 my-auto">
+                <div class="d-flex d-sm-block d-md-flex align-items-center">
+                <h2 class="mb-0">{{executive_count}}</h2>
+                <p class="text-danger ml-2 mb-0 font-weight-medium"></p>
+                </div>
+                <h6 class="text-muted font-weight-normal mt-3">All Works and task details of Executive </h6>
+            </div>
+            <div class="col-4 col-sm-12 col-xl-4 text-center text-xl-right">
+                <i class="icon-lg  mdi mdi-account-group text-success ml-auto"></i>
+            </div>
+            </div>
+        </div>
+        </div>
+    </a>
+  </div>
+
+  <div class="col-sm-4 grid-margin">
+    <a href="{% url 'admin_clientswork_page' %}" class="a-hover text-white">
+        <div class="card">
+        <div class="card-body">
+            <h5>Clients</h5>
+            <div class="row">
+            <div class="col-8 col-sm-12 col-xl-8 my-auto">
+                <div class="d-flex d-sm-block d-md-flex align-items-center">
+                <h2 class="mb-0">{{client_count}}</h2>
+                <p class="text-danger ml-2 mb-0 font-weight-medium"></p>
+                </div>
+                <h6 class="text-muted font-weight-normal mt-3">All Works and task details for a client</h6>
+            </div>
+            <div class="col-4 col-sm-12 col-xl-4 text-center text-xl-right">
+                <i class="icon-lg  mdi mdi-account-star text-warning ml-auto"></i>
+            </div>
+            </div>
+        </div>
+        </div>
+    </a>
+  </div>
+
+</div>
+ 
+
+<style>
+  a{
+      text-decoration: none;
+  }
+  a:hover{
+      text-decoration: none;
+  }
+</style>  
+{% endblock %}

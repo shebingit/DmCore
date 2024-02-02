@@ -1,0 +1,63 @@
+{% extends 'TC_base.html' %}
+{% load static %}
+{% block body %}
+<div>
+  <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'TC_current_clients' %}">Current Clients</a></li>
+        <li class="breadcrumb-item active text-md" aria-current="page">New Leads</li>
+      </ol>
+    </nav>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <h6 class="card-title custom-letter-spacing"> New Assigned Leads List</h6>
+
+    <div class="table-responsive">
+      <table class="table" id="leave-datatable">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th >Email</th>
+  
+            <th>Contact</th>
+            <th>Status</th>
+            <th >Action</th>  
+          </tr>
+        </thead>
+        <tbody>
+          {% for d in data %}
+  
+          <tr>
+            <td class="text-white">{{d.id}}</th>
+            <td><b><a href="" class="text-white">{{d.leadId.lead_name}}</a></b></td>
+            <td class="text-white">{{d.leadId.lead_email}}</td>
+            <td class="text-white">{{d.leadId.lead_contact}}</td>
+            <th>
+              <p class="text-success text-small">New Lead</p>
+            </th>
+            <td class="text-white">
+              <a href="{% url 'TC_newleads_accept' d.id %}" class="btn btn-outline-danger">
+                <span class="mdi mdi-check"></span> <span class="text-small"> Accept</span></a>
+            </td>
+  
+  
+          </tr>
+         
+          {% endfor %}
+  
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+  
+
+
+
+
+{% endblock %}

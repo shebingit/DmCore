@@ -1,0 +1,235 @@
+{% extends 'Executive_base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block body %}
+
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'executive_worksection' %}">Work</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Monthly Progress</li>
+        </ol>
+      </nav>
+</div>
+
+<div class="row">
+  <div class="col-12 grid-margin">
+    <div class="card">
+      <div class="card-body">
+        <form action="#" method="post" enctype="multipart/form-data" >
+            {% csrf_token %} 
+            <div class="row">
+              <div class="col-md-8 col-sm-12 col-lg-10 grid-margin">
+                  <h4 class="card-title custom-letter-spacing">List of Monthly progress</h4>
+                  <p class="card-description mb-3"> A list of monthly progress that employees work for different clients </p>
+              </div>
+              <div class="col-md-4 col-sm-12 col-lg-2 grid-margin">
+                  <button class="btn btn-outline-warning" type="button" data-toggle="modal" data-target="#monthly">
+                      <span class="mdi mdi-file-outline icon-sm mr-1"></span>
+                      <span class="small">Monthly upload</span>
+                  </button>
+              </div>
+              
+            
+            </div>
+        </form>
+        <div class="row">
+          <div class="table-responsive">
+            <div class="row mt-3">
+
+              <div class=" col-md-3">
+                <div class="form-group">
+                  <label>From date</label>
+                  <input type="date" class="form-control text-offwhite" name="#" id="fdate" required >                    
+                </div>
+              </div>
+              <div class=" col-md-3">
+                <div class="form-group">
+                  <label>To date</label>
+                  <input type="date" class="form-control text-offwhite" name="#" id="edate" required  >                    
+                </div>
+              </div>
+              <div class="col-md-2"></div>
+              
+                        
+            </div>
+            <table class="table" id="progress_table">
+              <thead>
+                <tr>
+                <th>No</th>
+                <th>From Date</th>
+                <th>To Date</th>
+                <th>Description</th>
+                <th>Files</th>
+                <th>Progress</th>
+                <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+
+                {% for i in progress %}
+                <tr>
+                  <td>{{forloop.counter}}</td>
+                  <td>{{i.wp_from_date|date:"Y-m-d"}}</td>
+                  <td>{{i.wp_to_date|date:"Y-m-d"}}</td>
+                  <td>{{i.work_discription}}</td>
+                  {% if i.wp_file %}
+                  <td>
+                    {% for file_info in i.wp_file %}
+                    <a class="badge badge-outline-primary badge-sm mt-2 mb-2" href="{% url 'download_progressfile' i.id forloop.counter0 %}">Download file {{ forloop.counter }}</a><br>
+                    {% endfor %}
+                  </td>
+                  {% else %}
+                  <td><p class="text-primary mt-2 mb-2">No files</p></td>
+                  {% endif %}
+                  <td>
+                    <div class="progress progress-lg rounded"data-toggle="modal" data-target="#updateProgressModal{{task.id}}">
+                      <div class="progress-bar bg-primary progress-bar-animated progress-bar-striped"
+                        role="progressbar"
+                        aria-valuenow="{{ i.wp_progress }}"
+                        style="width: {{ i.wp_progress}}%"
+                        aria-valuemin="0"
+                        aria-valuemax="100">{{ i.wp_progress }} %
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    {% if i.wp_status %}
+                    <p class="badge badge-outline-success">Verified</p>
+                    {% else %}
+                    <p class="badge badge-outline-warning">Pending</p>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+    
+
+        
+        
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Monthly progress upload -->
+<div class="modal fade" id="monthly">
+  <div class="modal-dialog  ">
+    <div class="modal-content">
+
+      <div class="card">
+        <div class="card-head d-flex justify-content-between align-items-center mt-3 mb-0 ">
+          <h4 class="card-title mt-3 ml-3">Upload Monthly Data </h4>
+          <span class="mdi mdi-close-box mdi-18px text-danger mr-2"  data-dismiss="modal"></span>
+        </div>  
+        <div class="card-body mt-0">
+          <form action="{% url 'executive_progress_save' %}" method="post"  enctype="multipart/form-data">
+            
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-xl-12 col-sm-12 grid-margin ">
+                    <div class="card">
+                        
+                        <div class="card-body">
+                            <div class="form-group add-items">
+                              <label>Check progress type</label>
+                              <div class="row">
+                                <div class="col-lg-6 col-md-6 col-xl-6 col-sm-12">
+                                  <div class="form-check">
+                                    <label class="form-check-label">
+                                      <input type="radio" class="form-check-input" name="type" id="#" value="Weekly" disabled> Weekly Progress 
+                                    </label>
+                                      
+                                  </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-xl-6 col-sm-12">
+                                  <div class="form-check">
+                                    <label class="form-check-label">
+                                      <input type="radio" class="form-check-input" name="type" id="#" value="Monthly" checked> Monthly Progress 
+                                    </label>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                            </div>
+                          
+                            <div class="form-group add-items ">
+                                <label>From Date</label>
+                                <input type="date" class="form-control text-offwhite" name="fdate" required>  
+                            </div>
+                            <div class="form-group add-items">
+                                <label>To Date</label>
+                                <input type="date" class="form-control text-offwhite" name="tdate" required>  
+                            </div>
+                            <div class="form-group add-items ">
+                              <label>Progress</label>
+                              <input type="number" class="form-control text-offwhite" name="progress" required>  
+                            </div>
+                            <div class="form-group add-items mt-3">
+                              <label>More about monthly progress</label>
+                              <textarea class="to-do-textarea  text-offwhite" name="description"  placeholder="enter more...">  </textarea>
+                            </div>
+                            <div class="form-group add-items mt-3">
+                              <label>Files</label>
+                              <input type="file" class="form-control text-offwhite" name="files" multiple>  
+                          </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        
+            <div class=" d-flex justify-content-center ">
+                <button class=" btn btn-outline-primary " type="submit">
+                  <span class="mdi mdi-arrow-expand-up mr-1"></span>
+                  <span class="small">Upload</span>
+              </button> 
+            </div>
+        
+        </form>
+
+        </div>
+
+      </div>
+    
+    </div>
+  </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  // Add event listener for date input changes
+  $('#fdate, #edate').on('change', function () {
+    filterTableByDate();
+  });
+  function filterTableByDate() {
+    var startDate = $('#fdate').val();
+    var endDate = $('#edate').val();
+
+    // Iterate through the table rows and hide/show them based on the date range
+    $('#progress_table tbody tr').each(function () {
+      var rowStartDate = $(this).find('td:eq(1)').text(); // Assuming start date is in the second column
+      var rowEndDate = $(this).find('td:eq(1)').text(); // Assuming end date is in the third column
+
+      if ((startDate === '' || rowStartDate >= startDate) && (endDate === '' || rowEndDate <= endDate)) {
+        $(this).show();
+      } else {
+        $(this).hide();
+      }
+    });
+  }
+
+</script>
+
+
+
+{% endblock %}

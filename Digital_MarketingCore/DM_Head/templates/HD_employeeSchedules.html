@@ -1,0 +1,150 @@
+{% extends 'HD_base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'head_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Employee Schedules</li>
+        </ol>
+      </nav>
+</div>
+
+
+
+<div class="row ">
+    <div class="col-12 grid-margin">
+      <div class="card">
+        <div class="card-body">
+            <div class="d-flex">
+                <h4 class="card-title">Schedules 
+                    {% if emp_obj %}
+                    
+                    - {{emp_obj.emp_name|default:" "}}
+                    {% endif %}
+                
+                </h4>
+                
+            </div>
+
+            <form action="{% url 'head_employee_schedules' %}" method="post">
+                {% csrf_token %}
+
+                <div class="row">
+                    
+                    <div class="col-sm-12 col-lg-5 col-md-5">
+                        <div class="form-group">
+                          <label> select employee</label>
+                          <select class="form-control text-offwhite" name="emp_name" id="#" required>
+                            <option value="0">----select employee----</option>
+                            {% for emp in employees %}
+                              <option value="{{emp.id}}">{{emp.emp_name}}</option>
+                            {% endfor %}
+                          </select>                        
+                        </div>
+                    </div>
+                   
+                   
+                    <div class="col-sm-12 col-lg-3 col-md-3">
+                        <div class="form-group">
+                          <label>from date</label>
+                          <input type="date" class="form-control text-offwhite" name="fDate" >                    
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-3 col-md-3">
+                        <div class="form-group">
+                          <label>to date</label>
+                          <input type="date" class="form-control text-offwhite" name="toDate" >                       
+                        </div>
+                    </div>
+                    
+                    <div class="col-sm-12 col-lg-1 col-md-1 d-flex  justify-content-center  align-items-center">
+                       
+                      <button class=" btn btn-primary " type="submit"><i class="mdi mdi-magnify mdi-18px"></i></button> 
+
+                    </div>
+                    
+                </div>
+            </form>
+
+            <div class="row  mt-3">
+                <div class="col-12 grid-margin">
+                  <div class="card">
+                    <div class="card-body">
+                      
+                      {% if schedules %}
+                      <div class="table-responsive">
+                        <table class="table">
+                          <thead>
+                            <tr>
+                              <th> Scheduled Date and Time </th>
+                              <th> Scheduled Task </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for schedule in schedules %}
+                            <tr>
+                              <td class="#">
+                               
+                                    <div class="left-date-time">
+                                      {% if schedule.schedule_status == 1 %}
+                                        <p class="schedule-date" style="text-decoration: line-through;">{{schedule.schedule_date}}</p>
+                                        <p class="schedule-date"  style="text-decoration: line-through;">Time - {{schedule.start_time}} to {{schedule.end_time}}</p>
+                                      {% else %}
+                                      <p class="schedule-date" >{{schedule.schedule_date}}</p>
+                                      <p class="schedule-date">Time - {{schedule.start_time}} to {{schedule.end_time}}</p>
+                                      {% endif %}
+                                        
+                                    </div>
+                              
+                              </td>
+                              <td class="#">
+                                
+                                <div class="right-scheduletask d-flex">
+
+                                    <div class="inner-schedule-content">
+                                      {% if schedule.schedule_status == 1 %}
+
+                                        <h6 style="text-decoration: line-through;">{{schedule.schedule_head}}</h6>
+                                        <p class="mb-2" style="text-decoration: line-through;">( {{schedule.emp_id.emp_name}} )</p>
+                                        <p style="text-decoration: line-through;">{{schedule.todo_content|tostr|split_into_paragraphs:50|safe }} </p>
+                                         
+                                      {% else %}
+                                        <h6>{{schedule.schedule_head}}</h6>
+                                        <p class="mb-2">( {{schedule.emp_id.emp_name}} )</p>
+                                        <p>{{schedule.todo_content|tostr|split_into_paragraphs:50|safe }} </p>
+
+
+                                      {% endif%}
+                                    </div>
+                                
+
+                                </div>
+                              </td>
+                            </tr>
+                            {% endfor %}
+                           
+                          </tbody>
+                        </table>
+                      </div>
+                      {% else %}
+                      <div class="d-flex justify-content-center">
+                        <img src="{% static 'images\file-icons\no-data-file.png' %}">
+                      </div>
+                      {% endif %}
+
+                    </div>
+                  </div>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+
+
+
+{% endblock %}

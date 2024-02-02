@@ -1,0 +1,134 @@
+{% extends 'DAM_base.html' %}
+{% load static %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'dataManager_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Employee Details </li>
+        </ol>
+      </nav>
+</div>
+
+
+<div class="card">
+    <div class="card-body">
+        
+        <div class="d-flex justify-content-between mb-3">
+            <h4 class="card-title">Employee Details </h4>
+            <button class="btn btn-outline-secondary" id="historyButton"><span class="mdi mdi-arrow-left"></span></button>
+        </div>
+      
+      <div class="row">
+        <div class="col-sm-12 col-lg-11 col-md-11">
+            <div class="d-flex  justify-content-center ">
+                <div class="image-box flex-column d-flex justify-content-center ">
+                   
+                    {% if emp_obj.emp_profile %}
+                    <img src="{{ emp_obj.emp_profile.url }}" id="profile-pic" alt="Profile Image.." >
+                    
+                    {% else %}
+                        <img src="{% static 'images/faces/profile-icon.png' %}" id="profile-pic" alt="Profile Image.." >
+                    {% endif %}
+                        
+                </div>
+            </div>
+
+        </div>
+
+      </div>
+      <div class="row mt-5">
+        <div class="col-sm-0 col-lg-3 col-md-3"></div>
+        <div class="col-sm-6 col-lg-4 col-md-4 text-start">
+            <p class="text-muted">Employee Name :</p>
+        </div>
+        <div class="col-sm-6 col-lg-5 col-md-5">
+            <p class="text-muted">{{ emp_obj.emp_name |default:'No Data Avilable'}} </p>
+        </div>
+        <div class="col-sm-0 col-lg-3 col-md-3"></div>
+        <div class="col-sm-6 col-lg-4 col-md-4">
+            <p class="text-muted">Employee Register Date :</p>
+        </div>
+        <div class="col-sm-6 col-lg-5 col-md-5">
+            <p class="text-muted">{{ emp_obj.emp_reg_date |default:'No Data Avilable'}} </p>
+        </div>
+        <div class="col-sm-0 col-lg-3 col-md-3"></div>
+        <div class="col-sm-6 col-lg-4 col-md-4">
+            <p class="text-muted">Employee ID :</p>
+        </div>
+        <div class="col-sm-6 col-lg-5 col-md-5">
+            <p class="text-muted">{{ emp_obj.emp_regId |default:'No Data Avilable'}} </p>
+        </div>
+        <div class="col-sm-0 col-lg-3 col-md-3"></div>
+        <div class="col-sm-6 col-lg-4 col-md-4">
+            <p class="text-muted">Email ID :</p>
+        </div>
+        <div class="col-sm-6 col-lg-5 col-md-5">
+            <p class="text-muted">{{ emp_obj.emp_email |default:'No Data Avilable'}} </p>
+        </div>
+        <div class="col-sm-0 col-lg-3 col-md-3"></div>
+        <div class="col-sm-6 col-lg-4 col-md-4">
+            <p class="text-muted">Phone Number :</p>
+        </div>
+        <div class="col-sm-6 col-lg-5 col-md-5">
+            <p class="text-muted">{{ emp_obj.emp_contact_no |default:'No Data Avilable'}} </p>
+        </div>
+        <div class="col-sm-0 col-lg-3 col-md-3"></div>
+        <div class="col-sm-6 col-lg-4 col-md-4">
+            <p class="text-muted">Address 1 :</p>
+        </div>
+        <div class="col-sm-6 col-lg-5 col-md-5">
+            <p class="text-muted">{{ emp_obj.emp_address1 |default:'No Data Avilable' }} </p>
+        </div>
+        <div class="col-sm-0 col-lg-3 col-md-3"></div>
+        <div class="col-sm-6 col-lg-4 col-md-4">
+            <p class="text-muted">Address 2 :</p>
+        </div>
+        <div class="col-sm-6 col-lg-5 col-md-5">
+            <p class="text-muted">{{ emp_obj.emp_address2 |default:'No Data Avilable'}} </p>
+        </div>
+        <div class="col-sm-0 col-lg-3 col-md-3"></div>
+        <div class="col-sm-6 col-lg-4 col-md-4">
+            <p class="text-muted">Address 3 :</p>
+        </div>
+        <div class="col-sm-6 col-lg-5 col-md-5">
+            <p class="text-muted">{{ emp_obj.emp_address3 |default:'No Data Avilable'}} </p>
+        </div>
+        <div class="col-sm-0 col-lg-3 col-md-3"></div>
+        <div class="col-sm-6 col-lg-4 col-md-4">
+            <p class="text-muted">Place :</p>
+        </div>
+        <div class="col-sm-6 col-lg-5 col-md-5">
+            <p class="text-muted">{{ emp_obj.emp_location |default:'No Data Avilable'}} </p>
+        </div>
+        <div class="col-sm-0 col-lg-3 col-md-3"></div>
+        <div class="col-sm-6 col-lg-4 col-md-4">
+            <p class="text-muted">District :</p>
+        </div>
+        <div class="col-sm-6 col-lg-5 col-md-5">
+            <p class="text-muted">{{ emp_obj.emp_district |default:'No Data Avilable'}} </p>
+        </div>
+        <div class="col-sm-0 col-lg-3 col-md-3"></div>
+        <div class="col-sm-6 col-lg-4 col-md-4">
+            <p class="text-muted">State :</p>
+        </div>
+        <div class="col-sm-6 col-lg-5 col-md-5">
+            <p class="text-muted">{{ emp_obj.emp_state |default:'No Data Avilable' }} </p>
+        </div>
+        
+        
+      </div>
+    </div>
+</div>
+
+
+<script>
+    document.getElementById("historyButton").addEventListener("click", function() {
+        // Go back to the previous page in the browser's history
+        window.history.back();
+    });
+</script>
+
+{% endblock %}

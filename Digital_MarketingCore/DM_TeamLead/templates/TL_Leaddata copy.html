@@ -1,0 +1,192 @@
+{% extends 'TL_base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'tl_individualWorks_section' %}">Individual Works</a></li>
+            <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'tl_ongoing_works' %}">Ongoing Works</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Lead Data</li>
+        </ol>
+      </nav>
+</div>
+
+
+<div class="row mt-1">
+    <div class="col-12 grid-margin">
+        <div class="card">
+            <div class="card-body">
+            
+            {% if client_tasks %}
+    
+                <div class="row">
+                    <div class="col-sm-12 col-lg-8 col-md-7 col-xl-9  grid-margin">
+                    <h5 class="card-title custom-letter-spacing"> Clients For Lead Collection</h5>
+                    </div>
+                    <div class="col-sm-12 col-lg-5 col-md-5 col-xl-3 d-flex justify-content-end  grid-margin">
+                    <div class="d-flex ">
+                        <input  class="form-control text-offwhite mr-1" name="#" id="search-data" placeholder="search here..">
+                        <span class="text-danger mdi mdi-close" id="closeBtn" type="button"></span> 
+                    </div>
+                    </div>
+                    
+                </div>
+        
+                <div class="table-responsive">
+                    <table class="table" id="leads-data-client">
+                    <thead>
+                        <tr>
+                        
+                        <th> No</th>
+                        <th> Client Name</th>
+                        <th> Start Date  </th>
+                        <th> End Date </th>
+                        
+                        <th> Progress </th>
+                        <th> Client Requried Fields  </th>
+                        <th> Leads</th>
+                        <th> Daily Work</th>
+
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cl_task in client_tasks %}
+                        <tr>
+                        
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ cl_task.client_Id.client_name }}</td>
+                        <td>{{ cl_task.work_Id.work_create_date }}</td>
+                        <td>{{ cl_task.work_Id.work_end_date }}</td>
+                        <td>
+                            {% if cl_task.task_total_progress <= 10 %}
+                            <div class="progress progress-lg mt-2">
+                              <div class="progress-bar bg-danger" role="progressbar" style="width: {{ cl_task.task_total_progress}} %" aria-valuenow="{{ cl_task.task_total_progress}} " aria-valuemin="0" aria-valuemax="100">
+                                 <span class="small ml-1">{{ cl_task.task_total_progress}}%</span>
+                              </div>
+                            </div>
+                            {% elif cl_task.task_total_progress >= 10 and cl_task.task_total_progress <= 80 %}
+                            <div class="progress progress-lg mt-2">
+                              <div class="progress-bar bg-warning" role="progressbar" style="width: {{ cl_task.task_total_progress}} %" aria-valuenow="{{ cl_task.task_total_progress}} " aria-valuemin="0" aria-valuemax="100">
+                                 <span class="small ml-1">{{ cl_task.task_total_progress}}%</span>
+                              </div>
+                            </div>
+                            {% else %}
+                            <div class="progress progress-lg mt-2">
+                              <div class="progress-bar bg-success" role="progressbar" style="width: {{ cl_task.task_total_progress}} %" aria-valuenow="{{ cl_task.task_total_progress}} " aria-valuemin="0" aria-valuemax="100">
+                                 <span class="small ml-1">{{ cl_task.task_total_progress}}%</span>
+                              </div>
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            
+                            <ol>
+                               
+                                <li><p>Full Name</p></li>
+                                <li><p> Email</p></li>
+                                <li><p> Contact Number </p></li>
+                                {% for fields in leadfield_obj %}
+                                {% if fields.field_work_regId.id == cl_task.work_Id.id %}
+                                <li><p>{{ fields.field_name }}</p></li>
+                                {% endif %}
+                                {% endfor %}
+                            </ol>
+                           
+                        </td>
+                        <td>
+                            <a href="{% url 'tl_lead_collected_data' cl_task.work_Id.id %}"><button class="btn btn-outline-warning"><span class="small">Add Leads</span></button></a>
+                        </td>
+                        <td>
+                            <a href="{% url 'tl_ongoingwork_dailyworkadd_lead' taskid %}"><button class="btn btn-outline-info"><span class="small">Add Daily Work</span></button></a> 
+                        </td>
+                        
+                        
+                        </tr>
+                        {% endfor %}
+                    
+                    </tbody>
+                    </table>
+                </div>
+
+            {% else %}
+            
+                <div class="d-flex justify-content-center">
+                <img src="{% static 'images\file-icons\no-data-file.png' %}">
+                </div>
+            
+            {% endif %}
+                        
+                        
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+   
+    const inputField = document.getElementById('search-data');
+    const closeBtn = document.getElementById('closeBtn');
+    const empTable = document.getElementById('leads-data-client');
+    closeBtn.style.display = 'none';
+  
+    inputField.addEventListener('input', function() {
+        filterTable();
+    });
+  
+    function filterTable() {
+        const filterValue = inputField.value.toLowerCase();
+        const rows = empTable.getElementsByTagName('tr');
+  
+        for (let i = 1; i < rows.length; i++) {
+            const Cell1 = rows[i].getElementsByTagName('td')[1];
+            const Cell2 = rows[i].getElementsByTagName('td')[2];
+            const Cell3 = rows[i].getElementsByTagName('td')[3];
+           
+            const Cell5 = rows[i].getElementsByTagName('td')[5];
+           
+            
+  
+            if (Cell1 || Cell2 || Cell3 || Cell5 ) {
+  
+                const datacell1 = Cell1.textContent || Cell1.innerText;
+                const datacell2 = Cell2.textContent || Cell2.innerText;
+                const datacell3 = Cell3.textContent || Cell3.innerText;
+              
+                const datacell5 = Cell5.textContent || Cell5.innerText;
+                
+  
+                if (datacell1.toLowerCase().includes(filterValue) ||
+                 datacell2.toLowerCase().includes(filterValue) || 
+                 datacell3.toLowerCase().includes(filterValue) ||
+                 datacell5.toLowerCase().includes(filterValue)) 
+                {
+                    rows[i].style.display = '';
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+        }
+    }
+  
+     // To display the close button and hide the close button based on the search input 
+    inputField.addEventListener('input', function() {
+    if (inputField.value == '') {
+        closeBtn.style.display = 'none';
+       
+    } else {
+        closeBtn.style.display = 'block';
+        
+    }
+    });
+  
+    closeBtn.addEventListener('click', function() {
+    inputField.value = '';
+    closeBtn.style.display = 'none';
+    filterTable(); // Display the full table data
+    });
+  </script>
+{% endblock %}

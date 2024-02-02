@@ -1,0 +1,212 @@
+{% extends 'HD_base.html' %}
+{% load static %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'head_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Complaints</li>
+        </ol>
+      </nav>
+</div>
+
+<div class="row">
+
+  <div class="col-md-12 col-xl-4 grid-margin stretch-card">
+      <div class="row">
+          
+          <div class="col-xl-12 col-sm-12 grid-margin stretch-card">
+            <div class="card" id="complaints-list-btn">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-9">
+                    <div class="d-flex align-items-center align-self-start">
+                      <h4 class="mb-0">View Complaints </h4>
+                      <!-- <p class="text-success ml-2 mb-0 font-weight-medium">+11%</p> -->
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    <div class="icon icon-box-success">
+                      <span class="mdi mdi-arrow-top-right icon-item"></span>
+                    </div>
+                  </div>
+                </div>
+                <h6 class="text-muted font-weight-normal">List out all complaints </h6>
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-12 col-sm-12 grid-margin stretch-card">
+            <div class="card" id="complaints-action-btn">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-9">
+                    <div class="d-flex align-items-center align-self-start">
+                      <h4 class="mb-0">Complaints Action</h4>
+                      <!-- <p class="text-success ml-2 mb-0 font-weight-medium">+3.5%</p> -->
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    <div class="icon icon-box-success ">
+                      <span class="mdi mdi-arrow-top-right icon-item"></span>
+                    </div>
+                  </div>
+                </div>
+                <h6 class="text-muted font-weight-normal">What action was taken in response to the complaint?</h6>
+              </div>
+            </div>
+          </div>
+         
+          
+        </div>
+  </div>
+  <div class="col-md-12 col-xl-8 grid-margin stretch-card">
+
+    <div class="card" id="complaints-list" >
+      <div class="card-body">
+        <h4 class="card-title mb-4"> Complaints View </h4>
+
+        <button class="btn btn-outline-primary mt-2 mr-2" id="comman_acton_taken-btn" >
+          <span class="mdi mdi-checkbox-multiple-marked-outline mdi-18px"></span> Add Response
+        </button>
+
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>  Date </th>
+                <th> complainant  </th>
+                <th> complaints  </th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for comp in complaints_data %}
+              <tr>
+                <td> 
+                  {{comp.complaint_date}}
+                  <p class="mt-2">
+                  {% if comp.status == 1 %}
+                  <span class="mdi mdi-check-all mdi-18px  text-success mb-0 "> Checked </span>
+                  {% else %}
+                  <span class="mdi mdi-alert-octagon mdi-18px  text-warning mb-0">Pending </span>
+
+                  {% endif %}
+                  </p>
+                </td>
+                <td>{{comp.complaint_emp_id.emp_name}}</td>
+                <td class="#">
+                  <div class="preview-list">
+                    <div class="preview-item border-bottom">
+                      <div class="preview-thumbnail">
+                        {% if comp.status == 0 %}
+                        <div class="preview-icon bg-warning">
+                          <i class="mdi mdi-file-document"></i>
+                        </div>
+                        {% else %}
+                        <div class="preview-icon bg-success">
+                          <i class="mdi mdi-file-document"></i>
+                        </div>
+                        {% endif %}
+                      </div>
+                      <div class="preview-item-content d-sm-flex flex-grow">
+                        <div class="flex-grow">
+                          <h6 class="preview-subject">{{comp.compaint_head}}</h6>
+                          <p class="text-muted mb-0">{{comp.compaint_content}}</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                  </div>
+                  <div class="#"> 
+                    
+                    <h6 class="mt-2">Response ({{comp.action_date|default:" "}})</h6>
+                    <p class="mt-2">{{comp.action}}</p>
+                    
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+      <div class="card" id="complaints-action" >
+          <div class="card-body">
+            <div class="leave-form">
+              <h4 class="card-title mb-4"> Complaints Action  </h4>
+              <form action="#" method="post">
+                {% csrf_token %}
+                <div class="row">
+                  <div class="col-sm-12 col-lg-12 col-md-12">
+                    <div class="form-group">
+                      <label>select complaint</label>
+                      <select class="form-control text-offwhite" name="complaintId" id="#" required>
+                        {% for compl in complaints_data %}
+                        <option value="{{compl.id}}">{{compl.compaint_head}}</option>
+                        {% endfor %}
+                      </select>                      
+                    </div>
+                  </div>
+                  <div class="col-sm-12 col-lg-12 col-md-12">
+                    <div class="form-group add-items">
+                      <label>Action Taken </label>
+                      <textarea  class="to-do-textarea  text-offwhite" name="action_content" id="" placeholder="enter text.."></textarea>
+                    </div>
+                  </div>
+                  <div class="col-sm-12 col-lg-12 col-md-12 d-flex  justify-content-center  align-items-center">       
+                    <button class=" btn btn-outline-primary " type="submit"><i class="mdi mdi-file-check mdi-18px"></i>Action</button> 
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+      </div>
+
+     
+  </div>
+
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $("#feedback-btn").click(function() {
+            // Toggle the card visibility
+            $("#feedback-add").toggle();
+
+            // Change the icon
+            $(this).find('span').toggleClass('mdi-plus-circle-outline mdi-minus-circle-outline');
+
+            // Toggle the btn-outline-danger class
+            $(this).toggleClass('btn-outline-primary btn-outline-danger');
+        });
+    });
+
+</script>
+  <script>
+    $(document).ready(function() {
+      $('#complaints-action').hide();
+
+      $('#complaints-action-btn').click(function() {
+        $('#complaints-action').show();
+        $('#complaints-list').hide();
+      });
+  
+      $('#complaints-list-btn').click(function() {
+        $('#complaints-action').hide();
+        $('#complaints-list').show();
+      });
+
+      $('#comman_acton_taken-btn').click(function() {
+        $('#complaints-action').show();
+        $('#complaints-list').hide();
+      });
+      comman_acton_taken-btn
+    });
+  </script>
+
+
+{% endblock %}

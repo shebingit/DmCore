@@ -1,0 +1,283 @@
+{% extends 'TL_base.html' %}
+{% load static %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'tl_individualWorks_section' %}">Individual Works</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Completed Works</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-sm-12 grid-margin">
+        
+        <div class="card">
+            <div class="card-body">
+                <h5>Task details</h5>
+                <div class="add-items d-flex mt-4 ">
+              
+                  <input  class="form-control text-offwhite" name="#" id="search-data" placeholder="search here..">
+                  <button class="btn btn-outline-danger mdi mdi-close" id="closeBtn" type="button"></button> 
+                </div>
+                <div class="row mt-3">
+                    <div class="table-responsive">
+                        <table class="table" id="task-details">
+                            <thead>
+                              <th>No</th>
+                              <th>Task Name</th>
+                              <th>Start date</th>
+                              <th>End date</th>
+                              <th>Accepted date</th>
+                              <th>Task Details</th>
+                              <th>Daily Works</th>
+                              <th>Progress</th>
+                              <th>Status</th>
+                
+                            </thead>
+
+                            {% for task in tasks  %}
+                            <tbody>
+                              <td>{{forloop.counter}}</td>
+                              <td>{{task.ta_taskId.task_name}}</td>
+                              <td>{{task.ta_start_date|date:"Y-m-d"}}</td>
+                              <td>{{task.ta_due_date|date:"Y-m-d"}}</td>
+                              <td>{{task.ta_accept_date|date:"Y-m-d" }}</td>
+                              <td>
+                                <div class="btn btn-outline-primary" data-toggle="modal" data-target="#details{{task.id}}">View</div>
+                              </td>
+                              <td><a class="btn btn-outline-primary" href="{% url 'tl_completedwork_dailyworks' task.id %}">View</a></td>
+                              <td>
+                                {% if task.ta_progress <= 10 %}
+                                    <div class="progress progress-sm">
+                                        <div class="progress-bar bg-danger progress-bar-animated progress-bar-striped" role="progressbar" aria-valuenow="{{ task.ta_progress }}" style="width: {{ task.ta_progress }}%" aria-valuemin="0" aria-valuemax="100">
+                                            {{ task.ta_progress }}%
+                                        </div>
+                                    </div>
+                                {% elif task.ta_progress >= 10 and task.ta_progress <= 80 %}
+                                    <div class="progress progress-sm">
+                                        <div class="progress-bar bg-warning progress-bar-animated progress-bar-striped" role="progressbar" aria-valuenow="{{ task.ta_progress }}" style="width: {{ task.ta_progress }}%" aria-valuemin="0" aria-valuemax="100">
+                                            {{ task.ta_progress }}%
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="progress progress-sm">
+                                        <div class="progress-bar bg-success progress-bar-animated progress-bar-striped" role="progressbar" aria-valuenow="{{ task.ta_progress }}" style="width: {{ task.ta_progress }}%" aria-valuemin="0" aria-valuemax="100">
+                                            {{ task.ta_progress }}%
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                
+                              
+                              <td>
+                                <p class="badge badge-outline-success">Completed</p>
+                              </td>
+                            </tbody> 
+                            {% endfor %}
+                        </table>
+                    </div>
+                
+                    
+                </div>
+                
+            </div>
+
+
+
+        </div>
+        
+    </div>
+   
+</div>
+
+<!-- Modal for task details starts -->
+{% for task in tasks %}    
+<div class="modal fade" id="details{{task.id}}">
+  <div class="modal-dialog  modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="card">
+        <div class="card-head d-flex justify-content-between align-items-center mt-3 mb-0 ">
+          <h4 class="card-title mt-3 ml-3">Task Details </h4>
+          <span class="mdi mdi-close-box mdi-18px text-danger mr-2"  data-dismiss="modal"></span>
+        </div>
+        
+        <div class="card-body mt-0">
+
+          <form action="" method="post"  enctype="multipart/form-data">
+            
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-xl-12 col-sm-12 grid-margin ">
+                    <div class="card" >
+                        
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-12 col-lg-12 col-md-12">
+                                  <div class="form-group">
+                                    <label>Client Name</label>
+                                    <h6 class="form-control">{{task.ta_taskId.client_Id.client_name}}</h6>
+                                    
+                                  </div>
+                                </div>
+                                
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-12 col-lg-6 col-md-6">
+                                  <div class="form-group">
+                                    <label>Allocate Date</label>
+                                    <h6 class="form-control">{{task.ta_allocate_date}}</h6>
+                                    
+                                  </div>
+                                </div>
+                                <div class="col-sm-12 col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                      <label>Accepted Date</label>
+                                      <h6 class="form-control">{{task.ta_accept_date}}</h6>
+                                      
+                                    </div>
+                                  </div>
+                                
+                            </div>
+                            <div class="row mb-3">
+                              <div class="col-sm-12 col-lg-12 col-md-12">
+                                <div class="form-group">
+                                  <label>Task Name</label>
+                                  <h6 class="form-control">{{task.ta_taskId.task_name }}</h6>
+                                  
+                                </div>
+                              </div>
+                              <div class="col-sm-12 col-lg-12 col-md-12">
+                                <div class="form-group">
+                                  <label>Task Description</label>
+                                  <div>
+                                    <p>{{task.ta_discription}}</p>
+                                  </div>
+                                  
+                                </div>
+                              </div>
+                              
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-12 col-lg-6 col-md-6">
+                                  <div class="form-group">
+                                    <label>Start Date</label>
+                                    <h6 class="form-control">{{task.ta_start_date}}</h6>
+                                    
+                                  </div>
+                                </div>
+                                <div class="col-sm-12 col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                      <label>End Date</label>
+                                      <h6 class="form-control">{{task.ta_due_date}}</h6>
+                                      
+                                    </div>
+                                  </div>
+                                
+                            </div>
+                            {% if task.ta_target %}
+                            <div class="row mb-3">
+                               
+                                <div class="col-sm-12 col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                      <label>Target</label>
+                                      <h6 class="form-control">{{task.ta_target}}</h6>
+                                      
+                                    </div>
+                                  </div>
+                                  <div class="col-sm-12 col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                      <label>Achieved Target</label>
+                                      <h6 class="form-control">{{task.ta_target_achived}}</h6>
+                                      
+                                    </div>
+                                  </div>
+                                
+                            </div>
+                            {% endif %}
+                            <div class="row mb-3">
+                              
+                              {% if task.ta_file %}
+                              <label  class="col-sm-2 col-form-label">File</label>
+                              <div class="col-sm-10">
+                                <a href="{{ task.ta_file.url }}" download>Download File</a>
+                              </div>                               
+                              {% endif %}
+                                
+                            </div>
+                            
+                            
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        
+            
+        
+        </form>
+
+        </div>
+
+      </div>
+    
+    </div>
+  </div>
+</div> 
+{% endfor %}
+<!-- Modal Ends --> 
+
+<!-- search task name in table -->
+<script>
+  
+  const inputField = document.getElementById('search-data');
+  const closeBtn = document.getElementById('closeBtn');
+  const taskTable = document.getElementById('task-details');
+  closeBtn.style.display = 'none';
+
+  inputField.addEventListener('input', function() {
+      filterTable();
+  });
+
+
+    // To display the close button and hide the close button based on the search input 
+  inputField.addEventListener('input', function() {
+  if (inputField.value == '') {
+      closeBtn.style.display = 'none';
+      
+  } else {
+      closeBtn.style.display = 'block';
+      
+  }
+  });
+
+  closeBtn.addEventListener('click', function() {
+  inputField.value = '';
+  closeBtn.style.display = 'none';
+  filterTable(); // Display the full table data
+  });
+
+  function filterTable() {
+    const searchText = inputField.value.toLowerCase();
+    const rows = taskTable.getElementsByTagName('tbody');
+
+    for (let row of rows) {
+      const taskName = row.getElementsByTagName('td')[1].textContent.toLowerCase();
+      if (taskName.includes(searchText)) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    }
+  }
+</script>
+
+
+
+{% endblock %}
+
+
+
+

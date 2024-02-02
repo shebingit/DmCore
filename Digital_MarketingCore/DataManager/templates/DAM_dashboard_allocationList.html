@@ -1,0 +1,194 @@
+{% extends 'DAM_base.html' %}
+{% load static %}
+{% block body %}
+
+<style>
+    .li-none{
+    list-style: none;
+    text-decoration: none;
+    }
+   
+</style>
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'DAM_Dashboard_allocation' %}">Allocation</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page"> List</li>
+        </ol>
+      </nav>
+</div>
+
+<div class="row grid-margin">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title text-offwhite">Allocation On Dates</h5>
+          <form action="{% url 'DAM_allAllocationList' %}" method="post">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-xl-1 col-lg-2 grid-margin col-sm-2  d-flex  align-items-center justify-content-center ">
+               
+                <a href="{% url 'DAM_allAllocationList' %}" class="btn btn-outline-secondary"><span class="mdi mdi-file"></span></a>
+             
+              </div> 
+             
+              <div class="col-xl-3 col-sm-12 grid-margin ">
+                  <div class="form-group">
+                      <label class="text-offwhite">From Date *</label>
+                      <input type="date" class="form-control text-offwhite" name="fdate" required >  
+          
+                    </div>
+              </div>
+              <div class="col-xl-3 col-sm-12 grid-margin ">
+                  <div class="form-group">
+                      <label class="text-offwhite">To Date *</label>
+                      <input type="date" class="form-control text-offwhite" name="edate" required>  
+                    </div>
+              </div>
+              <div class="col-xl-2 col-sm-12 grid-margin d-flex  align-items-center ">
+               
+                  <button type="submit" class="btn btn-outline-primary"><span class="mdi mdi-magnify"></span></button>
+               
+              </div> 
+              <div class="col-xl-3 col-lg-4  col-md-4 col-sm-12 grid-margin">
+                <div class="form-group">
+                    <label class="text-offwhite">Executives *</label>
+                    <select class="form-control w-100 text-offwhite" id="lead-executive">
+                      <option value=""> Select Executives</option>
+                      {% for emp in employees %}
+                      <option value="{{emp.id}}"> {{ emp.emp_name }}</option>
+                      {% endfor %}
+                    </select>
+        
+                  </div>
+              </div>
+            </div>
+          </form>
+          <div class="owl-carousel owl-theme nonloop owl-loaded owl-drag">
+            <div class="owl-stage-outer mt-3">
+                <div class="owl-stage" style="transform: translate3d(0px, 0px, 0px); transition: all 0.25s ease 0s; width: 263px;">
+                    {% for allocation in allocations %}
+                    <div class="owl-item active" style="width: 42.48px; margin-right: 10px;">
+                        <div class="item rounded p-1 shadow text-center">
+                            <a href="{% url 'DAM_allocated_listBydate' allocation.Assign_Date %}" class="text-decoration-none"> <p class="text-offwhite">{{ allocation.Assign_Date }}&nbsp; Count - {{ allocation.count }}</p></a>   
+                        </div>
+                    </div>
+                    {% endfor %}
+                
+                </div>
+                
+            </div>
+          </div>
+          <h6 class="card-title text-offwhite mt-2">
+            Allocated List - <span id="db-count">( {{ dataBank_count }} )</span> 
+          </h6>
+          
+          <div class="table-responsive mt-2">
+            <table class="table" id="lead-details">
+                <thead>
+                    <tr>
+                        <th> No </th>      
+                        <th> Client Name </th>
+                        <th > Lead Category </th>
+                        <th >  Leads Name </th>
+                        <th> Allocated Date</th>
+                        <th  > Allocated To </th>
+                        <th  > Response  </th>
+              
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                   
+           
+                  {% for lead in allocations_result %}
+                    <tr>
+
+                        <td>{{forloop.counter}} </td>
+
+                        <td>
+                            <span class="pl-2"> {{lead.client_id.client_name}} </span>
+                        </td>
+                        <td>{{lead.leadId.lead_category_id.lead_collection_for}} </td>
+                       
+                        <td> {{lead.leadId.lead_name}}</td>
+                       <td> {{ lead.Assign_Date }}</td>
+                        <td>{{lead.TC_Id.emp_name}} </td>
+                        <td> {{lead.Response}} </td>
+                       
+                       
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+          </div>
+           
+            
+          
+        </div>
+      </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+  $("#lead-executive").on("change", function () {
+    // Get the selected client ID
+    var selectedtId = $(this).val();
+  
+    
+    $.ajax({
+        url: "{% url 'fetch_lead_allocate_exe' %}",
+        type: 'GET',
+        dataType: 'json',
+        data: {
+          emp_id: selectedtId
+        },
+        success: function (data) {
+          
+            if (data.success) {
+                
+                updateTable(data.leads_data);
+                document.getElementById("db-count").innerText =data.dataBank_count;
+                
+            } else {
+                
+                console.error('Error: ' + data.message);
+            }
+           
+        },
+        error: function (xhr, status, error) {
+            // Handle Ajax errors (optional)
+            console.error('Ajax Error: ' + status + ' - ' + error);
+        }
+    });
+  });
+
+  function updateTable(dataList) {
+    // Clear existing table data
+    $("#table-body").empty();
+   
+    // Append new data to the table
+    $.each(dataList, function(index, data) {
+     
+        var newRow = "<tr>" +
+            "<td>" + (index + 1) + "</td>" +
+            "<td>" + data.client_name + "</td>" +
+            "<td>" + data.lead_collection_for + "</td>" +
+            "<td><span class='pl-2'>" + data.lead_name + "</span></td>" +
+            "<td>" + data.Genarated_date + "</td>" +
+            "<td>" + data.emp_name + "</td>" +
+            "<td>" + data.lead_status + "</td>" +
+           
+           
+        "</tr>";
+
+        $("#table-body").append(newRow);
+    });
+}
+
+
+
+</script>
+{% endblock %}

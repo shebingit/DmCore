@@ -1,0 +1,232 @@
+{% extends 'Executive_base.html' %}
+{% load static %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'executive_dashboard' %}" >Dashboard</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Feedback</li>
+        </ol>
+      </nav>
+</div>
+
+<!--  Mail section -->
+
+<div class="row">
+
+  <div class="col-md-12 col-xl-4 grid-margin ">
+    <div class="row">
+
+      <div class="col-xl-12 col-sm-12 grid-margin">
+        <div class="card" id="feedback-add-btn">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-9">
+                <div class="d-flex align-items-center align-self-start">
+                  <h4 class="mb-0">Add Feedback </h4>
+                  <p class="text-success ml-2 mb-0 font-weight-medium"></p>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="icon icon-box-success ">
+                  <span class="mdi mdi-arrow-top-right icon-item"></span>
+                </div>
+              </div>
+            </div>
+            <h6 class="text-muted font-weight-normal">Add your feedbacks here.</h6>
+          </div>
+        </div>
+      </div>
+
+        
+      <div class="col-xl-12 col-sm-12 grid-margin ">
+        <div class="card" id="feedback-view-btn">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-9">
+                <div class="d-flex align-items-center align-self-start">
+                  <h4 class="mb-0">View Feedback </h4>
+                  <p class="text-success ml-2 mb-0 font-weight-medium"></p>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="icon icon-box-success">
+                  <span class="mdi mdi-arrow-top-right icon-item"></span>
+                </div>
+              </div>
+            </div>
+            <h6 class="text-muted font-weight-normal">View all feedbacks.</h6>
+          </div>
+        </div>
+      </div>
+        
+        
+    </div>
+  </div>
+  <div class="col-md-12 col-xl-8 grid-margin stretch-card">
+
+    <div class="card" id="feedback-add" >
+      <div class="card-body">
+        <div class="leave-form">
+          <h4 class="card-title mb-4"> Feedback Add  </h4>
+          <form action="{% url 'exadd_feedback' %}" method="post" >
+
+            {% csrf_token %}
+
+
+            <div class="add-items d-flex ">
+              
+                <select class="form-control text-offwhite" name="feedbackto" id="#" required>
+                  <option value="" hidden>Select</option>
+                  {% for i in employees %}
+                  <option value="{{i.id}}">{{i.emp_name}}</option>
+                  {% endfor %}
+                </select>                        
+              
+              <button class=" btn btn-outline-primary " type="submit">Add</button> 
+            </div>
+            <div class="form-group add-items">
+                <textarea  class="to-do-textarea  text-offwhite" name="feedback_content" id="#" placeholder="enter feedback.."></textarea>
+            
+            </div>
+        
+          </form>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="card" id="feedback-view" >
+      <div class="card-body">
+        <div class="leave-form">
+          <div class="row">
+            <div class="col-md-4">
+              <h4 class="card-title mb-4">Feedback View</h4>
+            </div>
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+              <select class="form-control text-offwhite" name="feedbackto" id="feedback-filter">
+                <option value="Feedback Given" id="Feedback_given">Feedback Given</option>
+                <option value="Feedback Received" id="Feedback_received">Feedback Received</option>
+              </select>
+            </div>
+          </div>
+          
+
+          <form action="#" method="post">
+            {% csrf_token %}
+            
+            <div class="row">
+              <div class="col-sm-12 col-lg-12 col-md-12">
+                <div class="table-responsive">
+                  <table class="table" id="feedback-table">
+                    <thead>
+                      <tr>
+                        
+                        <th> Date </th>
+                        <th> Feedback By </th>
+                        <th> Feedback To </th>
+                        <th> Feedback </th>
+                        
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for i in feedback_view %}
+                      <tr>
+                        
+                        <td>{{i.feedback_date|date:"Y-m-d"}}</td>
+                        <td>{{i.from_name}} </td>
+                        <td>{{i.feedback_emp_id.emp_name}}</td>
+                        <td>{{i.feedback_content}}</td>
+                        
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+     
+  
+
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $("#feedback-btn").click(function() {
+            // Toggle the card visibility
+            $("#feedback-add").toggle();
+
+            // Change the icon
+            $(this).find('span').toggleClass('mdi-plus-circle-outline mdi-minus-circle-outline');
+
+            // Toggle the btn-outline-danger class
+            $(this).toggleClass('btn-outline-primary btn-outline-danger');
+        });
+    });
+
+  </script>
+
+  <script>
+    $(document).ready(function() {
+      $('#feedback-view').hide();
+
+      $('#feedback-view-btn').click(function() {
+        $('#feedback-view').show();
+        $('#feedback-add').hide();
+      });
+  
+      $('#feedback-add-btn').click(function() {
+        $('#feedback-view').hide();
+        $('#feedback-add').show();
+      });
+    });
+  </script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+      // Add a change event listener to the feedback filter dropdown
+      $("#feedback-filter").on('change', function()  {
+          var selectedOption = $(this).val();
+          if (selectedOption === "Feedback Given") {
+              filterFeedback('{% url "exfeedback_given" %}');
+          } else if (selectedOption === "Feedback Received") {
+              filterFeedback('{% url "exfeedback_received" %}');
+          }
+      });
+
+      function filterFeedback(url) {
+          // Send an AJAX request to the corresponding view function
+          $.ajax({
+              type: "GET",
+              url: url,
+              dataType: "json",
+              success: function(data) {
+                // Handle the JSON response
+                $("#feedback-table tbody").empty();  // Clear existing data
+                $.each(data.feedback_list, function(index, item) {
+                  var empName = item.feedback_emp ? item.feedback_emp : 'N/A';
+                  $("#feedback-table tbody").append('<tr><td>' + item.feedback_date + '</td><td>' + item.from_name + '</td><td>' + empName + '</td><td>' + item.feedback_content + '</td></tr>');
+                });
+              },
+              error: function(jqXHR, textStatus, errorThrown) {
+                // Handle errors
+                console.error("AJAX request failed: " + textStatus, errorThrown);
+              }
+          });
+      }
+  });
+</script>
+
+{% endblock %}

@@ -1,0 +1,211 @@
+{% extends 'Executive_base.html' %}
+{% load static %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'executive_worksection' %}">Works</a></li>
+            <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'executive_ongoingwork' %}">Ongoing Works</a></li>
+            <li class="breadcrumb-item active text-md" aria-current="page">Add Daily Works</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row mt-1">
+  <div class="col-12 grid-margin">
+    <div class="card">
+      <div class="card-body">
+      
+
+        <div class="row">
+          <div class="col-sm-12 col-lg-8 col-md-7 col-xl-9  grid-margin">
+          <h5 class="card-title custom-letter-spacing"> Clients For Lead Collection</h5>
+          </div>
+          <div class="col-sm-12 col-lg-5 col-md-5 col-xl-3 d-flex justify-content-end  grid-margin">
+          <div class="d-flex ">
+            <input  class="form-control text-offwhite mr-1" name="#" id="search-data" placeholder="search here..">
+            <span class="text-danger mdi mdi-close" id="closeBtn" type="button"></span> 
+          </div>
+          </div>
+            
+        </div>
+
+        <div class="table-responsive">
+          <table class="table" id="leads-data-client">
+            <thead>
+              <tr>
+              
+              <th> No</th>
+              <th> Client Name</th>
+              <th> Start Date  </th>
+              <th> End Date </th>
+              
+              <th> Progress </th>
+              <th> Client Requried Fields  </th>
+              <th> Leads</th>
+              <th> Daily Works</th>
+
+              </tr>
+            </thead>
+            <tbody>
+              
+              <tr>
+              
+                <td>{{forloop.counter}}</td>
+                <td>{{ task.ta_taskId.client_Id.client_name }}</td>
+                <td>{{ task.ta_start_date }}</td>
+                <td>{{ task.ta_due_date }}</td>
+                <td>
+                    {% if task.ta_progress <= 10 %}
+                    <div class="progress-bar bg-danger progress-bar-animated progress-bar-striped"
+                      role="progressbar"
+                      aria-valuenow="{{ task.ta_progress }}"
+                      style="width: {{ task.ta_progress }}%"
+                      aria-valuemin="0"
+                      aria-valuemax="100">{{ task.ta_progress }} %
+                    </div>
+                    {% elif task.ta_progress >= 10 and task.ta_progress <= 80 %}
+                    <div class="progress-bar bg-warning progress-bar-animated progress-bar-striped"
+                      role="progressbar"
+                      aria-valuenow="{{ task.ta_progress }}"
+                      style="width: {{ task.ta_progress }}%"
+                      aria-valuemin="0"
+                      aria-valuemax="100">{{ task.ta_progress }} %
+                    </div>
+                    {% else %}
+                    <div class="progress-bar bg-success progress-bar-animated progress-bar-striped"
+                      role="progressbar"
+                      aria-valuenow="{{ task.ta_progress }}"
+                      style="width: {{ task.ta_progress }}%"
+                      aria-valuemin="0"
+                      aria-valuemax="100">{{ task.ta_progress }} %
+                    </div>
+                    {% endif %}
+                </td>
+                <td>
+                    
+                  <ol>
+                    
+                    <li><p>Full Name</p></li>
+                    <li><p> Email</p></li>
+                    <li><p> Contact Number </p></li>
+                    <li><p> Lead Source </p></li>
+                    {% if leadinfo %}
+                    {% for fields in leadinfo %}
+                    <li><p>{{ fields.field_name }}</p></li>
+                    {% endfor %}
+                    {% endif %}
+                    
+                  </ol>
+                  
+                </td>
+                <td>
+                  <a href="{% url 'executive_leadcategory' task.id %}"><button class="btn btn-outline-primary"><span class="small">Add Leads</span></button></a>
+
+                </td>
+                
+                <td>
+                  <a href="{% url 'executive_ongoingwork_leads_dailywork' task.id %}"><button class="btn btn-outline-primary"><span class="small">Add Daily Works</span></button></a>
+
+                </td>
+              </tr>
+              
+          
+            </tbody>
+
+        
+          </table>
+        </div>
+
+      
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+ 
+  const inputField = document.getElementById('search-data');
+  const closeBtn = document.getElementById('closeBtn');
+  const empTable = document.getElementById('leads-data-client');
+  closeBtn.style.display = 'none';
+
+  inputField.addEventListener('input', function() {
+      filterTable();
+  });
+
+  function filterTable() {
+      const filterValue = inputField.value.toLowerCase();
+      const rows = empTable.getElementsByTagName('tr');
+
+      for (let i = 1; i < rows.length; i++) {
+          const Cell1 = rows[i].getElementsByTagName('td')[1];
+          const Cell2 = rows[i].getElementsByTagName('td')[2];
+          const Cell3 = rows[i].getElementsByTagName('td')[3];
+         
+          const Cell5 = rows[i].getElementsByTagName('td')[5];
+         
+          
+
+          if (Cell1 || Cell2 || Cell3 || Cell5 ) {
+
+              const datacell1 = Cell1.textContent || Cell1.innerText;
+              const datacell2 = Cell2.textContent || Cell2.innerText;
+              const datacell3 = Cell3.textContent || Cell3.innerText;
+            
+              const datacell5 = Cell5.textContent || Cell5.innerText;
+              
+
+              if (datacell1.toLowerCase().includes(filterValue) ||
+               datacell2.toLowerCase().includes(filterValue) || 
+               datacell3.toLowerCase().includes(filterValue) ||
+               datacell5.toLowerCase().includes(filterValue)) 
+              {
+                  rows[i].style.display = '';
+              } else {
+                  rows[i].style.display = 'none';
+              }
+          }
+      }
+  }
+
+   // To display the close button and hide the close button based on the search input 
+  inputField.addEventListener('input', function() {
+  if (inputField.value == '') {
+      closeBtn.style.display = 'none';
+     
+  } else {
+      closeBtn.style.display = 'block';
+      
+  }
+  });
+
+  closeBtn.addEventListener('click', function() {
+  inputField.value = '';
+  closeBtn.style.display = 'none';
+  filterTable(); // Display the full table data
+  });
+</script>
+
+
+
+
+
+<style>
+  a{
+    text-decoration: none;
+  }
+  a:hover{
+    text-decoration: none;
+  }
+</style>
+
+
+
+{% endblock %}
+
+
+
+

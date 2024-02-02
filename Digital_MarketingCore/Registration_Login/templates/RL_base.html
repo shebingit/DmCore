@@ -1,0 +1,186 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{{title}}</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="{% static 'vendors/mdi/css/materialdesignicons.min.css' %}">
+    <link rel="stylesheet" href="{% static 'vendors/css/vendor.bundle.base.css' %}">
+    <!-- endinject -->
+ 
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- End layout styles -->
+    <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" />
+  </head>
+  <body>
+
+  <div class="container-scroller">
+
+    <!-- Toast Notification-->
+       
+    <div class="toast toast-success" id="toast">
+      <div class="toast-content">
+        <span class="mdi mdi-checkbox-marked-circle mdi-24px alert-icon text-success"></span>
+        <div class="message">
+          <span class="text-message text-1 text-white font-weight-500">Success</span>
+          <span class="text-small text-2 mt-1">{{success_text}} registration successful.</span>
+        </div>
+        <span class="mdi mdi-close alert-icon text-danger" id="closeToast"></span>
+        
+      </div>
+
+    </div>
+
+    <!-- Error Notification-->
+    <div class="toast toast-danger" id="toast-error">
+      <div class="toast-content">
+        <span class="mdi mdi-close-circle mdi-24px alert-icon text-danger"></span>
+        <div class="message">
+          <span class="text-message text-1 text-danger font-weight-500">Error</span>
+          <span class="text-small text-2 mt-1">{{message_text}}</span>
+        </div>
+        <span class="mdi mdi-close alert-icon" id="closeToast-error"></span>
+       
+      </div>
+   </div>
+    
+    <!-- End Toast Notification-->
+
+    {% block body %}
+
+
+    {% endblock %}
+
+  </div>
+  <!-- End container-scroller -->
+
+
+
+  <!---  Comman Scripts -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+  <!-- Toast Notification script-->
+  {% if success %}
+  <script>
+    $(document).ready(function(){
+      $("#toast").addClass('active');
+      setTimeout(() => {
+        $("#toast").removeClass('active');
+      },4000);
+      $("#closeToast").click(function(){
+        $("#toast").removeClass('active');
+      });
+    })
+  </script>
+  {% endif %}
+
+  {% if error %}
+  <script>
+    $(document).ready(function(){
+      $("#toast-error").addClass('active');
+      setTimeout(() => {
+        $("#toast-error").removeClass('active');
+      },4000);
+      $("#closeToast-error").click(function(){
+        $("#toast-error").removeClass('active');
+      });
+    })
+  </script>
+  {% endif %}
+
+
+  <!-- Phone Number Validation -->
+  <script>
+      const phoneInput = document.getElementById('phoneInput');
+      const errorMessage = document.getElementById('error-message');
+
+      phoneInput.addEventListener('input', function(event) {
+          const inputValue = event.target.value;
+          const pattern = /^[6789][0-9]{9}$/;
+
+          // Check if the input contains any letters
+          if (/[a-zA-Z]/.test(inputValue)) {
+              errorMessage.style.display = 'block';
+
+              // Hide the error message after 4 seconds
+              setTimeout(function() {
+                  errorMessage.style.display = 'none';
+              }, 4000);
+            }
+        
+          else {
+              errorMessage.style.display = 'none';
+          }
+      });
+  </script>
+
+
+  <!-- Email id check -->
+
+  <script>
+  $(document).ready(function() {
+   
+      $('#email').change(function() {
+          var email_data = $(this).val();
+         
+  
+          // Make an AJAX call to check if the email already exists
+          $.ajax({
+              url: "{% url 'check_email' %}",
+              type: 'GET',
+              data: {
+                  'e-data': email_data
+              },
+              success: function(data) {
+                  var span_data = $("#email-error");
+                  if (data.exists) {
+                      span_data.text('Oops! email id already exists.');
+                      span_data.show();
+                      $('#email').val('');
+                      $('#username').val('');
+
+                    setTimeout(function() {
+                      span_data.hide();
+                    }, 5000);
+                  } else {
+                      span_data.hide();
+                  }
+              }
+          });
+      });
+  });
+  </script>
+
+  <script>
+      $(document).ready(function() {
+        // Listen for changes in input1
+        $('#email').on('input', function() {
+          // Update input2 with the value of input1
+          $('#username').val($(this).val());
+        });
+      });
+  </script>
+
+
+
+<!-- End Comman Scripts-->
+
+   <!-- plugins:js -->
+   <script src="{% static 'vendors/js/vendor.bundle.base.js"></script>
+   <!-- endinject -->
+   
+   <script src="{% static 'js/off-canvas.js' %}"></script>
+   <script src="{% static 'js/hoverable-collapse.js' %}"></script>
+   <script src="{% static 'js/misc.js' %}"></script>
+   <script src="{% static 'js/settings.js' %}"></script>
+   <script src="{% static 'js/todolist.js' %}"></script>
+   <!-- endinject -->
+
+
+ </body>
+</html>

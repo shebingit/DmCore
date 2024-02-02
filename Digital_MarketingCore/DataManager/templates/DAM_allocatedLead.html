@@ -1,0 +1,70 @@
+{% extends 'DAM_base.html' %}
+{% load static %}
+{% block body %}
+
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'dataManager_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Allocated Section</li>
+        </ol>
+      </nav>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form action="{% url 'DAM_allocated_leads' %}" method="post">
+            {% csrf_token %}
+            <div class="row ">
+                <div class="col-xl-2 col-sm-12 grid-margin stretch-card">
+                
+                    <input type="date" class="form-control w-100 text-offwhite" name="sdate" id="#"> 
+                    
+                </div>
+                <div class="col-xl-2 col-sm-12 grid-margin stretch-card">
+                
+                        <input type="date" class="form-control w-100 text-offwhite" name="edate" id="#"> 
+                    
+                </div>
+                <div class="col-xl-1 col-sm-12 grid-margin  stretch-card">
+                    <button type="submit" class="btn btn-outline-primary"><span class="mdi mdi-magnify"></span></button>
+                </div>
+            
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<div class="row mt-3">
+    {% for l in allocated_lead %}
+    <div class="col-xl-4 col-sm-12 grid-margin stretch-card">
+        <a href="{% url 'DAM_allocatedlead_byDate' l.allocated_date  %}" class="a-hover">
+            <div class="card">
+                <div class="card-body">
+                <div class="row">
+                    <div class="col-9 col-sm-9">
+                    <div class="d-flex align-items-center align-self-start">
+                        <h6 class="mb-0 text-offwhite">{{ l.allocated_date|date:'d-m-y'}} </h6>
+                        <!-- <p class="text-danger ml-2 mb-0 font-weight-medium">{{ pending_lead }}</p> -->
+                    </div>
+                    </div>
+                    <div class="col-3 col-sm-3">
+                    <div class="icon icon-box-success">
+                        <span class="small">{{ l.count }}</span>
+                    </div>
+                    </div>
+                </div>
+                <h6 class="text-muted font-weight-normal small mt-2 line-h13">On {{ l.allocated_date|date:'d-m-y'}}, &nbsp; {{ l.count }} - leads were allocated to &nbsp; 4 -Hr/Telecallers.</h6>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+   
+
+</div>
+
+
+{% endblock %}

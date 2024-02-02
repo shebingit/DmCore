@@ -1,0 +1,230 @@
+{% extends 'TC_base.html' %}
+{% load static %}
+{% block body %}
+
+<style>
+  ul.timeline {
+    list-style-type: none;
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+ /* Timeline vertical line */
+ul.timeline:before {
+    content: ' ';
+    background: #959494;
+    display: inline-block;
+    position: absolute;
+    left: 16px;
+    width: 4px;
+    height: 100%;
+    z-index: 400;
+    border-radius: 1rem;
+}
+
+li.timeline-item {
+    margin: 20px 0;
+}
+
+/* Timeline item arrow */
+.timeline-arrow {
+    border-top: 0.5rem solid transparent;
+    border-right: 0.5rem solid #fff;
+    border-bottom: 0.5rem solid transparent;
+    display: block;
+    position: absolute;
+    left: 2rem;
+}
+
+/* Timeline item circle marker */
+li.timeline-item::before {
+    content: ' ';
+    background: #242222;
+    display: inline-block;
+    position: absolute;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    left: 11px;
+    width: 14px;
+    height: 14px;
+    z-index: 400;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+
+/*
+*
+* ==========================================
+* FOR DEMO PURPOSES
+* ==========================================
+*
+*/
+
+.text-gray {
+    color: #999;
+}
+</style>
+
+
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'TC_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item text-md"> <a class="text-underline-remove" href="{% url 'Tc_follow_upLeads' %}">Followup Leads</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Followup Details</li>
+        </ol>
+      </nav>
+</div>
+
+<div class="row">
+  <div class="col-xl-8 col-sm-12 grid-margin stretch-card">
+    <div class="card">
+
+      <div class="card-body">
+        <h5 class="mb-0 text-offwhite">Follow Up </h5>
+
+        <div class="row">
+          <div class="col-xl-12 ">
+              
+              {% if followup_details_obj %}
+              <!-- Timeline -->
+              <ul class="timeline">
+                {% for followup in followup_details_obj %}
+                  <li class="timeline-item rounded ml-3 p-1 pl-2 shadow">
+                      <div class="timeline-arrow"></div>
+                      <h2 class="h5 mb-0">{{ followup.hr_telecaller_Id.emp_name }}</h2><span class="small text-gray"><i class="mdi mdi-clock mr-1"></i>{{ followup.response_date }} </span>
+                      <p class=" mt-2 font-weight-light">{{ followup.response }}</p>
+                      <span class="small text-gray"><i class="mdi mdi-clock-o mr-1"></i>Next Followup on : {{ followup.nextfollowup_date }} </span>
+                      <p class=" mt-2 font-weight-light"> Status - {{ followup.response_status }}</p>
+                  </li>
+                {% endfor %}
+                 
+              </ul><!-- End -->
+              {% else %}
+
+              <p class="mt-3 text-offwhite">No FollowUp Details Avilable...</p>
+              {% endif %}
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+     
+  </div>
+  <div class="col-xl-4 col-sm-12 grid-margin stretch-card">
+    <div class="card">
+
+      <div class="card-body">
+        <h5 class="mb-0 text-offwhite">Call Recordings </h5>
+
+        <div class="row">
+          <div class="col-xl-12 ">
+              
+              {% if call_records %}
+              <!-- Timeline -->
+              <ul class="timeline">
+                {% for record in call_records %}
+                  <li class="timeline-item rounded ml-3 p-1 pl-2 shadow">
+                      <div class="timeline-arrow"></div>
+                      <h6 class="mb-0">{{ record.record_Date }}</h6><span class="small text-gray"><i class="mdi mdi-clock mr-1"></i>{{  record.record_time }} </span>
+                      {% if record.Record %}
+                      <div class="row mt-2">
+                        <audio controls>
+                          <source src="{{record.Record.url}}">
+                        </audio>
+                      </div>
+        
+                      {% endif %}
+                      
+                  </li>
+                {% endfor %}
+                 
+              </ul><!-- End -->
+              {% else %}
+
+              <p class="mt-3 text-offwhite">No call record Details Avilable...</p>
+              {% endif %}
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+     
+  </div>
+
+  <div class="col-xl-4 col-sm-12 grid-margin stretch-card">
+    <div class="card">
+
+      <div class="card-body">
+        <h5 class="mb-0 text-offwhite">Lead Details </h5>
+
+        <h6 class="text-offwhite mt-4" style="font-size: 15px;">Client Details </h6>
+        <div class="row mt-3">
+        
+          <div class="col-xl-12 "><p class="">Client Name : {{lead_obj.lead_work_regId.clientId.client_name}}</p></div>
+          <div class="col-xl-12 "><p>Lead Category :{{ lead_obj.lead_category_id.lead_collection_for }}</p></div>
+
+        </div>
+        {% if lead_details_obj %}
+        <h6 class="text-offwhite mt-4" style="font-size: 15px;">Lead Field Details </h6>
+        <div class="row mt-3">
+         {% for details in lead_details_obj %}
+          <div class="col-xl-6 "><p>{{ details.lead_field_name }}</p></div>
+          <div class="col-xl-6 "><p>{{ details.lead_field_data }}</p></div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class=" mt-3 text-offwhite">No Lead Details Avilable.</p>
+        {% endif %}
+      </div>
+  </div>
+  </div>
+
+  <div class="col-xl-8 col-sm-12 grid-margin stretch-card">
+    <div class="card">
+
+      <div class="card-body">
+        <h5 class="mb-0 text-offwhite">Lead History </h5>
+        <div class="row">
+          <div class="col-xl-12 ">
+              
+            {% if followup_history_obj %}
+            <!-- Timeline -->
+            <ul class="timeline">
+              {% for History in followup_history_obj %}
+                <li class="timeline-item rounded ml-3 p-1 pl-2 shadow">
+                    <div class="timeline-arrow"></div>
+                    <h2 class="h5 mb-0">{{ History.hs_lead_Id.lead_name }}</h2><span class="small text-gray"><i class="mdi mdi-clock mr-1"></i>Allocated on :{{ History.allocated_date }} </span>
+                    <p class=" mt-2 font-weight-light">Allocated To : {{ History.hr_telecaller_Id.emp_name }}</p>
+                    <span class="small text-gray"><i class="mdi mdi-clock-o mr-1"></i>Note : {{ History.note }} </span>
+                    <p class=" mt-2 font-weight-light">Final Status - {{ History.final_status }}</p>
+                </li>
+              {% endfor %}
+               
+            </ul><!-- End -->
+            {% else %}
+
+            <p class="mt-3 text-offwhite">No History Details Avilable...</p>
+            {% endif %}
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+      
+  </div>
+  
+ 
+
+</div>
+
+
+
+
+
+
+{% endblock %}

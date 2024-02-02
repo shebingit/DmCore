@@ -1,0 +1,453 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Digital Markenting Core</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="{% static 'vendors/mdi/css/materialdesignicons.min.css' %}">
+    <link rel="stylesheet" href="{% static 'vendors/css/vendor.bundle.base.css' %}">
+    <!-- endinject -->
+    
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- End layout styles -->
+    <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" />
+    <style>
+      a{
+          text-decoration: none;
+      }
+      a:hover{
+          text-decoration: none;
+      }
+  </style>
+  </head>
+
+  <body>
+    <div class="container-scroller">
+      <!-- partial:../../partials/_sidebar.html -->
+      <nav class="sidebar sidebar-offcanvas" id="sidebar">
+        <div class="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top">
+          <a class="sidebar-brand brand-logo" href="{% url 'executive_dashboard' %}">DM Core</a>
+          <a class="sidebar-brand brand-logo-mini" href="{% url 'executive_dashboard' %}">DM</a>
+        </div>
+        <ul class="nav">
+          <li class="nav-item profile">
+            <div class="profile-desc">
+              <div class="profile-pic">
+                <div class="count-indicator">
+                  {% if dash_details.emp_profile %}
+                  <img class="img-xs rounded-circle " src="{{dash_details.emp_profile.url}}" alt="">
+                  {% else %}
+                  <img class="img-xs rounded-circle " src="{% static 'images/faces/profile-icon.png' %}" alt="">
+                  {% endif %}
+                  <span class="count bg-success"></span>
+                </div>
+                <div class="profile-name">
+                  <h5 class="mb-0 font-weight-normal">{{dash_details.emp_name}}</h5>
+                  <span>Executive</span>
+                </div>
+              </div>
+              <a href="#" id="profile-dropdown" data-toggle="dropdown"><i class="mdi mdi-dots-vertical"></i></a>
+              <div class="dropdown-menu dropdown-menu-right sidebar-dropdown preview-list" aria-labelledby="profile-dropdown">
+                <a href="#" class="dropdown-item preview-item">
+                  <div class="preview-thumbnail">
+                    <div class="preview-icon bg-dark rounded-circle">
+                      <i class="mdi mdi-settings text-primary"></i>
+                    </div>
+                  </div>
+                  <div class="preview-item-content">
+                    <p class="preview-subject ellipsis mb-1 text-small">Account settings</p>
+                  </div>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="{% url 'executive_password' %}" class="dropdown-item preview-item">
+                  <div class="preview-thumbnail">
+                    <div class="preview-icon bg-dark rounded-circle">
+                      <i class="mdi mdi-onepassword  text-info"></i>
+                    </div>
+                  </div>
+                  <div class="preview-item-content">
+                    <p class="preview-subject ellipsis mb-1 text-small">Change Password</p>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </li>
+          <li class="nav-item nav-category">
+            <span class="nav-link">Navigation</span>
+          </li>
+          <li class="nav-item menu-items">
+            <a class="nav-link" href="{% url 'executive_dashboard' %}">
+              <span class="menu-icon">
+                <i class="mdi mdi-speedometer"></i>
+              </span>
+              <span class="menu-title">Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item menu-items">
+            <a class="nav-link" href="{% url 'executive_worksection' %}">
+              <span class="menu-icon">
+                <i class="mdi mdi-briefcase"></i>
+              </span>
+              <span class="menu-title">Works</span>
+            </a>
+          </li>
+          <li class="nav-item menu-items">
+            <a class="nav-link" data-toggle="collapse" href="#schedule-list" aria-expanded="false" aria-controls="ui-basic">
+              <span class="menu-icon">
+                <i class="mdi mdi-timetable"></i>
+              </span>
+              <span class="menu-title">Schedule</span>
+              <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="schedule-list">
+              <ul class="nav flex-column sub-menu">
+                <li class="nav-item"> <a class="nav-link" href="{% url 'executive_schedule' %}">My Schedule</a></li>
+                <li class="nav-item"> <a class="nav-link" href="{% url 'executive_scheduleview' %}">View Schedule </a></li>
+              </ul>
+            </div>
+          </li>
+          
+          <!-- <li class="nav-item menu-items">
+            <a class="nav-link" href="#">
+              <span class="menu-icon">
+                <i class="mdi mdi-table-large"></i>
+              </span>
+              <span class="menu-title">Link Name</span>
+            </a>
+          </li> -->
+         
+          <li class="nav-item menu-items">
+            <a class="nav-link" href="{% url 'executive_leave' %}">
+              <span class="menu-icon">
+                <i class="mdi mdi-calendar-today"></i>
+              </span>
+              <span class="menu-title">Leave</span>
+            </a>
+          </li>
+          <li class="nav-item menu-items">
+            <a class="nav-link" href="{% url 'executive_actionTaken' %}">
+              <span class="menu-icon">
+                <i class="mdi mdi-marker-check"></i>
+              </span>
+              <span class="menu-title">Actions Taken</span>
+            </a>
+          </li>
+          <li class="nav-item menu-items">
+            <a class="nav-link" data-toggle="collapse" href="#message" aria-expanded="false" aria-controls="auth">
+              <span class="menu-icon">
+                <i class="mdi mdi-message-alert"></i>
+              </span>
+              <span class="menu-title">Meesages</span>
+              <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="message">
+              <ul class="nav flex-column sub-menu">
+                <li class="nav-item"> <a class="nav-link" href="{% url 'executive_feedback' %}"> Feedback  </a></li>
+                <li class="nav-item"> <a class="nav-link" href="{% url 'executive_complaints' %}"> Complaints </a></li>
+              
+              </ul>
+            </div>
+          </li>
+        
+        </ul>
+      </nav>
+      <!-- partial -->
+      <div class="container-fluid page-body-wrapper">
+        <!-- partial:../../partials/_navbar.html -->
+        <nav class="navbar p-0 fixed-top d-flex flex-row">
+          <div class="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
+            <a class="navbar-brand brand-logo-mini" href="#"><img src="{% static 'images/logo-mini.svg' %}" alt="logo" /></a>
+          </div>
+          <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
+            <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+              <span class="mdi mdi-menu"></span>
+            </button>
+           
+            <ul class="navbar-nav navbar-nav-right">
+              <li class="nav-item dropdown d-none d-lg-block">
+                
+                <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="createbuttonDropdown">
+                  <h6 class="p-3 mb-0">Projects</h6>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item preview-item">
+                    <div class="preview-thumbnail">
+                      <div class="preview-icon bg-dark rounded-circle">
+                        <i class="mdi mdi-file-outline text-primary"></i>
+                      </div>
+                    </div>
+                    <div class="preview-item-content">
+                      <p class="preview-subject ellipsis mb-1">Software Development</p>
+                    </div>
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item preview-item">
+                    <div class="preview-thumbnail">
+                      <div class="preview-icon bg-dark rounded-circle">
+                        <i class="mdi mdi-web text-info"></i>
+                      </div>
+                    </div>
+                    <div class="preview-item-content">
+                      <p class="preview-subject ellipsis mb-1">UI Development</p>
+                    </div>
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item preview-item">
+                    <div class="preview-thumbnail">
+                      <div class="preview-icon bg-dark rounded-circle">
+                        <i class="mdi mdi-layers text-danger"></i>
+                      </div>
+                    </div>
+                    <div class="preview-item-content">
+                      <p class="preview-subject ellipsis mb-1">Software Testing</p>
+                    </div>
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  <p class="p-3 mb-0 text-center">See all projects</p>
+                </div>
+              </li>
+             
+             
+              <li class="nav-item dropdown border-left">
+                <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-toggle="dropdown">
+                  <i class="mdi mdi-bell"></i>
+                  {% if notification %}
+                  <span class="count bg-danger"></span>
+                  {% endif %}
+                </a>
+                <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
+                  <h6 class="p-3 mb-0">Notifications</h6>
+                  {% if notification %}
+
+                  {% for note in notification %}
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item preview-item">
+                    
+                    <div class="preview-thumbnail">
+                      <div class="preview-icon bg-dark rounded-circle">
+                        <i class="mdi mdi-calendar text-success"></i>
+                      </div>
+                    </div>                    
+                    <div class="preview-item-content">
+                      <p class="preview-subject mb-1">{{note.notific_head}}</p>
+                      <p class="text-muted ellipsis mb-0"> Just a reminder that you have a notification</p>
+                    </div>
+                    
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  {% endfor %}
+
+                  {% else %}
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item preview-item">
+                    
+                    <div class="preview-thumbnail">
+                      <div class="preview-icon bg-dark rounded-circle">
+                        <i class="mdi mdi-bell-off text-danger"></i>
+                      </div>
+                    </div>                    
+                    <div class="preview-item-content">
+                      <p class="preview-subject mb-1">No new notifications</p>
+                      <p class="text-muted ellipsis mb-0">Youd don't have a new notification now</p>
+                    </div>
+                    
+                  </a>
+                  <div class="dropdown-divider"></div>
+
+                  {% endif %}
+                  <div class="dropdown-divider"></div>
+                  <a href="{% url 'executive_allnotification' %}">
+                    <p class="p-3 mb-0 text-center">See all notifications</p>
+                  </a>
+                  
+                </div>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link" id="profileDropdown" href="#" data-toggle="dropdown">
+                  <div class="navbar-profile">
+                    {% if dash_details.emp_profile %}
+                    <img class="img-xs rounded-circle" src="{{dash_details.emp_profile.url}}" alt="">
+                    {% else %}
+                    <img class="img-xs rounded-circle " src="{% static 'images/faces/profile-icon.png' %}" alt="">
+                       
+                    {% endif %}
+                    <p class="mb-0 d-none d-sm-block navbar-profile-name">{{dash_details.emp_name}}</p>
+                    <i class="mdi mdi-menu-down d-none d-sm-block"></i>
+                  </div>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="profileDropdown">
+                  <h6 class="p-3 mb-0">Profile</h6>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item preview-item" href="{% url 'executive_profile' %}">
+                    <div class="preview-thumbnail">
+                      <div class="preview-icon bg-dark rounded-circle">
+                        <i class="mdi mdi-settings text-success"></i>
+                      </div>
+                    </div>
+                    <div class="preview-item-content">
+                      <p class="preview-subject mb-1">Settings</p>
+                    </div>
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item preview-item" href="{% url 'executive_logout' %}">
+                    <div class="preview-thumbnail">
+                      <div class="preview-icon bg-dark rounded-circle">
+                        <i class="mdi mdi-logout text-danger"></i>
+                      </div>
+                    </div>
+                    <div class="preview-item-content">
+                      <p class="preview-subject mb-1">Log out</p>
+                    </div>
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  <p class="p-3 mb-0 text-center">Advanced settings</p>
+                </div>
+              </li>
+            </ul>
+            <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+              <span class="mdi mdi-format-line-spacing"></span>
+            </button>
+          </div>
+        </nav>
+        <!-- partial -->
+        <div class="main-panel">
+
+          <div class="content-wrapper">
+            <!-- Toast Notification-->
+       
+            <div class="toast toast-success" id="toast">
+               <div class="toast-content">
+                 <span class="mdi mdi-checkbox-marked-circle mdi-24px alert-icon"></span>
+                 <div class="message">
+                   <span class="text-message text-1 text-success font-weight-500">Success</span>
+                   <span class="text-small text-2 mt-1">{{success_text}}</span>
+                 </div>
+                 <span class="mdi mdi-close alert-icon" id="closeToast"></span>
+                 <div class="toast-progress"></div>
+               </div>
+       
+             </div>
+             
+
+                <!-- Error Notification-->
+            <div class="toast toast-danger" id="toast-error">
+              <div class="toast-content">
+                <span class="mdi mdi-close-circle mdi-24px alert-icon text-danger"></span>
+                <div class="message">
+                  <span class="text-message text-1 text-danger font-weight-500">Error</span>
+                  <span class="text-small text-2 mt-1">{{error_text}}</span>
+                </div>
+                <span class="mdi mdi-close alert-icon" id="closeToast-error"></span>
+              
+              </div>
+          </div>
+            
+          <!-- End Toast Notification-->
+
+         
+
+            {% block body %}
+
+
+            {% endblock %}
+          </div>
+
+
+
+  
+          <!-- content-wrapper ends -->
+          <!-- partial:../../partials/_footer.html -->
+          <footer class="footer">
+            <div class="d-sm-flex justify-content-center justify-content-sm-between">
+              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © Altos Technologies {% now 'Y' %}</span>
+             
+            </div>
+          </footer>
+          <!-- partial -->
+        </div>
+        <!-- main-panel ends -->
+      </div>
+      <!-- page-body-wrapper ends -->
+    </div>
+
+    <!-- Success Notification -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    
+
+    <!-- Toast Notification script-->
+    {% if success %}
+    <script>
+      $(document).ready(function(){
+        $("#toast").addClass('active');
+        setTimeout(() => {
+          $("#toast").removeClass('active');
+        },4000);
+        $("#closeToast").click(function(){
+          $("#toast").removeClass('active');
+        });
+      })
+    </script>
+    {% endif %}
+
+    <!-- Error Notification -->
+    {% if error %}
+    <script>
+      $(document).ready(function(){
+        $("#toast-error").addClass('active');
+        setTimeout(() => {
+          $("#toast-error").removeClass('active');
+        },4000);
+        $("#closeToast-error").click(function(){
+          $("#toast-error").removeClass('active');
+        });
+      })
+    </script>
+    {% endif %}
+
+
+
+    <!-- Phone Number Validation -->
+  <script>
+    const phoneInput = document.getElementById('phoneInput');
+    const errorMessage = document.getElementById('error-message');
+
+    phoneInput.addEventListener('input', function(event) {
+        const inputValue = event.target.value;
+        const pattern = /^[6789][0-9]{9}$/;
+
+        // Check if the input contains any letters
+        if (/[a-zA-Z]/.test(inputValue)) {
+            errorMessage.style.display = 'block';
+
+            // Hide the error message after 4 seconds
+            setTimeout(function() {
+                errorMessage.style.display = 'none';
+            }, 4000);
+          }
+      
+        else {
+            errorMessage.style.display = 'none';
+        }
+    });
+  </script>
+
+
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+    <script src="{% static 'vendors/js/vendor.bundle.base.js' %}"></script>
+    <!-- endinject -->
+    
+    <script src="{% static 'js/off-canvas.js' %}"></script>
+    <script src="{% static 'js/hoverable-collapse.js' %}"></script>
+    <script src="{% static 'js/misc.js' %}"></script>
+    <script src="{% static 'js/settings.js' %}"></script>
+    <script src="{% static 'js/todolist.js' %}"></script>
+    <!-- endinject -->
+    <!-- Custom js for this page -->
+    <!-- End custom js for this page -->
+  </body>
+
+</html>

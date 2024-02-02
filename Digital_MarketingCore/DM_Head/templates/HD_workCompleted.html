@@ -1,0 +1,177 @@
+{% extends 'HD_base.html' %}
+{% load static %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'head_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Work Completed clients</li>
+        </ol>
+      </nav>
+</div>
+
+
+<div class="row ">
+  <div class="col-12 grid-margin">
+    <div class="card">
+      <div class="card-body">
+        
+        <div class="d-flex justify-content-between mb-3">
+          <h4 class="card-title"> Work Done</h4>
+         
+        </div>
+       
+        <div class="add-items d-flex ">
+          
+          <input  class="form-control text-offwhite" name="#" id="search-data" placeholder="search here..">
+          <button class="btn btn-outline-danger mdi mdi-close" id="closeBtn" type="button"></button> 
+        </div>
+        
+        <div class="table-responsive">
+          <table class="table" id="work-completed">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th> Client Name </th>
+                <th> Start Date </th>
+                <th> Due Date </th>
+                <th> Progress </th>
+                <th> Associated Team Lead </th>
+                <th> Status </th>
+               
+              </tr>
+            </thead>
+            <tbody>
+              {% for work in works %}
+              <tr >
+                <td>
+                 {{forloop.counter}}
+                </td>
+                <td>
+                  {% if work.clientId.client_profile %}
+                  <img src="{{work.clientId.client_profile.url}}" alt="Profile" />
+                  {% else %}
+                  <img src="{% static 'images/faces/profile-icon.png' %}" alt="image" />
+                  {% endif %}
+                  <span class="pl-2">{{work.clientId.client_name}}</span>
+                </td>
+                <td> {{ work.work_create_date }} </td>
+                <td> {{ work.work_end_date }} </td>
+                <td> 
+                  <div class="progress progress-sm">
+                   
+                    <div class="progress-bar bg-success progress-bar-animated progress-bar-striped" role="progressbar" aria-valuenow="{{work.work_progress}}" style="width: {{work.work_progress}}% " aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                </td>
+                <td>
+                 
+
+                  <ul>
+                    {% for employee in work.allocated_emp.all %}
+                        <li class="mt-2" style="list-style: none;">
+
+                          <div class="row">
+                            <div class="col-xl-12 ">
+                              <a href="{% url 'head_teamLead_allocatedTask' work.id employee.id %}" class="text-offwhite text-decoration-none">
+                                {% if employee.wa_work_allocate.emp_profile %}
+                                <img src="{{employee.wa_work_allocate.emp_profile.url}}" alt="profile">
+                                {% else %}
+                                <img src="{% static 'images\faces\profile-icon.png' %}" alt="profile">
+                                {% endif %}
+                                {{ employee.emp_name }}
+                              </a>
+                            </div>
+                            
+                          </div>
+                         
+                      </li>
+                          
+                    {% endfor %}
+                  </ul>
+                  
+                 
+                </td>
+                <td>
+                 
+                    <div class="badge badge-outline-success">Completed</div>
+                  
+                </td>
+                
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Script to sort table -->
+<script>
+   
+  const inputField = document.getElementById('search-data');
+  const closeBtn = document.getElementById('closeBtn');
+  const empTable = document.getElementById('work-completed');
+  closeBtn.style.display = 'none';
+
+  inputField.addEventListener('input', function() {
+      filterTable();
+  });
+
+  function filterTable() {
+      const filterValue = inputField.value.toLowerCase();
+      const rows = empTable.getElementsByTagName('tr');
+
+      for (let i = 1; i < rows.length; i++) {
+          const Cell1 = rows[i].getElementsByTagName('td')[1];
+          const Cell2 = rows[i].getElementsByTagName('td')[2];
+          const Cell3 = rows[i].getElementsByTagName('td')[3];
+          const Cell4 = rows[i].getElementsByTagName('td')[4];
+          const Cell5 = rows[i].getElementsByTagName('td')[5];
+          
+
+          if (Cell1 || Cell2 || Cell3 || Cell4|| Cell5) {
+
+              const datacell1 = Cell1.textContent || Cell1.innerText;
+              const datacell2 = Cell2.textContent || Cell2.innerText;
+              const datacell3 = Cell3.textContent || Cell3.innerText;
+              const datacell4 = Cell4.textContent || Cell4.innerText;
+              const datacell5 = Cell5.textContent || Cell5.innerText;
+              
+              
+
+              if (datacell1.toLowerCase().includes(filterValue) || datacell2.toLowerCase().includes(filterValue) || datacell3.toLowerCase().includes(filterValue)
+              || datacell4.toLowerCase().includes(filterValue) || datacell5.toLowerCase().includes(filterValue) ) 
+              {
+                  rows[i].style.display = '';
+              } else {
+                  rows[i].style.display = 'none';
+              }
+          }
+      }
+  }
+
+   // To display the close button and hide the close button based on the search input 
+  inputField.addEventListener('input', function() {
+  if (inputField.value == '') {
+      closeBtn.style.display = 'none';
+     
+  } else {
+      closeBtn.style.display = 'block';
+      
+  }
+  });
+
+  closeBtn.addEventListener('click', function() {
+  inputField.value = '';
+  closeBtn.style.display = 'none';
+  filterTable(); // Display the full table data
+  });
+</script>
+  
+
+
+{% endblock %}

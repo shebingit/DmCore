@@ -1,0 +1,16 @@
+INSTALLED_APPS -  'DataManager',
+
+urlpatterns = [
+   
+    path('',include('DataManager.urls')),
+]
+
+
+Registation_Login Module 
+
+views - elif dash_details.emp_designation_id.dashboard_id == 5:
+                             
+                            return render(request,'DAM_dashboard.html',content)
+     
+
+AD_designation.html - <option value="5">Data Manager</option>                   

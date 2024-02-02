@@ -1,0 +1,98 @@
+{% extends 'TL_base.html' %}
+{% load static %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'tl_individualWorks_section' %}">Individual Works</a></li>
+            <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'tl_ongoing_works' %}">Ongoing Works</a></li>
+            <li class="breadcrumb-item active text-md" aria-current="page">Add Daily Works</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="col-sm-12 grid-margin stretch-card">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title mb-4">Daily Works</h4>
+            <form action="{% url 'tl_ongoingwork_dailyworksave' task.id  %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-sm-12 col-lg-6 col-md-6">
+                        <div class="form-group">
+                            <label>Task Name</label>
+                            <h6 class="form-control text-offwhite">{{task.ta_taskId.task_name}}</h6>
+                        
+                        </div>
+                        
+                    </div>
+                    <div class="col-sm-12 col-lg-6 col-md-6">
+                        <div class="form-group">
+                            <label>Date</label>
+                            <h6 class="form-control text-offwhite">{{tdate|date:"Y-m-d"}}</h6>
+                        
+                        </div>
+                    </div>
+                
+                </div>
+                
+                <div class="row">
+               
+                    <div class="col-sm-12 col-lg-12 col-md-12">
+                        <div class="form-group">
+                            <label>Title*</label>
+                            <input type="text" class="form-control text-offwhite " name="tad_title" placeholder="enter a title" required>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-12 col-md-12">
+                        <div class="form-group">
+                        <label>Daily Works*</label>
+                        <textarea class="form-control text-offwhite" name="tad_discription" rows="10" placeholder="enter all your daily works for this task" required></textarea>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-6 col-md-6">
+                        <div class="form-group">
+                            <label>Target*</label>
+                            <input type="number" class="form-control text-offwhite " name="tad_target" required>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-6 col-md-6">
+                        <div class="form-group">
+                            <label>Files*</label>
+                            <input type="file"  class="form-control text-offwhite " name="tad_file" multiple required>
+                        </div>
+                    </div>
+                
+                </div>
+                
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-primary btn-block enter-btn">Save Work</button>
+                </div>
+                
+                
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<style>
+  a{
+    text-decoration: none;
+  }
+  a:hover{
+    text-decoration: none;
+  }
+</style>
+
+
+
+{% endblock %}
+
+
+
+

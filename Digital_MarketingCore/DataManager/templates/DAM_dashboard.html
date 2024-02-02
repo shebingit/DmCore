@@ -1,0 +1,323 @@
+{% extends 'DAM_base.html' %}
+{% load static %}
+{% block body %}
+
+
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'dataManager_dashboard' %}">Dashboard</a></li>
+        </ol>
+      </nav>
+</div>
+
+        <div class="row">
+            <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+                <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                    <div class="col-9">
+                        <div class="d-flex align-items-center align-self-start">
+                        <h3 class="mb-0">{{ dataBank_count }}</h3>
+                        <!-- <p class="text-success ms-2 mb-0 font-weight-medium">+3.5%</p> -->
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="icon icon-box-success ">
+                        <span class="mdi mdi-arrow-top-right icon-item"></span>
+                        </div>
+                    </div>
+                    </div>
+                    <h5 class="text-offwhite font-weight-normal">Total Leads</h5>
+                </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+                <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                    <div class="col-9">
+                        <div class="d-flex align-items-center align-self-start">
+                            <h3 class="mb-0">{{ dataBank_allocate_count }}</h3>
+                            <!-- <p class="text-success ms-2 mb-0 font-weight-medium">+3.5%</p> -->
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="icon icon-box-success ">
+                        <span class="mdi mdi-arrow-top-right icon-item"></span>
+                        </div>
+                    </div>
+                    </div>
+                    <h5 class="text-offwhite font-weight-normal">Allocated Leads</h5>
+                </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+                <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                    <div class="col-9">
+                        <div class="d-flex align-items-center align-self-start">
+                            <h3 class="mb-0">{{ dataBank_open_count }}</h3>
+                            <!-- <p class="text-success ms-2 mb-0 font-weight-medium">+3.5%</p> -->
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="icon icon-box-success ">
+                        <span class="mdi mdi-arrow-top-right icon-item"></span>
+                        </div>
+                    </div>
+                    </div>
+                    <h5 class="text-offwhite font-weight-normal">Opend Leads</h5>
+                </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+                <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                    <div class="col-9">
+                        <div class="d-flex align-items-center align-self-start">
+                            <h3 class="mb-0">{{ dataBank_close_count }}</h3>
+                            <!-- <p class="text-success ms-2 mb-0 font-weight-medium">+3.5%</p> -->
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="icon icon-box-success ">
+                        <span class="mdi mdi-arrow-top-right icon-item"></span>
+                        </div>
+                    </div>
+                    </div>
+                    <h5 class="text-offwhite font-weight-normal">Closed Leads</h5>
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xl-4 col-sm-12 grid-margin stretch-card">
+                <a href="{% url 'DAM_Dashboard_databank' %}" class="a-hover">
+                    <div class="card">
+                        <div class="card-body">
+                        <div class="row">
+                            <div class="col-9 col-sm-9">
+                            <div class="d-flex align-items-center align-self-start">
+                                <h4 class="mb-0">Data Bank </h4>
+                                <p class="text-secondary ml-2 mb-0 font-weight-medium"> </p>
+                            </div>
+                            </div>
+                            <div class="col-3 col-sm-3">
+                            <div class="icon icon-box-secondary">
+                                <span class="mdi mdi-database-plus  icon-item"></span>
+                            </div>
+                            </div>
+                        </div>
+                        <h6 class="text-muted font-weight-normal small line-h13 mt-2"> Data Bank, providing you with real-time insights and seamless information retrieval. </h6>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        
+            <div class="col-xl-4 col-sm-12 grid-margin stretch-card">
+                <a href="{% url 'DAM_Dashboard_allocation' %}" class="a-hover">
+                    <div class="card">
+                        <div class="card-body">
+                        <div class="row">
+                            <div class="col-9 col-sm-9">
+                            <div class="d-flex align-items-center align-self-start">
+                                <h4 class="mb-0">Allocation Leads </h4>
+                                <p class="text-primary ml-2 mb-0 font-weight-medium"> </p>
+                            </div>
+                            </div>
+                            <div class="col-3 col-sm-3">
+                            <div class="icon icon-box-primary">
+                                <span class="mdi mdi-account-network  icon-item"></span>
+                            </div>
+                            </div>
+                        </div>
+                        <h6 class="text-muted font-weight-normal small line-h13 mt-2"> Data Bank, providing you with real-time insights and seamless information retrieval. </h6>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        
+            <div class="col-xl-4 col-sm-12 grid-margin stretch-card">
+                <a href="{% url 'DAM_Dashboard_followups' %}" class="a-hover">
+                    <div class="card">
+                        <div class="card-body">
+                        <div class="row">
+                            <div class="col-9 col-sm-9">
+                            <div class="d-flex align-items-center align-self-start">
+                                <h4 class="mb-0">Follow Up </h4>
+                                <p class="text-warning ml-2 mb-0 font-weight-medium"> - {{ dataBank_followup_count }}</p>
+                            </div>
+                            </div>
+                            <div class="col-3 col-sm-3">
+                            <div class="icon icon-box-warning">
+                                <span class="mdi mdi-checkbox-multiple-marked-outline  icon-item"></span>
+                            </div>
+                            </div>
+                        </div>
+                        <h6 class="text-muted font-weight-normal small line-h13 mt-2"> Data Bank, providing you with real-time insights and seamless information retrieval. </h6>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+           
+            <div class="col-xl-4 col-sm-12 grid-margin stretch-card">
+                <a href="{% url 'DAM_notification_section' %}" class="a-hover">
+                    <div class="card">
+                        <div class="card-body">
+                        <div class="row">
+                            <div class="col-9 col-sm-9">
+                            <div class="d-flex align-items-center align-self-start">
+                                <h4 class="mb-0">Notifications </h4>
+                                <p class="text-success ml-2 mb-0 font-weight-medium"></p>
+                            </div>
+                            </div>
+                            <div class="col-3 col-sm-3">
+                            <div class="icon icon-box-success">
+                                <span class="mdi mdi-bell-ring-outline  icon-item"></span>
+                            </div>
+                            </div>
+                        </div>
+                        <h6 class="text-muted font-weight-normal small line-h13 mt-2"> Stay informed with timely updates and notifications on new leads, facilitating efficient follow-up processes</h6>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-xl-4 col-sm-12 grid-margin stretch-card">
+                <a href="{% url 'DAM_Dashboard_Executive' %}" class="a-hover">
+                    <div class="card">
+                        <div class="card-body">
+                        <div class="row">
+                            <div class="col-9">
+                            <div class="d-flex align-items-center align-self-start">
+                                <h4 class="mb-0">Employees</h4>
+                                <p class="text-danger ml-2 mb-0 font-weight-medium"> </p>
+                            </div>
+                            </div>
+                            <div class="col-3">
+                            <div class="icon icon-box-secondary">
+                                <span class="mdi mdi-account-multiple  icon-item"></span>
+                            </div>
+                            </div>
+                        </div>
+                        <h6 class="text-muted font-weight-normal small line-h13 mt-2">Track and manage allocated lead data of different client to employees   </h6>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-xl-4 col-sm-12 grid-margin stretch-card">
+                <a href="{% url 'DAM_Dashboard_clients' %}" class="a-hover">
+                    <div class="card">
+                        <div class="card-body">
+                        <div class="row">
+                            <div class="col-9 col-sm-9">
+                            <div class="d-flex align-items-center align-self-start">
+                                <h4 class="mb-0">Clients </h4>
+                                <p class="text-primary ml-2 mb-0 font-weight-medium"> </p>
+                            </div>
+                            </div>
+                            <div class="col-3 col-sm-3">
+                            <div class="icon icon-box-primary">
+                                <span class="mdi mdi-account-multiple  icon-item"></span>
+                            </div>
+                            </div>
+                        </div>
+                        <h6 class="text-muted font-weight-normal small line-h13 mt-2"> Data Bank, providing you with real-time insights and seamless information retrieval. </h6>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-xl-4 col-sm-12 grid-margin stretch-card">
+                <a href="{% url 'DAM_platform_management' %}" class="a-hover">
+                    <div class="card">
+                        <div class="card-body">
+                        <div class="row">
+                            <div class="col-9">
+                            <div class="d-flex align-items-center align-self-start">
+                                <h4 class="mb-0">Platform Management</h4>
+                                <!-- <p class="text-danger ml-2 mb-0 font-weight-medium">-2.4%</p> -->
+                            </div>
+                            </div>
+                            <div class="col-3">
+                            <div class="icon icon-box-success">
+                                <span class="mdi mdi-calendar-check  icon-item"></span>
+                            </div>
+                            </div>
+                        </div>
+                        <h6 class="text-muted font-weight-normal mt-2"> Data management strategy,
+                            involving the oversight and maintenance </h6>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-xl-4 col-sm-12 grid-margin stretch-card">
+                <a href="{% url 'DAM_wasteData_management' %}" class="a-hover">
+                    <div class="card">
+                        <div class="card-body">
+                        <div class="row">
+                            <div class="col-9">
+                            <div class="d-flex align-items-center align-self-start">
+                                <h4 class="mb-0">Wasted Datas</h4>
+                                <p class="text-danger ml-2 mb-0 font-weight-medium"> </p>
+                            </div>
+                            </div>
+                            <div class="col-3">
+                            <div class="icon icon-box-danger">
+                                <span class="mdi mdi-delete-variant  icon-item"></span>
+                            </div>
+                            </div>
+                        </div>
+                        <h6 class="text-muted font-weight-normal small line-h13 mt-2">Track and manage wasted data with the different strategies   </h6>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        
+        </div>
+        <div class="row">
+            <div class="col-xl-6  col-lg-6 grid-margin stretch-card">
+                <div class="card " style="overflow-x: scroll;" >
+                  <div class="card-body">
+                    <h4 class="card-title">Leads in Dates</h4>
+                    
+                    <canvas id="barChart" style="height:230px"></canvas>
+                    <p  class="form-control" style="display:none;"  id="labels_names">{{ labels }}</p>
+                    <p class="form-control" style="display:none;" id="votes_data">{{ votes_data }}</p>
+                  </div>
+                </div>
+            </div>
+        
+       
+            <div class="col-xl-6  col-lg-6 grid-margin stretch-card">
+                <div class="card"  style="overflow-x: scroll;">
+                  <div class="card-body">
+                    <h4 class="card-title">Leads From Platforms</h4>
+                    
+                    <canvas id="barChart-platform" style="height:230px"></canvas>
+                    <p  class="form-control" style="display:none;"  id="plflabels_names">{{ PlatForms_labels }}</p>
+                    <p class="form-control" style="display:none;" id="plfvotes_data">{{ PlatForms_votes_data }}</p>
+                  </div>
+                </div>
+            </div>
+            
+        </div>
+        
+      
+
+       
+
+
+
+
+{% endblock %}
+
+
+
+
+

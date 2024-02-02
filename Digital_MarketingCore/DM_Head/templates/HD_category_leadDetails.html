@@ -1,0 +1,42 @@
+{% extends 'HD_base.html' %}
+{% load static %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'head_lead_collected_data' leads_obj.lead_work_regId.id lcID  %}">Lead Collection</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page"> Lead Details </li>
+        </ol>
+      </nav>
+</div>
+
+
+<div class="row mt-1">
+    <div class="col-12 grid-margin">
+        <div class="card">
+            <div class="card-body">
+
+                <ol>
+                                
+                {% for Details in lead_Details_obj %}
+                
+                    <li>
+                        <p>
+                            <span class="mr-1"> {{ Details.lead_field_name }} :</span>
+                            <span> {{ Details.lead_field_data }} </span>
+                        </p>               
+                    </li>
+               
+                {% endfor %}
+                </ol> 
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+
+

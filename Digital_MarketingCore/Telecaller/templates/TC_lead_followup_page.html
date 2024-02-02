@@ -1,0 +1,496 @@
+{% extends 'TC_base.html' %}
+{% load static %}
+{% block body %}
+
+<style>
+  .bg-danger
+  {
+    background-color: #f50a168a !important;
+    color: rgb(225, 226, 226);
+  }
+  .bg-warning {
+    background-color: #ffca09a3 !important; 
+    color: rgb(225, 226, 226);}
+  .bg-danger a,  .bg-warning a{
+    color: rgb(225, 226, 226);
+  }
+</style>
+<div>
+  <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'TC_current_clients' %}">Current Clients</a></li>
+        <li class="breadcrumb-item active text-md" aria-current="page">Followup Leads</li>
+      </ol>
+    </nav>
+</div>
+
+<div class="card">
+
+    <div class="card-body">
+      
+
+      <div class="row">
+        <div class="col-sm-12 col-lg-8 col-md-8 col-xl-9  grid-margin">
+          <h6 class="card-title custom-letter-spacing"> Follow Up Leads List - (  <span id="check-count"> {{ leads_obj_count }} </span> )</h6>
+        </div>
+        
+        <div class="col-sm-12 col-lg-4 col-md-4 col-xl-3 d-flex justify-content-end  grid-margin">
+            <div class="d-flex ">
+                <input  class="form-control text-offwhite mr-1" name="#" id="search-data" placeholder="search here..">
+                <span class="text-danger mdi mdi-close" id="closeBtn" type="button"></span> 
+            </div>
+        </div>
+        
+    </div>
+
+
+      <div class="table-responsive">
+        <table class="table" id="table-data">
+              <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                 
+                  <th scope="col">Name</th>
+                  <th scope="col">Email</th>
+        
+                  <th scope="col">Contact</th>
+                  <th scope="col" >Client Name \ Lead Category</th>
+                  <th scope="col">Next Update Date</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Details</th>
+                  <th scope="col">Follow up</th>
+                  <th scope="col">Mark as Waste</th>
+                  <th scope="col">Closed</th>
+        
+                </tr>
+              </thead>
+              <tbody>
+                {% for d in data %}
+                
+                {% if d.Next_update_date < t_date %}
+                <tr class="bg-danger" >
+                  <td class="">{{forloop.counter }}</td>
+                  
+                  <td><a href="{% url 'Tc_followupDetails' d.leadId.id %}" class="">{{d.leadId.lead_name}}</a></td>
+                  <td class="">{{d.leadId.lead_email}}</td>
+                  <td class="">{{d.leadId.lead_contact}}</td>
+                  <td class="">
+                    <p class=""> {{d.leadId.lead_work_regId.clientId.client_name}} \
+                    <span > {{d.leadId.lead_category_id.lead_collection_for}} </span>  </p>
+                  </td>
+                    
+                  <td class="">{{d.Next_update_date | default:'No date available'}}</td> 
+
+                  {% if d.Update_Action == 0 %}
+                  <td><div class="badge badge-outline-success"  id="btn1"><span class="text-small">New Lead</span></div></td>
+                  {% else %}
+                
+                    <td><div class="badge badge-outline-warning"  id="btn1"><span class="text-small">{{d.Response}}</span></div></td>
+                  
+                  {% endif %}
+                 
+        
+                  <td class="text-white"><a href="" class="btn btn-secondary" data-toggle="modal"
+                    data-target="#myModal2{{d.id}}"><span class="mdi mdi-file-document text-dark"></span> </a></td>
+    
+                  
+    
+                  <td class="text-white"><a href="" class="btn btn-success" data-toggle="modal"
+                      data-target="#myModal{{d.id}}"><span class="mdi mdi-phone"></span> </a>
+                  </td>
+                  <td>
+                    <a href="" class="btn btn-outline-warning text-small mr-2"
+                    data-toggle="modal"
+                    data-target="#wastemodal{{d.id}}"><span class="text-small">waste Lead</span> </a>
+                  </td>
+                  <td>
+                    <a href="{% url 'TC_complete_lead' d.id %}" class="btn btn-outline-danger"><span class="mdi mdi-checkall"></span>
+                      <span class="text-small"> Complete Lead </span> </a>
+                  </td>
+        
+        
+                </tr>
+                {% elif d.Next_update_date == t_date %}
+                <tr class="bg-warning" >
+                  <td class="">{{forloop.counter }}</td>
+                  
+                  <td><a href="{% url 'Tc_followupDetails' d.leadId.id %}" class="">{{d.leadId.lead_name}}</a></td>
+                  <td class="">{{d.leadId.lead_email}}</td>
+                  <td class="">{{d.leadId.lead_contact}}</td>
+                  <td class="">
+                    <p class=""> {{d.leadId.lead_work_regId.clientId.client_name}} \
+                    <span > {{d.leadId.lead_category_id.lead_collection_for}} </span>  </p>
+                  </td>
+                    
+                  <td class="">{{d.Next_update_date | default:'No date available'}}</td> 
+
+                  {% if d.Update_Action == 0 %}
+                  <td><div class="badge badge-outline-success"  id="btn1"><span class="text-small">New Lead</span></div></td>
+                  {% else %}
+                
+                    <td><div class="badge badge-outline-secondary"  id="btn1"><span class="text-small">{{d.Response}}</span></div></td>
+                  
+                  {% endif %}
+                 
+        
+                  <td class="text-white"><a href="" class="btn btn-secondary" data-toggle="modal"
+                    data-target="#myModal2{{d.id}}"><span class="mdi mdi-file-document text-dark"></span> </a></td>
+    
+                  
+    
+                  <td class="text-white"><a href="" class="btn btn-success" data-toggle="modal"
+                      data-target="#myModal{{d.id}}"><span class="mdi mdi-phone"></span> </a>
+                  </td>
+                  <td>
+                    <a href="" class="btn btn-outline-secondary text-small mr-2"
+                    data-toggle="modal"
+                    data-target="#wastemodal{{d.id}}"><span class="text-small">waste Lead</span> </a>
+                  </td>
+                  <td>
+                    <a href="{% url 'TC_complete_lead' d.id %}" class="btn btn-outline-danger"><span class="mdi mdi-checkall"></span>
+                      <span class="text-small"> Complete Lead </span> </a>
+                  </td>
+        
+        
+                </tr>
+                {% else %}
+                <tr class="text-offwhite" >
+                  <td class="">{{forloop.counter }}</td>
+                  
+                  <td><a href="{% url 'Tc_followupDetails' d.leadId.id %}" class="text-offwhite">{{d.leadId.lead_name}}</a></td>
+                  <td class="">{{d.leadId.lead_email}}</td>
+                  <td class="">{{d.leadId.lead_contact}}</td>
+                  <td class="">
+                    <p class=""> {{d.leadId.lead_work_regId.clientId.client_name}} \
+                    <span > {{d.leadId.lead_category_id.lead_collection_for}} </span>  </p>
+                  </td>
+                    
+                  <td class="">{{d.Next_update_date | default:'No date available'}}</td> 
+
+                  {% if d.Update_Action == 0 %}
+                  <td><div class="badge badge-outline-success"  id="btn1"><span class="text-small">New Lead</span></div></td>
+                  {% else %}
+                
+                    <td><div class="badge badge-outline-warning"  id="btn1"><span class="text-small">{{d.Response}}</span></div></td>
+                  
+                  {% endif %}
+                 
+        
+                  <td class="text-white"><a href="" class="btn btn-secondary" data-toggle="modal"
+                    data-target="#myModal2{{d.id}}"><span class="mdi mdi-file-document"></span> </a></td>
+    
+                  
+    
+                  <td class="text-white"><a href="" class="btn btn-success" data-toggle="modal"
+                      data-target="#myModal{{d.id}}"><span class="mdi mdi-phone"></span> </a>
+                  </td>
+                  <td>
+                    <a href="" class="btn btn-outline-warning text-small mr-2" data-toggle="modal"
+                    data-target="#wastemodal{{d.id}}">
+                      <span class="text-small">waste Lead</span> </a>
+                  </td>
+                  <td>
+                    <a href="{% url 'TC_complete_lead' d.id %}" class="btn btn-outline-danger"><span class="mdi mdi-checkall"></span>
+                      <span class="text-small"> Complete Lead </span> </a>
+                  </td>
+        
+        
+                </tr>
+                {% endif %}
+                
+                {% endfor %}
+              </tbody>
+            </table>
+      </div>
+
+
+        
+             
+  
+    </div>
+  
+   
+      
+  </div>
+
+
+
+
+  
+  {% for d in data %}
+
+
+  <div class="modal fade" id="wastemodal{{d.id}}" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="card">
+          <div class="card-body mt-0" style="padding: 0.875rem 0.5625rem">
+            <div class="modal-header">
+              <h6 class="modal-title text-center" >Please clarify the reason for marking waste lead !</h6>
+              <button type="button" class="close text-danger" data-dismiss="modal" style="justify-content: end;">&times;</button>
+              
+             
+            </div>
+            <div class="modal-body">
+              
+              <form action="{% url 'TC_waste_leads_action' d.leadId.id %}" method="post">
+                {% csrf_token %}
+
+                <div class="row">
+                  <div class="col-lg-12">
+                    <label style="font-size: 13px;margin-top: 10px;">Enter your reason </label>
+                    <textarea class="form-control text-offwhite" name="reason_for" style="height: 120px;" required></textarea>
+                  </div>
+                 
+                </div>
+                <div class="d-flex justify-content-center mt-3 mb-2">
+                  <button type="submit" class="btn btn-outline-success   mr-2"><span class="text-small">Update</span></button>
+                 
+                  <button type="button" class="btn btn-outline-danger text-small" data-dismiss="modal"><span class="text-small">Close</span></button>
+                </div>
+              </form>
+            </div>
+        
+            <div class="modal-footer">
+              
+              
+              <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!--Response Modal -->
+  <div class="modal fade" id="myModal2{{d.id}}" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="card">
+          <div class="card-body mt-0" style="padding: 0.875rem 0.5625rem">
+            <div class="modal-header">
+              <h4 class="modal-title text-center" >Clients Response</h4>
+              <button type="button" class="close text-danger" data-dismiss="modal" style="justify-content: end;">&times;</button>
+              
+            </div>
+            <div class="modal-body">
+              <div class="row p-2">
+                <div class="col-3"><p> Response </p></div>
+                <div class="col-9"><p> {{d.Response}} </p></div>
+              </div>
+              <div class="row p-2">
+                <div class="col-3"> <p> Reason </p></div>
+                <div class="col-9"> <p>{{d.Reason}} </p></div>
+              </div>
+              {% for m in more %}
+            
+              {% if m.leadId.id == d.leadId.id %}
+              <div class="row p-2">
+                <div class="col"> <p> {{m.lead_field_name}} </p></div>
+                <div class="col">: <p> {{m.lead_field_data}} </p></div>
+              </div>
+              {% endif %}
+              {% endfor%}
+
+              {% for r in record %}
+              {% if r.Record %}
+              {% if r.Leads_assignto_tc_id.id == d.id %}
+              
+              <div class="row p-2 pt-4">
+                <audio controls>
+                  <source src="{{r.Record.url}}">
+                </audio>
+              </div>
+              {% endif %}
+              {% endif %}
+              {% endfor %}
+            </div>
+          
+        
+            <div class="modal-footer">
+              
+              
+              <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+
+
+  <!--Update Modal -->
+  <div class="modal fade" id="myModal{{d.id}}" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="card">
+          <div class="card-head d-flex justify-content-between align-items-center mt-3 mb-0 ">
+            <h4 class="card-title mt-3 ml-3">Update Clients Response </h4>
+            <span class="mdi mdi-close-box mdi-18px text-danger mr-2"  data-dismiss="modal"></span>
+          </div>
+          <div class="card-body mt-0" style="padding: 0.875rem 1rem">
+        
+       
+          <form action="{% url 'TC_update_Clients_Response' d.id %}" method="post"  enctype="multipart/form-data">
+            {% csrf_token %} 
+            <div class="row">
+              <div class="col">
+                <p>Name</p>
+              </div>
+              <div class="col">
+                <p>: {{d.leadId.lead_name}}</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <p>Email</p>
+              </div>
+              <div class="col">
+                <p>: {{d.leadId.lead_email}}</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <p>Contact</p>
+              </div>
+              <div class="col">
+                <p>: {{d.leadId.lead_contact}}</p>
+              </div>
+            </div>
+            <select name="Response" id="response" class="form-control text-white p-2" 
+              required>
+              <option value="">choose Response</option>
+              {% for response in flstatus %}
+              <option value="{{ response.status_name }}" class="text-white">{{ response.status_name }}</option>
+              {% endfor %}
+             
+            </select>
+            <label style="font-size: 13px;margin-top: 10px;"> Next Update Date*</label>
+            <input type="date"  id="nud" name="nud" class="form-control  text-white">
+            <!-- <input type="text" placeholder="Enter Response" class="form-control mt-3"> -->
+            <textarea type="text" placeholder="enter Reason" name="Reason" class="form-control mt-3 text-white" style="height: 100px;" required></textarea>
+
+            <label style="font-size: 13px;margin-top: 10px;">If call record is available ?</label>
+            <input type="file" class="form-control text-offwhite" name="record" accept="audio/*">
+            <div class="d-flex justify-content-center mt-3 mb-2">
+              <button type="submit" class="btn btn-outline-success   mr-2"><span class="text-small">Update</span></button>
+             
+              <button type="button" class="btn btn-outline-danger text-small" data-dismiss="modal"><span class="text-small">Close</span></button>
+            </div>
+           
+          </form>
+          </div>
+        </div>
+       
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    var a ="{{i.id }}"
+    $(document).ready(function(){
+      $("#myBtn"+a).click(function(){
+      $("#myModal"+a).modal({show:true});
+    });
+  
+    });
+  </script>
+  <script>
+    var a ="{{i.id }}"
+    $(document).ready(function(){
+      $("#myBtn2"+a).click(function(){
+      $("#myModal2"+a).modal({show:true});
+    });
+  
+    });
+  </script>
+  {% endfor %}
+
+
+  <script>
+   
+    const inputField = document.getElementById('search-data');
+    const closeBtn = document.getElementById('closeBtn');
+    const empTable = document.getElementById('table-data');
+    closeBtn.style.display = 'none';
+  
+    inputField.addEventListener('input', function() {
+        filterTable();
+    });
+  
+    function filterTable() {
+        const filterValue = inputField.value.toLowerCase();
+        const rows = empTable.getElementsByTagName('tr');
+  
+        for (let i = 1; i < rows.length; i++) {
+            const Cell1 = rows[i].getElementsByTagName('td')[1];
+            const Cell2 = rows[i].getElementsByTagName('td')[2];
+            const Cell3 = rows[i].getElementsByTagName('td')[3];
+            const Cell4 = rows[i].getElementsByTagName('td')[4];
+            const Cell5 = rows[i].getElementsByTagName('td')[5];
+            const Cell6 = rows[i].getElementsByTagName('td')[0];
+            const Cell7 = rows[i].getElementsByTagName('td')[6];
+
+
+            
+  
+            
+            if (Cell1 || Cell2 || Cell3 || Cell4|| Cell5 || Cell6 || Cell7) {
+  
+                const datacell1 = Cell1.textContent || Cell1.innerText;
+                const datacell2 = Cell2.textContent || Cell2.innerText;
+                const datacell3 = Cell3.textContent || Cell3.innerText;
+                const datacell4 = Cell4.textContent || Cell4.innerText;
+                const datacell5 = Cell5.textContent || Cell5.innerText;
+                const datacell6 = Cell6.textContent || Cell6.innerText;
+                const datacell7 = Cell7.textContent || Cell7.innerText;
+              
+                
+                
+  
+                if (datacell1.toLowerCase().includes(filterValue) ||
+                 datacell2.toLowerCase().includes(filterValue) || 
+                 datacell3.toLowerCase().includes(filterValue) ||
+                 datacell4.toLowerCase().includes(filterValue) || 
+                 datacell5.toLowerCase().includes(filterValue) ||
+                 datacell6.toLowerCase().includes(filterValue) ||
+                 datacell7.toLowerCase().includes(filterValue)) 
+                {
+                    rows[i].style.display = '';
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+        }
+    }
+  
+     // To display the close button and hide the close button based on the search input 
+    inputField.addEventListener('input', function() {
+    if (inputField.value == '') {
+        closeBtn.style.display = 'none';
+       
+    } else {
+        closeBtn.style.display = 'block';
+        
+    }
+    });
+  
+    closeBtn.addEventListener('click', function() {
+    inputField.value = '';
+    closeBtn.style.display = 'none';
+    filterTable(); // Display the full table data
+    });
+</script>
+
+{% endblock %}

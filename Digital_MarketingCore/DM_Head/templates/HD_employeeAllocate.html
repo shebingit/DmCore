@@ -1,0 +1,208 @@
+{% extends 'HD_base.html' %}
+{% load static %}
+{% block body %}
+
+<style>
+    .allocate-count
+    {
+        width: 2rem;
+        height: 2rem;
+        background-color: rgb(11, 64, 97);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white; /* Add text color for better visibility */
+    }
+</style>
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'head_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Employee Allocate</li>
+        </ol>
+      </nav>
+</div>
+
+
+
+<div class="row ">
+    <div class="col-sm-12 col-lg-4 col-md-6 grid-margin stretch-card">
+        <div class="card mb-2" id="#" >
+            <div class="card-body">
+              <div class="leave-form">
+                <h4 class="card-title mb-4"> Allocated   </h4>
+               
+
+                {% for allocation_count in allocation_counts %}
+                <div class="day-wrapper">
+                    <div class="card-schedule d-flex  justify-content-between">
+                        <h6>{{ allocation_count.allocat_to__emp_name }} </h6>
+                        <div class="allocate-count"><span class="">{{ allocation_count.count }}</span></div>
+                    </div>
+                </div>
+                {% endfor %}
+            
+               
+              </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-12 col-lg-8 col-md-6 grid-margin">
+      <div class="card">
+        <div class="card-body">
+            <div class="d-flex">
+                <h4 class="card-title">Pending Employees List</h4>
+                
+            </div>
+
+            <div class="add-items d-flex ">
+              
+              <input  class="form-control text-offwhite" name="#" id="search-data" placeholder="search here..">
+              <button class="btn btn-outline-danger mdi mdi-close" id="closeBtn" type="button"></button> 
+          </div>
+
+          <form action="{% url 'head_employeeAllocate' %}" method="post" >
+        
+            {% csrf_token %}
+  
+            <div class="add-items d-flex ">
+              
+                <select class=" form-control text-offwhite" name="alocated_to" id="#" required>
+                    <option value="" selected>--- select team lead --- </option>
+                  {% for team in Team_leads %}
+                  <option value="{{team.id}}"> 
+                       {{team.emp_name}}
+                      </option>
+                  {% endfor %}
+                </select>                        
+              
+              <button class=" btn btn-outline-primary " type="submit">Allocate</button> 
+            </div>
+          
+            
+            <div class="table-responsive">
+                <table class="table" id="employee-pending">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th> No </th>                     
+                        <th> Employees Id </th>
+                        <th> Employees Name </th>
+                        <th> Department </th>
+                        <th> Designation </th> 
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for emp in employees %}
+                    <tr>
+                        <td>
+                            <div class="form-check form-check m-0">
+                            <label class="form-check-label">
+                                <input type="checkbox" class="form-check-input" name="selected_emp" value="{{emp.id}}">
+                            </label>
+                            </div>
+                        </td>
+                    <td>
+                        {{forloop.counter}}
+                    </td>
+                    
+                    <td>
+                        {% if emp.emp_regId %}
+                        {{emp.emp_regId }}
+                        {% else %} 
+                        EMP0000 
+                        {% endif %}
+                    </td> 
+                    <td>
+                        {% if emp.emp_profile %}
+                        <img src="{{emp.emp_profile.url}}" alt="Profile-image" />
+                        {% else %}
+                        <img src="{% static 'images/faces/profile-icon.png' %}" alt="Profile-image" />
+                        {% endif %}
+                        <span class="pl-2">{{emp.emp_name}}</span>
+                    </td>
+                    
+                    <td> {{emp.emp_department_id.dept_name}} </td>
+                    <td> {{emp.emp_designation_id.desig_name}} </td>
+                    
+                    </tr>
+                {% endfor %}
+                </tbody>
+                </table>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Sorting Table -->
+
+<script>
+   
+    const inputField = document.getElementById('search-data');
+    const closeBtn = document.getElementById('closeBtn');
+    const empTable = document.getElementById('employee-pending');
+    closeBtn.style.display = 'none';
+    console.log(inputField)
+
+    inputField.addEventListener('input', function() {
+        filterTable();
+    });
+
+    function filterTable() {
+        const filterValue = inputField.value.toLowerCase();
+        console.log('trigerd')
+        const rows = empTable.getElementsByTagName('tr');
+
+        for (let i = 1; i < rows.length; i++) {
+           
+            const Cell2 = rows[i].getElementsByTagName('td')[2];
+            const Cell3 = rows[i].getElementsByTagName('td')[3];
+            const Cell4 = rows[i].getElementsByTagName('td')[4];
+            const Cell5 = rows[i].getElementsByTagName('td')[5];
+            
+          
+
+            if ( Cell2 || Cell3 || Cell4 || Cell5  ) {
+
+                const datacell2 = Cell2.textContent || Cell2.innerText;
+                const datacell3 = Cell3.textContent || Cell3.innerText;
+                const datacell4 = Cell4.textContent || Cell4.innerText;
+                const datacell5 = Cell5.textContent || Cell5.innerText;
+               
+               
+
+                if (datacell3.toLowerCase().includes(filterValue)|| datacell4.toLowerCase().includes(filterValue) || datacell5.toLowerCase().includes(filterValue) || datacell2.toLowerCase().includes(filterValue) ) 
+                {
+                    rows[i].style.display = '';
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+        }
+    }
+
+     // To display the close button and hide the close button based on the search input 
+    inputField.addEventListener('input', function() {
+    if (inputField.value == '') {
+        closeBtn.style.display = 'none';
+       
+    } else {
+        closeBtn.style.display = 'block';
+        
+    }
+    });
+
+    closeBtn.addEventListener('click', function() {
+    inputField.value = '';
+    closeBtn.style.display = 'none';
+    filterTable(); // Display the full table data
+    });
+</script>
+
+
+{% endblock %}

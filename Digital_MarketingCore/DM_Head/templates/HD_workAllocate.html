@@ -1,0 +1,346 @@
+{% extends 'HD_base.html' %}
+{% load static %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'head_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Work Allocate View</li>
+        </ol>
+      </nav>
+</div>
+
+
+<div class="row ">
+  <div class="col-12 grid-margin">
+    <div class="card">
+      <div class="card-body">
+        
+        <div class="d-flex justify-content-between mb-3">
+          <h4 class="card-title">Our Clients for Work</h4>
+         
+        </div>
+       
+        <div class="add-items d-flex ">        
+          <input  class="form-control text-offwhite" name="#" id="search-data" placeholder="search here..">
+          <button class="btn btn-outline-danger mdi mdi-close" id="closeBtn" type="button"></button> 
+        </div>
+        
+        <div class="table-responsive">
+          <table class="table" id="work-allocate">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th> Client Name </th>
+                <th> Start Date </th>
+                <th> Due Date </th>
+                <th> Progress </th>
+                <th class="text-center"> Allocated Team Lead </th>
+                <th> Action </th>
+               
+              </tr>
+            </thead>
+            <tbody>
+              {% for work in works %}
+              <tr >
+                <td>
+                 {{forloop.counter}}
+                </td>
+                <td>
+                  {% if work.clientId.client_profile %}
+                  <img src="{{work.clientId.client_profile.url}}" alt="Profile" />
+                  {% else %}
+                  <img src="{% static 'images/faces/profile-icon.png' %}" alt="image" />
+                  {% endif %}
+                  <span class="pl-2">{{work.clientId.client_name}}</span>
+                </td>
+                <td> {{ work.work_create_date }} </td>
+                <td> {{ work.work_end_date }} </td>
+                <td>
+                  <p class="small">{{work.work_progress}} %</p>
+                  <div class="progress progress-sm">
+                    <div class="progress-bar bg-primary progress-bar-animated progress-bar-striped" role="progressbar" aria-valuenow="{{work.work_progress}}" style="width: {{work.work_progress}}% " aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                </td>
+                <td>
+                  {% if work.allocated_emp.all %}
+
+                  <ul>
+                    {% for employee in work.allocated_emp.all %}
+                        <li class="mt-2" style="list-style: none;">
+
+                          <div class="row">
+                            <div class="col-xl-9 ">
+                              <a href="{% url 'head_teamLead_allocatedTask' work.id employee.id %}" class="text-offwhite text-decoration-none">
+                                {% if employee.wa_work_allocate.emp_profile %}
+                                <img src="{{employee.wa_work_allocate.emp_profile.url}}" alt="profile">
+                                {% else %}
+                                <img src="{% static 'images\faces\profile-icon.png' %}" alt="profile">
+                                {% endif %}
+                                {{ employee.emp_name }}
+                              </a>
+                            </div>
+                            <div class="col-xl-3">
+                              <a href="{% url 'head_removeAllocatedTl' work.id employee.id %}"><span class="mdi mdi-close-circle text-danger"></span></a>
+                            </div>
+                          </div>
+                         
+                      </li>
+                          
+                    {% endfor %}
+                  </ul>
+                  {% else %}
+                  <div class="text-center">
+                    <button class="btn btn-outline-warning">
+                      <span class="small"> Not Allocated</span>
+                    </button>
+                  </div>
+                       
+                  {% endif %}
+                </td>
+                <td>
+                 
+                    <div class="badge badge-outline-primary" data-toggle="modal" data-target="#allocate{{work.id}}">Single Allocate \ Group Allocate</div>
+                  
+                    <a href="{% url  'test_allocate_page' work.id %}" class="btn btn-success"> Allocate Page Dummy</a>
+                </td>
+                
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Allocate Modal-->
+{% for work in works %}
+<div class="modal fade" id="allocate{{work.id}}">
+  <div class="modal-dialog  ">
+    <div class="modal-content">
+
+      <div class="card">
+        <div class="card-head d-flex justify-content-between align-items-center mt-3 mb-0 ">
+          <h4 class="card-title mt-3 ml-3">Allocate Team Lead </h4>
+          <span class="mdi mdi-close-box mdi-18px text-danger mr-2"  data-dismiss="modal"></span>
+        </div>
+        <p class="mt-1 ml-3"> * You can individually allocate tasks to the selected team leads here.</p>
+        
+        <div class="card-body mt-0">
+
+          <form action="{% url 'head_workAllocate' %}" method="post"  enctype="multipart/form-data">
+           
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-xl-12 col-sm-12 grid-margin ">
+                    <div class="card">
+                        
+                        <div class="card-body">
+                            <div class="form-group add-items"> 
+                              <input type="hidden" value="{{work.id}}"  name="Work_id">
+                                <label>Team Lead Name</label>
+                                <select class="form-control text-offwhite" name="selected_tl" id="#" required>
+                                  <option value="">--- select Team Lead --- </option>
+                                  {% for tl in tl_list %}
+                                  <option value="{{tl.id}}">{{tl.emp_name}}</option>
+                                  {% endfor %}
+                                </select>  
+                                 
+                            </div>
+        
+                            <div class="form-group mt-2">
+                                <label>Check task to Team Lead</label>
+                            </div>
+                            <div class="row">
+                                
+                                {% for ctask in client_task %}
+                                {% if ctask.work_Id.id == work.id %}
+                                <div class="col-xl-6 col-sm-12 grid-margin ">
+                                   
+                                    <div class="form-check ">
+                                        <label class="form-check-label">
+                                            <input type="checkbox" class="form-check-input" name="clientTask" value="{{ctask.id}}" >{{ctask.task_name}}
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="form-group add-items ">
+                              <label>Total Target</label>
+                              <input type="number" class="form-control text-offwhite" value="0" min="0" name="ttarget">  
+                            </div>
+                            
+                            <div class="form-group add-items">
+                              <label>Choose Work Type</label>
+                              <div class="row">
+                                <div class="col-lg-6 col-md-6 col-xl-6 col-sm-12">
+                                  <div class="form-check">
+                                    <label class="form-check-label">
+                                      <input type="radio" class="form-check-input" name="work_type" id="#" value="1"> Single work </label>
+                                      
+                                  </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-xl-6 col-sm-12">
+                                  <div class="form-check">
+                                    <label class="form-check-label">
+                                      <input type="radio" class="form-check-input" name="work_type" id="#" value="0" checked> Group work </label>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                            </div>
+                          
+                            <div class="form-group add-items ">
+                                <label>Start Date</label>
+                                <input type="date" class="form-control text-offwhite" name="fDate" required>  
+                            </div>
+                            <div class="form-group add-items">
+                                <label>Due Date</label>
+                                <input type="date" class="form-control text-offwhite" name="dueDate" required>  
+                            </div>
+                            <div class="form-group add-items mt-3">
+                                <label>More about work</label>
+                                <textarea class="to-do-textarea  text-offwhite" name="discription_data"  placeholder="enter more...">  </textarea>
+                            </div>
+                            <div class="form-group add-items mt-3">
+                              <label>File</label>
+                              <input type="file" class="form-control text-offwhite" name="wFile">  
+                          </div>
+                        </div>
+                    </div>
+                </div>
+               
+            </div>
+        
+            <div class="add-items d-flex justify-content-center ">
+                <button class=" btn btn-outline-primary " type="submit">Allocate</button> 
+            </div>
+        
+        </form>
+
+        </div>
+
+      </div>
+    
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+
+
+<script>
+   
+  const inputField = document.getElementById('search-data');
+  const closeBtn = document.getElementById('closeBtn');
+  const empTable = document.getElementById('work-allocate');
+  closeBtn.style.display = 'none';
+
+  inputField.addEventListener('input', function() {
+      filterTable();
+  });
+
+  function filterTable() {
+      const filterValue = inputField.value.toLowerCase();
+      const rows = empTable.getElementsByTagName('tr');
+
+      for (let i = 1; i < rows.length; i++) {
+          const Cell1 = rows[i].getElementsByTagName('td')[1];
+          const Cell2 = rows[i].getElementsByTagName('td')[2];
+          const Cell3 = rows[i].getElementsByTagName('td')[3];
+          const Cell4 = rows[i].getElementsByTagName('td')[4];
+          const Cell5 = rows[i].getElementsByTagName('td')[5];
+          
+
+          if (Cell1 || Cell2 || Cell3 || Cell4|| Cell5) {
+
+              const datacell1 = Cell1.textContent || Cell1.innerText;
+              const datacell2 = Cell2.textContent || Cell2.innerText;
+              const datacell3 = Cell3.textContent || Cell3.innerText;
+              const datacell4 = Cell4.textContent || Cell4.innerText;
+              const datacell5 = Cell5.textContent || Cell5.innerText;
+              
+              
+
+              if (datacell1.toLowerCase().includes(filterValue) || datacell2.toLowerCase().includes(filterValue) || datacell3.toLowerCase().includes(filterValue)
+              || datacell4.toLowerCase().includes(filterValue) || datacell5.toLowerCase().includes(filterValue) ) 
+              {
+                  rows[i].style.display = '';
+              } else {
+                  rows[i].style.display = 'none';
+              }
+          }
+      }
+  }
+
+   // To display the close button and hide the close button based on the search input 
+  inputField.addEventListener('input', function() {
+  if (inputField.value == '') {
+      closeBtn.style.display = 'none';
+     
+  } else {
+      closeBtn.style.display = 'block';
+      
+  }
+  });
+
+  closeBtn.addEventListener('click', function() {
+  inputField.value = '';
+  closeBtn.style.display = 'none';
+  filterTable(); // Display the full table data
+  });
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        // Add a change event listener to the client selection dropdown
+        $("#client-change").on("change", function () {
+            var selectedClientId = $(this).val();
+            if (selectedClientId) {
+                // Make an AJAX request to the Django server
+                $.ajax({
+                    type: "GET",
+                    url: "{% url 'get_client_tasks' %}",
+                    data: { client_id: selectedClientId },
+                    dataType: "json",
+                    success: function (data) {
+                        var clientTaskDropdown = $("#client-Task");
+                        clientTaskDropdown.empty(); // Clear existing options
+
+                         // Add the 'form-control' and 'text-offwhite' classes
+                        clientTaskDropdown.addClass("form-control small text-offwhite");
+                        // Populate the client tasks
+                        $.each(data, function (index, task) {
+                            // Create an <option> element with the task details
+                            var option = $("<option>")
+                                .val(task.id)
+                                .text(task.task_name);
+
+                            // Append the option to the task dropdown
+                            clientTaskDropdown.append(option);
+                        });
+                    },
+                    error: function (error) {
+                        console.error("Error:", error);
+                    }
+                });
+            } else {
+                // Clear the task dropdown if no client is selected
+                $("#client-Task").empty();
+            }
+        });
+    });
+</script>
+  
+
+  
+
+
+{% endblock %}

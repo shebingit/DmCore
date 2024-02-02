@@ -1,0 +1,99 @@
+{% extends 'TC_base.html' %}
+{% load static %}
+{% block body %}
+
+<div>
+  <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'TC_dashboard' %}">Dashboard</a></li>
+       
+      </ol>
+    </nav>
+</div>
+
+
+    
+    <div class="row ">
+        <div class="col-md-4 " id="card1">
+          <a href="{% url 'TC_current_clients' %}" style="text-decoration: none;">
+          <div class="card" >
+            <div class="card-body">
+  
+              <div class="row">
+                <div class="col-md-9">
+                  
+                  <h5 class="card-title  fw-semibold">CURRENT CLIENTS</h5>
+                   
+                  <p class="text-offwhite">Assigning and ongoing Clients</p>
+  
+                </div>
+                <div class="col">    
+                    
+                  <i class="icon-lg mdi mdi-account-card-details text-success ml-auto" style="font-size: 40px;"></i>
+                  
+                </div>
+              </div>
+            </div>
+          </div></a>
+
+        </div>      
+        
+        <div class="col-md-4 grid-margin">
+          <a href="{% url 'TC_previous_clients' %}" style="text-decoration: none;">
+          <div class="card">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-9">
+                  
+                    
+                    <h5 class="card-title mb-9 fw-semibold">PREVIOUS CLIENTS</h5>
+                  
+                    <p class="text-offwhite">Already Completed Clients</p>
+                  
+                  
+  
+                </div>
+                <div class="col">
+                  
+                    <i class="icon-lg mdi mdi-arrange-send-backward text-primary ms-auto" style="font-size: 40px;"></i>
+               
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+          </a>
+        </div>   
+
+        <div class="col-md-4 grid-margin" style="width: 100%;">
+          <a href="{% url 'TC_waste_leads' %}" style="text-decoration: none;">
+          <div class="card">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-9 text-danger">
+                  
+                    
+                    <h4 class="card-title mb-9 fw-semibold">WASTE LEADS</h4>
+                  
+                    <p class="text-offwhite" >Useless leads of different clients </p>
+                  
+                  
+  
+                </div>
+                <div class="col">
+                  
+                    <i class="icon-lg mdi mdi-alert-circle text-danger ms-auto" style="font-size: 40px;"></i>
+                    
+               
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+          </a>
+        </div>   
+      </div>
+
+
+
+{% endblock %}

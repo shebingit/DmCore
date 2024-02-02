@@ -1,0 +1,337 @@
+{% extends 'DAM_base.html' %}
+{% load static %}
+{% block body %}
+
+<style>
+    .li-none{
+    list-style: none;
+    }
+</style>
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'dataManager_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item"><a class="text-underline-remove text-md" href="{% url 'DAM_notification_section' %}">Today FollowUp</li>
+        </ol>
+      </nav>
+</div>
+
+
+<div class="card" >
+
+    <div class="card-body">       
+       
+            <div class="row ">
+                <div class="col-12 grid-margin">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                        <h6 class="card-title text-offwhite">
+                             Leads We Have - ( {{ dataBank_count }} ) 
+                            <span id="dotsElement" class="mdi mdi-dots-vertical text-secondary" onclick="exicutionActions(this)"></span>
+                        </h6>
+                        <div id="fileActionDropdown" class="file-dactiondropdown card" style="display: none;z-index:99; position: absolute; top:10%;">
+                            <ul class="list-group p-3">
+                            <li class="mb-3 li-none">
+                                <span class="mdi  mdi-printer text-primary "></span>
+                                <a href="" class="ml-2 text-offwhite"><span class="small">Print</span></a>
+                            </li>
+                            <li class="mb-3 li-none">
+                                <span class="mdi mdi-file-pdf text-danger"></span>
+                                <a href="" class=" ml-2 text-offwhite"><span class="small">Pdf</span></a>
+                            </li>
+                            <li class="mb-3 li-none">
+                                <span class="mdi mdi-file-excel text-secondary"></span>
+                                <a href="" class=" ml-2 text-offwhite"><span class="small">Excel</span></a>
+                            </li>
+                            </ul>
+                        </div>
+                        
+                        
+                                    
+                            <div class="add-items d-flex ">
+                        
+                                <input  class="form-control text-offwhite" name="#" id="search-data" placeholder="search here..">
+                                <button class="btn btn-outline-danger mdi mdi-close" id="closeBtn" type="button"></button> 
+                            </div>
+                            
+                        </div>
+            
+                    
+                        
+                  
+                        <form action="{% url 'DAM_Dashboard_todayFollowups' %}" method="post">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-xl-1 col-sm-12 grid-margin ">
+                                    <div class="form-group mt-3">
+                                    
+                                        <a href="{% url 'DAM_Dashboard_todayFollowups' %}" class="btn btn-outline-secondary"> <span class="text-small">All Data</span></a>
+                            
+                                    </div>
+                                </div>
+                                
+                                <div class="col-xl-4 col-sm-12 grid-margin ">
+                                    <div class="form-group">
+                                        <label class="text-offwhite">Select HR\Telecaller *</label>
+                                        <select class="form-control text-offwhite"  name="selected_emp" required>
+                                        <option value="">Select Employee</option>
+                                        {% for emp in employees %}
+                                        <option value="{{emp.id}}">{{ emp.emp_name }}</option>
+                                        {% endfor %}
+                                        </select>
+                            
+                                    </div>
+                                </div>
+                                <div class="col-xl-1 col-sm-12 grid-margin ">
+                                    <div class="form-group mt-3">
+                                    <button type="submit" class="btn btn-outline-primary"> <span class="mdi mdi-magnify"></span></button>
+                            
+                                    </div>
+                                </div>
+                            
+                            
+                                
+                            </div>
+                        </form>
+                    {% if dataBank_objs %} 
+                    <div class="table-responsive">
+                        
+                        <table class="table" id="table-details">
+                        <thead>
+                            <tr>
+                            
+                               
+                                <th> No </th>
+                                <th> Action </th>
+                                <th> Status </th>
+                                <th> Added Date </th>
+                                
+                                <th> Lead Name </th>
+                                <th> Email </th>
+                                <th> Phone Number </th>
+                                <th> Data Sourse </th>
+                                <th> Client name </th>
+                                <th> Lead Category </th>
+                            
+                            </tr>
+                        </thead>
+                        <tbody  id="lead-data">
+                        {% for d in dataBank_objs %}
+                            <tr >
+            
+                               
+                                
+                                <td>{{ forloop.counter }}</td> 
+                                <td>
+                                        
+                                        <span class="mdi mdi-dots-vertical close-action text-secondary" onclick="showActions(this)"></span>
+                                        <div class="actions-dropdown card" style="display: none; position: absolute;">
+                                        
+                                        <ul class="list-group p-3">
+                                            
+                                            <li class="mb-3 li-none">
+                                                <span class="mdi mdi-phone text-secondary"></span>
+                                                <a href="{% url 'DAM_dataBnak_followup' d.id %}" class="small ml-2 text-offwhite">FollowUp</a>
+                                            </li>
+                                            <li class="mb-3 li-none">
+                                            <span class="mdi mdi-file-account text-secondary"></span>
+                                            <a href="{% url 'DAM_dataBnak_followup' d.id %}" class="small ml-2 text-offwhite">Details</a>
+                                            </li>
+                                        
+                                            <li class=" li-none">
+                                            <span class="mdi mdi-delete text-secondary"></span>
+                                            <a href="{% url 'DAM_dataBnak_remove' d.id %}" class=" ml-2 small text-offwhite">Delete</a>
+                                            </li>
+                                        </ul>
+                                        </div>
+                                        
+                                </td> 
+                                <td>
+                                    {% if d.lead_status == 'Not Attended' %}
+                                    <p>
+                                        <span class="mdi mdi-information-outline text-warning mr-1"></span>
+                                        {{ d.lead_status }}</p>
+                                    {% elif  d.lead_status == 'Allocated' %}
+                                    <p><span class="mdi mdi-check text-success mr-1"></span>  {{ d.lead_status }}</p> 
+                                    {% elif  d.lead_status == 'Opend' %}
+                                    <p><span class="mdi mdi-check-all text-success mr-1"></span>  {{ d.lead_status }}</p> 
+                                    {% else %}
+                                    <p><span class="mdi mdi-check-circle text-success mr-1"></span>  {{ d.lead_status }} </p> 
+                                
+                                    {% endif %}
+                                </td>       
+                            
+                                
+                                <td> {{ d.Genarated_date}} </td>  
+                                    
+                                <td><span class="pl-2">{{ d.lead_Id.lead_name }}</span> </td>
+                                <td>{{ d.lead_Id.lead_email }} </td>
+                                <td>{{ d.lead_Id.lead_contact }}</td>
+                                <td>{{ d.lead_Id.lead_source }}</td>
+                                <td>{{ d.lead_Id.lead_work_regId.clientId.client_name }}</td>
+                                <td>{{ d.lead_Id.lead_category_id.lead_collection_for }}</td>
+                            
+                            </tr>
+            
+                            {% endfor %}
+                        
+                        </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                        <div class="d-flex justify-content-center">
+                        <img src="{% static 'images\file-icons\no-data-file.png' %}">
+                        </div>
+                    {% endif %}
+
+                    </div>
+                </div>
+                </div>
+            </div>
+
+       
+    
+    </div>
+    
+</div>
+
+
+
+  <script>
+   
+    const inputField = document.getElementById('search-data');
+    const closeBtn = document.getElementById('closeBtn');
+    const empTable = document.getElementById('table-details');
+    closeBtn.style.display = 'none';
+  
+    inputField.addEventListener('input', function() {
+        filterTable();
+    });
+  
+    function filterTable() {
+        const filterValue = inputField.value.toLowerCase();
+        const rows = empTable.getElementsByTagName('tr');
+  
+        for (let i = 1; i < rows.length; i++) {
+            const Cell1 = rows[i].getElementsByTagName('td')[1];
+            const Cell2 = rows[i].getElementsByTagName('td')[2];
+            const Cell3 = rows[i].getElementsByTagName('td')[3];
+            const Cell4 = rows[i].getElementsByTagName('td')[4];
+            const Cell5 = rows[i].getElementsByTagName('td')[5];
+            const Cell6 = rows[i].getElementsByTagName('td')[6];
+            const Cell7 = rows[i].getElementsByTagName('td')[7];
+            const Cell8 = rows[i].getElementsByTagName('td')[8];
+            const Cell9 = rows[i].getElementsByTagName('td')[9];
+            const Cell10 = rows[i].getElementsByTagName('td')[10];
+           
+  
+  
+            if (Cell1 || Cell2 || Cell3 || Cell4|| Cell5 || Cell6 || Cell7 || Cell8 || Cell9 || Cell10) {
+  
+                const datacell1 = Cell1.textContent || Cell1.innerText;
+                const datacell2 = Cell2.textContent || Cell2.innerText;
+                const datacell3 = Cell3.textContent || Cell3.innerText;
+                const datacell4 = Cell4.textContent || Cell4.innerText;
+                const datacell5 = Cell5.textContent || Cell5.innerText;
+                const datacell6 = Cell6.textContent || Cell6.innerText;
+                const datacell7 = Cell7.textContent || Cell7.innerText;
+                const datacell8 = Cell8.textContent || Cell8.innerText;
+                const datacell9 = Cell9.textContent || Cell9.innerText;
+                const datacell10 = Cell10.textContent || Cell10.innerText;
+                
+                
+  
+                if (datacell1.toLowerCase().includes(filterValue) || 
+                    datacell2.toLowerCase().includes(filterValue) || 
+                    datacell3.toLowerCase().includes(filterValue) ||
+                    datacell4.toLowerCase().includes(filterValue) || 
+                    datacell5.toLowerCase().includes(filterValue) || 
+                    datacell6.toLowerCase().includes(filterValue) ||
+                    datacell7.toLowerCase().includes(filterValue) || 
+                    datacell8.toLowerCase().includes(filterValue) || 
+                    datacell9.toLowerCase().includes(filterValue) || 
+                    datacell10.toLowerCase().includes(filterValue))
+                    
+                {
+                    rows[i].style.display = '';
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+        }
+    }
+  
+     // To display the close button and hide the close button based on the search input 
+    inputField.addEventListener('input', function() {
+    if (inputField.value == '') {
+        closeBtn.style.display = 'none';
+       
+    } else {
+        closeBtn.style.display = 'block';
+        
+    }
+    });
+  
+    closeBtn.addEventListener('click', function() {
+    inputField.value = '';
+    closeBtn.style.display = 'none';
+    filterTable(); // Display the full table data
+    });
+
+
+   
+  </script>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+  <script>
+    function exicutionActions(element) {
+      // Hide all other dropdowns before showing the selected one
+      $('#fileActionDropdown').hide();
+      
+      // Toggle the display of the file-dactiondropdown based on its current state
+      $('#fileActionDropdown').toggle();
+    }
+  
+    // Close the dropdown if the user clicks outside of it
+    $(document).on('click', function (e) {
+      if (!$(e.target).closest('#fileActionDropdown').length && !$(e.target).is('#dotsElement')) {
+        $('#fileActionDropdown').hide();
+      }
+    });
+
+    function showActions(element) {
+      // Hide all other dropdowns before showing the selected one
+      $('.actions-dropdown').hide();
+      
+      // Find the closest actions-dropdown and toggle its display
+      $(element).closest('td').find('.actions-dropdown').toggle();
+    }
+  
+    // Close the dropdown if the user clicks outside of it
+    $(document).on('click', function (e) {
+      if (!$(e.target).closest('.actions-dropdown').length && !$(e.target).hasClass('mdi-dots-vertical')) {
+        $('.actions-dropdown').hide();
+      }
+      
+      
+    });
+
+
+    
+    
+  </script>
+
+
+  
+
+{% endblock %}

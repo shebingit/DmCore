@@ -1,0 +1,48 @@
+def head_TlsingleTask(request,work_assigngId):
+    if 'emp_id' in request.session:
+        if request.session.has_key('emp_id'):
+            emp_id = request.session['emp_id']
+           
+        else:
+            return redirect('/')
+        
+        emp_dash = LogRegister_Details.objects.get(id=emp_id)
+        dash_details = EmployeeRegister_Details.objects.get(logreg_id=emp_dash)
+
+        # Notification-----------
+        notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
+
+       
+        works_assign = WorkAssign.objects.get(id=work_assigngId)
+        success = False
+        success_text = None
+
+
+        if request.POST:
+
+            task_obj = TaskAssign()
+            task_obj.ta_workAssignId = works_assign
+            task_obj.ta_workerId = EmployeeRegister_Details.objects.get(id=int(request.POST['emp_ID']))
+            task_obj.ta_taskId = ClientTask_Register.objects.get(id=int(request.POST['task_name']))
+            task_obj.ta_discription = request.POST['discription_data']
+            task_obj.ta_start_date = request.POST['fDate']
+            task_obj.ta_due_date = request.POST['dueDate']
+            task_obj.ta_allocate_date =  date.today()
+            task_obj.ta_target =  request.POST['task_target']
+            task_obj.ta_file =  request.FILES.get('task_target')
+            task_obj.save()
+
+            success = True
+            success_text = 'Task allocated success.'
+        
+    
+        content = {'emp_dash':emp_dash,'success_text':success_text,
+                   'dash_details':dash_details,
+                   'notifications':notifications,
+                   'works_assign':works_assign,'success':success
+                   }
+
+        return render(request,'HD_Team_Taskallocate.html',content)
+
+    else:
+            return redirect('/')

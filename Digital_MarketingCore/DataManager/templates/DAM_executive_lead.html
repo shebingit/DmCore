@@ -1,0 +1,66 @@
+{% extends 'DAM_base.html' %}
+{% load static %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'dataManager_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item"><a class="text-underline-remove text-md" href="{% url 'DAM_executive_lead' %}">Executive Management</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Executives</li>
+        </ol>
+      </nav>
+</div>
+
+<div class="row">
+    <div class="col-xl-4 col-sm-12 grid-margin stretch-card">
+        <a href="{% url 'DAM_executive_collected_leads' 0 %}" class="a-hover">
+            <div class="card">
+                <div class="card-body">
+                <div class="row">
+                    <div class="col-9 col-sm-9">
+                    <div class="d-flex align-items-center align-self-start">
+                        <h6 class="mb-0 text-white">Sebin John </h6>
+                        <p class="text-success ml-2 mb-0 font-weight-medium" data-toggle="tooltip" title="Total lead count">100</p>
+                    </div>
+                    </div>
+                    <div class="col-3 col-sm-3">
+                    <div class="icon icon-box-primary">
+                        <span class="mdi mdi-account  icon-item"></span>
+                    </div>
+                    </div>
+                </div>
+                <h6 class="text-muted font-weight-normal mt-2"> click to view all leads collected by executives </h6>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-xl-4 col-sm-12 grid-margin stretch-card">
+        <a href="{% url 'DAM_executive_collected_leads' 0 %}" class="a-hover">
+            <div class="card">
+                <div class="card-body">
+                <div class="row">
+                    <div class="col-9 col-sm-9">
+                    <div class="d-flex align-items-center align-self-start">
+                        <h6 class="mb-0 text-white">Kiran Mohan </h6>
+                        <p class="text-success ml-2 mb-0 font-weight-medium"data-toggle="tooltip" title="Total lead count">250</p>
+                    </div>
+                    </div>
+                    <div class="col-3 col-sm-3">
+                    <div class="icon icon-box-primary">
+                        <span class="mdi mdi-account  icon-item"></span>
+                    </div>
+                    </div>
+                </div>
+                <h6 class="text-muted font-weight-normal mt-2"> click to view all leads collected by executives </h6>
+                </div>
+            </div>
+        </a>
+    </div>
+ 
+
+</div>
+
+
+
+{% endblock %}

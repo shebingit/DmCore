@@ -1,0 +1,25 @@
+{% extends 'DAM_base.html' %}
+{% load static %}
+{% block body %}
+
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'dataManager_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active text-md " aria-current="page"><a class="text-underline-remove text-md" href="{% url 'DAM_Dashboard_databank' %}">Data Bank</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Edit</li>
+        </ol>
+      </nav>
+</div>
+
+
+<div class="card">
+
+    <div class="card-body">
+    </div>
+</div>
+
+
+
+{% endblock %}

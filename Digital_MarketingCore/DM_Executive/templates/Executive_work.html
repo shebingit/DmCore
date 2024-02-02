@@ -1,0 +1,141 @@
+{% extends 'Executive_base.html' %}
+{% load static %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'executive_dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active text-md" aria-current="page">Works</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-sm-4 grid-margin">
+        <a href="{% url 'executive_newwork' %}" class="text-white">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5></h5>
+                    <div class="row">
+                        <div class="col-8 col-sm-12 col-xl-8 my-auto">
+                            <div class="d-flex d-sm-block d-md-flex align-items-center">
+                                <h3 class="mb-0">New Works</h3>
+                                <p class="text-success ml-2 mb-0 font-weight-medium"></p>
+                            </div>
+                            <h6 class="text-muted font-weight-normal mt-2">View all your new assigned works and accept them to start work</h6>
+                        </div>
+                        <div class="col-4 col-sm-12 col-xl-4 text-center text-xl-right">
+                            <i class="icon-lg mdi mdi-briefcase-plus text-danger ml-auto"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-sm-4 grid-margin">
+        <a href="{% url 'executive_ongoingwork' %}" class="text-white">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5></h5>
+                    <div class="row">
+                        <div class="col-8 col-sm-12 col-xl-8 my-auto">
+                            <div class="d-flex d-sm-block d-md-flex align-items-center">
+                                <h3 class="mb-0">Ongoing Works</h3>
+                                <p class="text-success ml-2 mb-0 font-weight-medium"></p>
+                            </div>
+                            <h6 class="text-muted font-weight-normal mt-2">Add daily works and View progress, details of your ongoing works </h6>
+                        </div>
+                        <div class="col-4 col-sm-12 col-xl-4 text-center text-xl-right">
+                            <i class="icon-lg mdi mdi-progress-clock text-warning ml-auto"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-sm-4 grid-margin">
+        <a href="{% url 'executive_completedwork' %}" class="text-white">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5></h5>
+                    <div class="row">
+                        <div class="col-8 col-sm-12 col-xl-8 my-auto">
+                            <div class="d-flex d-sm-block d-md-flex align-items-center">
+                                <h3 class="mb-0">Completed Works</h3>
+                                <p class="text-danger ml-2 mb-0 font-weight-medium"></p>
+                            </div>
+                            <h6 class="text-muted font-weight-normal mt-2">View details and status of your completed works</h6>
+                        </div>
+                        <div class="col-4 col-sm-12 col-xl-4 text-center text-xl-right">
+                            <i class="icon-lg mdi mdi-briefcase-check text-success ml-auto"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>    
+        </a>
+    </div>
+
+    <div class="col-sm-4 grid-margin">
+        <a href="{% url 'executive_weekly_progress' %}" class="text-white">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5></h5>
+                    <div class="row">
+                        <div class="col-8 col-sm-12 col-xl-8 my-auto">
+                            <div class="d-flex d-sm-block d-md-flex align-items-center">
+                                <h3 class="mb-0">Weekely Progress</h3>
+                                <p class="text-danger ml-2 mb-0 font-weight-medium"></p>
+                            </div>
+                            <h6 class="text-muted font-weight-normal mt-2">Add your Weekely work progress report and view the details and status </h6>
+                        </div>
+                        <div class="col-4 col-sm-12 col-xl-4 text-center text-xl-right">
+                            <i class="icon-lg mdi mdi-chart-line text-info ml-auto"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>    
+        </a>
+    </div>
+    
+    <div class="col-sm-4 grid-margin">
+        <a href="{% url 'executive_monthly_progress' %}" class="text-white">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5></h5>
+                    <div class="row">
+                        <div class="col-8 col-sm-12 col-xl-8 my-auto">
+                            <div class="d-flex d-sm-block d-md-flex align-items-center">
+                                <h3 class="mb-0">Monthly Progress</h3>
+                                <p class="text-danger ml-2 mb-0 font-weight-medium"></p>
+                            </div>
+                            <h6 class="text-muted font-weight-normal mt-2">Add your Monthly work progress report and view the details and status </h6>
+                        </div>
+                        <div class="col-4 col-sm-12 col-xl-4 text-center text-xl-right">
+                            <i class="icon-lg mdi mdi-chart-bar text-primary ml-auto"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>    
+        </a>
+    </div>
+</div>
+
+
+<style>
+    a{
+        text-decoration: none;
+    }
+    a:hover{
+        text-decoration: none;
+    }
+</style>
+ 
+
+{% endblock %}
+
+
+
+
