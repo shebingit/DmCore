@@ -23,6 +23,11 @@ from openpyxl.workbook import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
 from django.http import HttpResponse
 
+#---------new-------
+
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+
 
 def head_dashboard(request):
     if 'emp_id' in request.session:
@@ -1062,22 +1067,31 @@ def head_transfer_lead(request):
             Cl_ID = request.POST['client_change']
             Ct_ID = request.POST['category_name']
             leads_obj = Leads.objects.filter(lead_work_regId__clientId__id=Cl_ID,lead_category_id__id=Ct_ID,lead_status=1,waste_data=0,lead_transfer_status=0)
-            lead_Details_obj = lead_Details.objects.filter(leadId__in=leads_obj)
+            
         else:
            
             leads_obj = Leads.objects.filter(lead_work_regId__in=works_obj,lead_status=1,waste_data=0,lead_transfer_status=0)
-            lead_Details_obj = lead_Details.objects.filter(leadId__in=leads_obj)
+            
 
         clients_objs = ClientTask_Register.objects.filter(task_name='Lead Collection',cTcompId__id=dash_details.emp_comp_id.id)
         
+        page = request.GET.get('page', 1)
+        paginator = Paginator(leads_obj,5)  # Show 5 items per page
+        try:
+            items = paginator.page(page)
+        
+        except PageNotAnInteger:
+            items = paginator.page(1)
+        except EmptyPage:
+            items = paginator.page(paginator.num_pages)
         
         content = {'emp_dash':emp_dash,
                     'dash_details':dash_details,
                     'notifications':notifications,
                     'works_obj':works_obj,
                     'clients_objs':clients_objs,
-                    'leads_obj':leads_obj,
-                     'lead_Details_obj':lead_Details_obj,
+                    'leads_obj':items,
+                    
                     }
 
         return render(request,'HD_TransferLead.html',content)
@@ -1371,13 +1385,25 @@ def head_lead_collected_data(request,pk,lcID):
         executive_data = EmployeeRegister_Details.objects.filter(Q(emp_designation_id__dashboard_id=1) | Q(emp_designation_id__dashboard_id=2) | Q(emp_designation_id__dashboard_id=3),emp_comp_id=dash_details.emp_comp_id)
             
         lc_obj=LeadCategory_Register.objects.get(id=lcID)
+
+
+        page = request.GET.get('page', 1)
+        paginator = Paginator(leads_obj,5)  # Show 10 items per page
+        try:
+            items = paginator.page(page)
+        
+        except PageNotAnInteger:
+            items = paginator.page(1)
+        except EmptyPage:
+            items = paginator.page(paginator.num_pages)
+
         
 
         content = {'emp_dash':emp_dash,
                     'dash_details':dash_details,
                     'notifications':notifications,
                     'works_obj':works_obj,
-                    'leads_obj':leads_obj,
+                    'leads_obj':items,
                      'lead_Details_obj':lead_Details_obj,
                      'leads_obj_count':leads_obj_count,
                      'lf_obj':lf_obj,
@@ -1918,12 +1944,13 @@ def head_workAllocate(request):
                                                           emp_designation_id__dashboard_id=2)
         
             client_tasks = ClientTask_Register.objects.filter(work_Id=works)
-            lead_category_obj = LeadCategory_Register.objects.filter(cTaskId__in=client_tasks)
+            
 
-            if client_task.task_name == 'Lead Collection' and request.POST['Taskcategory']:
+            category = request.POST['Taskcategory']
+           
 
-                message_obj = 'Are you selected the Lead Collection ! Select categorie '
-    
+            if client_task.task_name == 'Lead Collection' and category == '0' :
+                message_obj = 'Lead Collection task selected! Did you forget to select the category?'
 
             else:
 
@@ -1937,37 +1964,85 @@ def head_workAllocate(request):
                 # Adding allocated Team lead id to WorkRegister Table 
                 works.allocated_emp.add(seletedTl)
                 works.work_allocate_status = 1
-                #works.save()
+                works.save()
 
-                # work_assign_obj = WorkAssign()
+                work_assign_obj = WorkAssign()
 
-                # work_assign_obj.wa_compId = works.wcompId
-                # work_assign_obj.wa_clientId = works.clientId
-                # work_assign_obj.wa_work_regId = works
-                # work_assign_obj.wa_work_allocate = seletedTl
-                # work_assign_obj.wa_from_date = sdate
-                # work_assign_obj.wa_due_date = duedate
-                # work_assign_obj.wa_discription = discription
-                # work_assign_obj.wa_file = any_file
-                # work_assign_obj.wa_status = 1
-                # work_assign_obj.wa_target = wtarget
-                # work_assign_obj.wa_type = w_type
+                work_assign_obj.wa_compId = works.wcompId
+                work_assign_obj.wa_clientId = works.clientId
+                work_assign_obj.wa_work_regId = works
+                work_assign_obj.wa_work_allocate = seletedTl
+                work_assign_obj.wa_from_date = sdate
+                work_assign_obj.wa_due_date = duedate
+                work_assign_obj.wa_discription = discription
+                work_assign_obj.wa_file = any_file
+                work_assign_obj.wa_status = 1
+                work_assign_obj.wa_target = wtarget
+                work_assign_obj.wa_type = w_type
+                work_assign_obj.save()
+                work_assign_obj.wa_tasksId.add(client_task)
+                work_assign_obj.save()
 
-                # work_assign_obj.wa_tasksId.add(*client_task)
-                # work_assign_obj.save()
+                if client_task.task_name == 'Lead Collection' and  category !=0:
+            
+                    lc_team_obj = LeadCateogry_TeamAllocate()
+                    lc_team_obj.Tl_id = seletedTl
+                    lc_team_obj.lc_id = LeadCategory_Register.objects.get(id=int(category))
+                    lc_team_obj.wa_id = work_assign_obj 
+                    lc_team_obj.lcta_discription = discription 
+                    lc_team_obj.lcta_from_date = sdate 
+                    lc_team_obj.lcta_due_date = duedate 
+                    lc_team_obj.lcta_target = wtarget
+                    lc_team_obj.lcta_file = any_file
+                    lc_team_obj.save()
+                
+                if w_type == '1' :
+                    
+                    task_assign_obj = TaskAssign()
+                    task_assign_obj.ta_workAssignId = work_assign_obj
+                    task_assign_obj.ta_workerId = seletedTl
+                    task_assign_obj.ta_taskId = client_task
+
+                    task_assign_obj.ta_discription = discription
+                    task_assign_obj.ta_file = any_file
+                    task_assign_obj.ta_start_date = sdate
+                    task_assign_obj.ta_due_date = duedate
+                    task_assign_obj.ta_target = wtarget
+                    task_assign_obj.ta_allocate_date = date.today()
+                    task_assign_obj.save()
+                    work_assign_obj.allocated_exemp.add(seletedTl)
+                    work_assign_obj.save()
+
+                    if client_task.task_name == 'Lead Collection' and  category !=0:
+                    
+                        lca_obj = LeadCateogry_Assign()
+                        lca_obj.executive_id = seletedTl
+                        lca_obj.lcta_id = lc_team_obj
+                        lca_obj.ta_id = task_assign_obj
+                        lca_obj.lca_discription = discription
+                        lca_obj.lca_from_date = sdate
+                        lca_obj.lca_due_date = duedate
+                        lca_obj.lca_target = wtarget
+                        lca_obj.lca_file = any_file
+                        lca_obj.save()
+
 
                 success = True
-                success_text= 'Work and Task add successful.' 
+                if w_type == '1' :
+                    success_text= client_task.task_name +'Task allocated to ' + seletedTl.emp_name +' successful.' 
+                else:
+                    success_text= client_task.task_name + 'Group task allocated to ' + seletedTl.emp_name +' successful.' 
+
 
             content = {'emp_dash':emp_dash,
                         'dash_details':dash_details,
                         'notifications':notifications,
                         'works':works,'tl_list':tl_list,
-                        'client_task':client_tasks,'lead_category_obj':lead_category_obj,
+                        'client_task':client_tasks,
                         'message_obj':message_obj,'success':success,
                         'success_text':success_text}
 
-            return render(request,'Test\workallocate_page.html',content)
+            return render(request,'workallocate_page.html',content)
                
 
         else:
@@ -2297,11 +2372,27 @@ def head_pendingworkView(request):
                                                           emp_designation_id__dashboard_id=2)
         
         client_task = ClientTask_Register.objects.all()
+
+
+        # pagination--------------------- 
+        page = request.GET.get('page', 1)
+        paginator = Paginator(assigned_works,5)  # Show 5 items per page
+        try:
+            items = paginator.page(page)
+        
+        except PageNotAnInteger:
+            items = paginator.page(1)
+        except EmptyPage:
+            items = paginator.page(paginator.num_pages)
+
+
+
+
         
         content = {'emp_dash':emp_dash,
                    'dash_details':dash_details,
                    'notifications':notifications,
-                   'assigned_works':assigned_works,'tl_list':tl_list,
+                   'assigned_works':items,'tl_list':tl_list,
                    'client_task':client_task}
 
         return render(request,'HD_workpending.html',content)
@@ -4594,7 +4685,7 @@ def head_lead_verify_unverify_all(request,all_wkid,all_lcid):
 #   testing section ------------------------------
 
 
-def test_allocate_page(request,pk):
+def allocate_page(request,pk):
     if 'emp_id' in request.session:
         if request.session.has_key('emp_id'):
             emp_id = request.session['emp_id']
@@ -4622,7 +4713,7 @@ def test_allocate_page(request,pk):
                    'works':works,'tl_list':tl_list,
                    'client_task':client_task,'lead_category_obj':lead_category_obj}
 
-        return render(request,'Test\workallocate_page.html',content)
+        return render(request,'workallocate_page.html',content)
 
     else:
             return redirect('/')

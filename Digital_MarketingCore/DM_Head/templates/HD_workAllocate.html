@@ -100,10 +100,8 @@
                   {% endif %}
                 </td>
                 <td>
-                 
-                    <div class="badge badge-outline-primary" data-toggle="modal" data-target="#allocate{{work.id}}">Single Allocate \ Group Allocate</div>
                   
-                    <a href="{% url  'test_allocate_page' work.id %}" class="btn btn-success"> Allocate Page Dummy</a>
+                    <a href="{% url  'allocate_page' work.id %}"  class="badge badge-outline-primary"> Single Allocate \ Group Allocate</a>
                 </td>
                 
               </tr>
@@ -117,120 +115,7 @@
 </div>
 
 
-<!-- Allocate Modal-->
-{% for work in works %}
-<div class="modal fade" id="allocate{{work.id}}">
-  <div class="modal-dialog  ">
-    <div class="modal-content">
 
-      <div class="card">
-        <div class="card-head d-flex justify-content-between align-items-center mt-3 mb-0 ">
-          <h4 class="card-title mt-3 ml-3">Allocate Team Lead </h4>
-          <span class="mdi mdi-close-box mdi-18px text-danger mr-2"  data-dismiss="modal"></span>
-        </div>
-        <p class="mt-1 ml-3"> * You can individually allocate tasks to the selected team leads here.</p>
-        
-        <div class="card-body mt-0">
-
-          <form action="{% url 'head_workAllocate' %}" method="post"  enctype="multipart/form-data">
-           
-            {% csrf_token %}
-            <div class="row">
-                <div class="col-xl-12 col-sm-12 grid-margin ">
-                    <div class="card">
-                        
-                        <div class="card-body">
-                            <div class="form-group add-items"> 
-                              <input type="hidden" value="{{work.id}}"  name="Work_id">
-                                <label>Team Lead Name</label>
-                                <select class="form-control text-offwhite" name="selected_tl" id="#" required>
-                                  <option value="">--- select Team Lead --- </option>
-                                  {% for tl in tl_list %}
-                                  <option value="{{tl.id}}">{{tl.emp_name}}</option>
-                                  {% endfor %}
-                                </select>  
-                                 
-                            </div>
-        
-                            <div class="form-group mt-2">
-                                <label>Check task to Team Lead</label>
-                            </div>
-                            <div class="row">
-                                
-                                {% for ctask in client_task %}
-                                {% if ctask.work_Id.id == work.id %}
-                                <div class="col-xl-6 col-sm-12 grid-margin ">
-                                   
-                                    <div class="form-check ">
-                                        <label class="form-check-label">
-                                            <input type="checkbox" class="form-check-input" name="clientTask" value="{{ctask.id}}" >{{ctask.task_name}}
-                                        </label>
-                                    </div>
-                                </div>
-                                {% endif %}
-                                {% endfor %}
-                            </div>
-                            <div class="form-group add-items ">
-                              <label>Total Target</label>
-                              <input type="number" class="form-control text-offwhite" value="0" min="0" name="ttarget">  
-                            </div>
-                            
-                            <div class="form-group add-items">
-                              <label>Choose Work Type</label>
-                              <div class="row">
-                                <div class="col-lg-6 col-md-6 col-xl-6 col-sm-12">
-                                  <div class="form-check">
-                                    <label class="form-check-label">
-                                      <input type="radio" class="form-check-input" name="work_type" id="#" value="1"> Single work </label>
-                                      
-                                  </div>
-                                </div>
-                                <div class="col-lg-6 col-md-6 col-xl-6 col-sm-12">
-                                  <div class="form-check">
-                                    <label class="form-check-label">
-                                      <input type="radio" class="form-check-input" name="work_type" id="#" value="0" checked> Group work </label>
-                                  </div>
-                                </div>
-                              </div>
-                              
-                            </div>
-                          
-                            <div class="form-group add-items ">
-                                <label>Start Date</label>
-                                <input type="date" class="form-control text-offwhite" name="fDate" required>  
-                            </div>
-                            <div class="form-group add-items">
-                                <label>Due Date</label>
-                                <input type="date" class="form-control text-offwhite" name="dueDate" required>  
-                            </div>
-                            <div class="form-group add-items mt-3">
-                                <label>More about work</label>
-                                <textarea class="to-do-textarea  text-offwhite" name="discription_data"  placeholder="enter more...">  </textarea>
-                            </div>
-                            <div class="form-group add-items mt-3">
-                              <label>File</label>
-                              <input type="file" class="form-control text-offwhite" name="wFile">  
-                          </div>
-                        </div>
-                    </div>
-                </div>
-               
-            </div>
-        
-            <div class="add-items d-flex justify-content-center ">
-                <button class=" btn btn-outline-primary " type="submit">Allocate</button> 
-            </div>
-        
-        </form>
-
-        </div>
-
-      </div>
-    
-    </div>
-  </div>
-</div>
-{% endfor %}
 
 
 
@@ -296,51 +181,6 @@
   });
 </script>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<script>
-    $(document).ready(function () {
-        // Add a change event listener to the client selection dropdown
-        $("#client-change").on("change", function () {
-            var selectedClientId = $(this).val();
-            if (selectedClientId) {
-                // Make an AJAX request to the Django server
-                $.ajax({
-                    type: "GET",
-                    url: "{% url 'get_client_tasks' %}",
-                    data: { client_id: selectedClientId },
-                    dataType: "json",
-                    success: function (data) {
-                        var clientTaskDropdown = $("#client-Task");
-                        clientTaskDropdown.empty(); // Clear existing options
-
-                         // Add the 'form-control' and 'text-offwhite' classes
-                        clientTaskDropdown.addClass("form-control small text-offwhite");
-                        // Populate the client tasks
-                        $.each(data, function (index, task) {
-                            // Create an <option> element with the task details
-                            var option = $("<option>")
-                                .val(task.id)
-                                .text(task.task_name);
-
-                            // Append the option to the task dropdown
-                            clientTaskDropdown.append(option);
-                        });
-                    },
-                    error: function (error) {
-                        console.error("Error:", error);
-                    }
-                });
-            } else {
-                // Clear the task dropdown if no client is selected
-                $("#client-Task").empty();
-            }
-        });
-    });
-</script>
-  
-
-  
 
 
 {% endblock %}

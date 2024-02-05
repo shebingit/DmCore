@@ -18,9 +18,11 @@
         <div class="mt-2">
             <a href="{% url 'head_allocateWorkView' %}" class="ml-2 small text-secondary"><span class="mdi mdi-undo-variant">  </span> Back</a>
             
+            {% if message_obj %}
             <div class="text-center m-1 bg-danger">
                 <p class="text-secondary p-2"> <span class="mdi mdi-close-circle mr-2"></span>{{message_obj}}</p>
             </div>
+            {% endif %}
         </div>
        
         <div class="card-body">
@@ -61,7 +63,7 @@
                            
                             <label>Select task category</label>
                             <select class="form-control text-offwhite" name="Taskcategory" id="lead-category" >
-                                <option value="">--- Select Categories --- </option>
+                                <option value="0">--- Select Categories --- </option>
                                
                             </select>  
                         </div>
@@ -165,7 +167,7 @@
                   
                     leadCategorySelect.empty(); 
       
-                    var option = '<option>' + '--- Select Categories ---' + '</option>';
+                    var option = '<option value="0">' + '--- Select Categories ---' + '</option>';
                     leadCategorySelect.append(option);
                     data.lead_categories.forEach(function (category) {
                         var option = '<option value="' + category.id + '">' + category.name + '</option>';

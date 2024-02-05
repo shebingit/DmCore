@@ -8,7 +8,40 @@
     {
         background: transparent;
     }
- </style>
+ 
+    /* Pagination Styling */
+   
+      .pagination-box
+      {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 0.5rem;
+      }
+      .pagination .pagination-ul a
+      {
+        color: #e7e7e7;
+      }
+      .pagination .pagination-ul li:hover a
+      {
+        color: #4a739c;
+      }
+      .pagination .pagination-ul .page-link
+      {
+        border: #e5e3e3;
+        background: #1a191900;
+      }
+      @media(max-width:768px)
+      {
+        .pagination-box
+      {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      }
+    </style>
 
 <div>
     <nav aria-label="breadcrumb">
@@ -42,74 +75,125 @@
                     
                 </div>
                 <div class="row">
-                    <div class="col-sm-6 col-lg-3 col-md-3 col-xl-2  grid-margin">
+                    <!-- <div class="col-sm-6 col-lg-1 col-md-2 col-xl-1  grid-margin">
                         <div class="badge badge-pill badge-outline-info">
                             <span id="check-count">Leads -{{  leads_obj_count }}</span>
                         </div>
+                    </div> -->
+                    <div class="col-sm-6 col-lg-8 col-md-7 col-xl-9  grid-margin">
+                        <form action="{% url 'head_lead_collected_data' works_obj.id lc_obj.id %}" method="post" >
+
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-sm-12 col-lg-4 col-md-4 col-xl-4  grid-margin">
+                                    <div class="section-box">
+                                        <select class="form-control" style="color: rgb(238, 242, 242);" name="empID">
+                                            <option value="0"> Select Executives </option>
+                                            {% for exe in executive_data %}
+                                            <option value="{{ exe.id }}"> {{ exe.emp_name }} </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-lg-3 col-md-3 col-xl-3  grid-margin">
+                                    <div class="form-group">
+                                        <input type="date" class="form-control" name="sdate">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-lg-3 col-md-3 col-xl-3  grid-margin">
+                                    <div class="form-group ">
+                                        <input type="date" class="form-control" name="edate">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-lg-2 col-md-2 col-xl-2  grid-margin">
+                                    <button type="submit" class="btn btn-outline-primary"><span class="mdi mdi-magnify"></span></button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
-                    <div class="col-sm-6 col-lg-3 col-md-3 col-xl-2  grid-margin">
-                        <a href="#">
-                            <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#singlLead">
-                                <span class="mdi mdi-arrow-expand-up mr-1"></span><span class="small">Data Form</span>
-                            </button>
-                        </a>
-                    </div>
-                    <div class="col-sm-6 col-lg-3 col-md-3 col-xl-2  grid-margin">
-                        <a href="{% url 'duplicate_data' works_obj.id lcID %}">
-                            <button class="btn btn-outline-warning" data-toggle="tooltip" title="To check duplicates data based on email and Contact number">
-                                <span class="mdi mdi-file-multiple mr-1"></span><span class="small">Duplicates Data</span>
-                            </button>
-                        </a>
-                    </div>
-                    <div class="col-sm-6 col-lg-3 col-md-3 col-xl-2 grid-margin ">
-                        <a href="{% url 'download_excel' works_obj.id lcID %}">
-                            <button class="btn btn-outline-danger" data-toggle="tooltip" title="Excel file format for data upload">
-                                <span class="mdi mdi-file-excel mr-1"></span><span class="small">File Download</span>
-                            </button>
-                        </a>
-                    </div>
-                    <div class="col-sm-6 col-lg-3 col-md-3 col-xl-2  grid-margin">
-                        <a href="#">
-                            <button class="btn btn-outline-primary" data-toggle="modal" data-target="#fileUpload">
-                                <span class="mdi mdi-arrow-expand-up mr-1"></span><span class="small">File Upload</span>
-                            </button>
-                        </a>
+                    <style>
+                        .btn-bgcolor
+                        {
+                            background: #dd8518;
+                            border: none;
+                            
+                        }
+                        .btn-mdicon
+                        {
+                            color: #f8f6f600;
+                        }
+                    </style>
+                    
+                    <div class="col-sm-6 col-lg-3 col-md-3 col-xl-3  grid-margin">
+                        <div class="d-flex justify-content-end align-items-center">
+
+
+                            <div class="grid-margin">
+                                <a href="#" title="Lead register form">
+                                    <button class="btn btn-bgcolor" data-toggle="modal" data-target="#singlLead">
+                                        <span class="mdi mdi-file-document  mr-1"></span>
+                                    </button>
+                                </a>
+                            </div>
+                            <!-- <div class="grid-margin">
+                                <a href="{% url 'duplicate_data' works_obj.id lcID %}">
+                                    <button class="btn btn-warning" data-toggle="tooltip" title="To check duplicates data based on email and Contact number">
+                                        <span class="mdi mdi-file-multiple mr-1"></span><span class="small">Duplicates Data</span>
+                                    </button>
+                                </a>
+                            </div> -->
+                            <div class=" grid-margin " title="Excel file download">
+                                <a href="{% url 'download_excel' works_obj.id lcID %}" class="ml-1">
+                                    <button class="btn btn-danger" data-toggle="tooltip">
+                                        <span class="mdi mdi-file-excel mr-1"></span><span class="small"></span>
+                                    </button>
+                                </a>
+                            </div>
+                            <div class=" grid-margin">
+                                <a href="#" class="ml-1"  title="Excel file upload">
+                                    <button class="btn btn-primary" data-toggle="modal" data-target="#fileUpload">
+                                        <span class="mdi mdi-arrow-expand-up mr-1"></span><span class="small"></span>
+                                    </button>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <form action="{% url 'head_lead_collected_data' works_obj.id lc_obj.id %}" method="post" class="mt-3">
-
-                    {% csrf_token %}
-                    <div class="row">
-                        <div class="col-sm-12 col-lg-4 col-md-4 col-xl-4  grid-margin">
-                            <div class="section-box">
-                                <select class="form-control" style="color: rgb(238, 242, 242);" name="empID">
-                                    <option value="0"> Select Executives </option>
-                                    {% for exe in executive_data %}
-                                    <option value="{{ exe.id }}"> {{ exe.emp_name }} </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-lg-3 col-md-3 col-xl-3  grid-margin">
-                            <div class="form-group">
-                                <input type="date" class="form-control" name="sdate">
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-lg-3 col-md-3 col-xl-3  grid-margin">
-                            <div class="form-group ">
-                                <input type="date" class="form-control" name="edate">
-                            </div>
-                        </div>
-                        <div class="col-sm-12 col-lg-2 col-md-2 col-xl-2  grid-margin">
-                            <button type="submit" class="btn btn-outline-primary"><span class="mdi mdi-magnify"></span></button>
-                        </div>
-                </form>
+                
 
                 {% if leads_obj %}
                 
                   
                     <div class="table-responsive">
+
+                        <div class="pagination pagination-box ">
+                            <div>
+                              <p class="text-muted">Showing {{ leads_obj.start_index }} to {{ leads_obj.end_index }} of {{ leads_obj.paginator.count }} entries</p>
+                            </div>
+                            <div>
+                              <ul class="pagination pagination-ul">
+                                  {% if leads_obj.has_previous %}
+                                      <li class="page-item"><a class="page-link" href="?page=1">&laquo;&laquo;</a></li>
+                                      <li class="page-item"><a class="page-link" href="?page={{ leads_obj.previous_page_number }}">&laquo;</a></li>
+                                  {% endif %}
+                          
+                                  {% for i in leads_obj.paginator.page_range %}
+                                    {% if i > leads_obj.number|add:'-3' and i < leads_obj.number|add:'3' %}
+                                        <li class="page-item{% if leads_obj.number == i %} active{% endif %}">
+                                            <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                          
+                                  {% if leads_obj.has_next %}
+                                      <li class="page-item"><a class="page-link" href="?page={{ leads_obj.next_page_number }}">&raquo;</a></li>
+                                      <li class="page-item"><a class="page-link" href="?page={{ leads_obj.paginator.num_pages }}">&raquo;&raquo;</a></li>
+                                  {% endif %}
+                              </ul>
+                            </div>
+                            
+                        </div>
                        
                         <table class="table" id="leads-data">
                         <thead>

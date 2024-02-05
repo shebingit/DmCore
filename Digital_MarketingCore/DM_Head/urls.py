@@ -198,7 +198,7 @@ urlpatterns = [
 # tesing url section 
 
 
-    path('work allocate/<int:pk>',views.test_allocate_page,name='test_allocate_page'),
+    path('Work_allocate/<int:pk>',views.allocate_page,name='allocate_page'),
     path('Fetch_Task_Categories',views.fetch_task_categories,name='fetch_task_categories'),
     
 

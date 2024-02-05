@@ -3,6 +3,40 @@
 {% load custom_filters %}
 {% block body %}
 
+<!-- Pagination Styling -->
+<style>
+    .pagination-box
+    {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1rem;
+    }
+    .pagination .pagination-ul a
+    {
+      color: #e7e7e7;
+    }
+    .pagination .pagination-ul li:hover a
+    {
+      color: #4a739c;
+    }
+    .pagination .pagination-ul .page-link
+    {
+      border: #e5e3e3;
+      background: #1a191900;
+    }
+    @media(max-width:768px)
+    {
+      .pagination-box
+    {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    }
+  </style>
+
 <div>
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -84,6 +118,37 @@
                 </div>
         
                 <div class="table-responsive">
+
+
+                    <div class="pagination pagination-box ">
+                        <div>
+                          <p class="text-muted">Showing {{ leads_obj.start_index }} to {{ leads_obj.end_index }} of {{ leads_obj.paginator.count }} entries</p>
+                        </div>
+                        <div>
+                          <ul class="pagination pagination-ul">
+                              {% if leads_obj.has_previous %}
+                                  <li class="page-item"><a class="page-link" href="?page=1">&laquo;&laquo;</a></li>
+                                  <li class="page-item"><a class="page-link" href="?page={{ leads_obj.previous_page_number }}">&laquo;</a></li>
+                              {% endif %}
+                      
+                              {% for i in leads_obj.paginator.page_range %}
+                                {% if i > leads_obj.number|add:'-3' and i < leads_obj.number|add:'3' %}
+                                    <li class="page-item{% if assigned_works.number == i %} active{% endif %}">
+                                        <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                      
+                              {% if leads_obj.has_next %}
+                                  <li class="page-item"><a class="page-link" href="?page={{ leads_obj.next_page_number }}">&raquo;</a></li>
+                                  <li class="page-item"><a class="page-link" href="?page={{ leads_obj.paginator.num_pages }}">&raquo;&raquo;</a></li>
+                              {% endif %}
+                          </ul>
+                        </div>
+                        
+                    </div>
+
+
                     <table class="table" id="leads-data">
                     <thead>
                         <tr>
@@ -98,17 +163,18 @@
                                     
                                 </div>
                               </th>
+                              <th> Action </th>
                               <th>No</th>
                             <th>Collected Date</th>
                             <th>Client </th>
                             <th>Lead Collected for </th>
-                            <th>Lead Full Name</th>
+                            <th>Full Name</th>
                             <th>Email id  </th>
                             <th>Contact No </th>
                             <th>Source </th>
-                            <th> Details  </th>
+                           
                             <th> Verification Status </th>
-                            <th> Action </th>
+                           
                             
                         </tr>
                     </thead>
@@ -125,6 +191,9 @@
                                 </label>
                             </div>
                             </td>
+                            <td>
+                                <a href="{% url 'head_single_leadTransfer' lead.id %}" class=" btn btn-outline-primary "><span class="mdi mdi-redo-variant mr-1 small"> Transfer</span></a>
+                            </td>
                             <td> <span>{{ forloop.counter }}</span></td>
                             <td>{{ lead.lead_add_date }}</td>
                             <td>{{lead.lead_work_regId.clientId.client_name}}</td>
@@ -133,29 +202,11 @@
                             <td>{{ lead.lead_email }}</td>
                             <td>{{ lead.lead_contact }}</td>
                             <td>{{ lead.lead_source }}</td>
-                            <td>
-                                
-                                <ol>
-                                
-                                    {% for Details in lead_Details_obj %}
-                                    {% if Details.leadId.id == lead.id %}
-                                    <li>
-                                        <p>
-                                            <span class="mr-1"> {{ Details.lead_field_name }} :</span>
-                                            <span> {{ Details.lead_field_data }} </span>
-                                        </p>
-                                    </li>
-                                    {% endif %}
-                                    {% endfor %}
-                                </ol>
                             
-                            </td>
                             <td>
                                 <button class=" btn btn-outline-success "><span class="mdi mdi-check-all mr-1 small"> Verified</span></button>   
                             </td>
-                            <td>
-                                <a href="{% url 'head_single_leadTransfer' lead.id %}" class=" btn btn-outline-primary "><span class="mdi mdi-redo-variant mr-1 small"> Transfer</span></a>
-                            </td>
+                            
 
                         </tr>
                     {% endfor %}
