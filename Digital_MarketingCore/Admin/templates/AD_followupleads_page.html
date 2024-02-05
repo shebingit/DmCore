@@ -316,9 +316,17 @@
             console.log("Received data:", data);
   
             // Populate the table with the received data
+            
+            
             for (var i = 0; i < data.details1.length; i++) {
               var lead = data.details1[i];
-              var more_detail = `<button class="btn btn-outline-success btn-sm leads-btn" data-toggle="modal" data-target="#leadModal${lead.modalid}">Details</button>`;
+              var lid = lead.modalid
+             
+
+              var url ="{% url 'admin_lead_details' 0 %}".replace('0', lid);
+              var more_detail = `<a href="${url}" class="btn btn-outline-success btn-sm leads-btn">Details</a>`;
+             
+              
               
               var newRow = `
                 <tr>

@@ -1,0 +1,264 @@
+{% extends 'AD_base.html' %}
+{% load static %}
+{% block body %}
+<style>
+    .line-bd
+    {
+        border: 1px #3d3c39 solid;
+    }
+</style>
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'admin_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item"><a class="text-underline-remove text-md" href="{% url 'admin_leads_section' %}">DataBank</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Reports</li>
+        </ol>
+      </nav>
+</div>
+
+<div class="d-flex justify-content-between">
+    <h5 class="ml-3">Leads - <span class=""> {{databank_obj_count}} </span>  </h5>
+    <div>
+        <p class="small">Date : {% now 'd-m-y' %} </p>
+    </div>
+</div>
+<div class="card line-bd"></div>
+
+<div class="row mt-3">
+    <div class="col-lg-3 col-md-3 col-sm-6 grid-margin">
+        <div class="card">
+            <div class="card-body text-center">
+                <p><span class="mdi mdi-file-document ml-2"></span> <span> New Leads Today - 50 </span> </p>
+            </div>
+            
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-6 grid-margin">
+        <div class="card">
+            <div class="card-body text-center">
+                <p><span class="mdi mdi-file-account ml-2"></span> <span>Aocation Pending - 34</span></p>
+            </div>
+              
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-6 grid-margin">
+        
+        <div class="card">  
+            <div class="card-body text-center ">
+                <p><span class="mdi mdi-calendar-multiple-check ml-2"></span> <span>Total Follow Up - 24</span></p>
+                
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-6 grid-margin">
+        
+        <div class="card">  
+            <div class="card-body text-center">
+                <p><span class="mdi mdi-calendar-today ml-2"></span> <span> Today Follow Up - 24</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card line-bd"></div>
+
+<div class="table-responsive" >
+
+    <div class="card mt-3">
+        <div class="card-body">
+            <form>
+                <div class="row ">
+                    <div class="col-lg-2 col-md-2 col-sm-6 grid-margin">
+                        <select name="client-select" id="#" class="form-control text-white" >
+                            <option value="" hidden>-- Select Client --</option>
+                            {% for i in clients %}
+                            <option value="{{i.id}}">{{i.client_name}}</option>
+                            {% endfor %}
+                        </select>    
+                            
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-6 grid-margin">
+                        <select name="client-select" id="#" class="form-control text-white" >
+                            <option value="" hidden>-- Select Category --</option>
+                            {% for i in clients %}
+                            <option value="{{i.id}}">{{i.client_name}}</option>
+                            {% endfor %}
+                        </select>    
+                            
+                    </div>
+                    
+                    <div class="col-lg-2 col-md-2 col-sm-6 grid-margin">
+                        <select name="client-select" id="#" class="form-control text-white" >
+                            <option value="" hidden>-- Select Hr --</option>
+                            {% for i in clients %}
+                            <option value="{{i.id}}">{{i.client_name}}</option>
+                            {% endfor %}
+                        </select>    
+                            
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-6 grid-margin">
+                        <select name="client-select" id="#" class="form-control text-white" >
+                            <option value="" hidden>-- Select Status --</option>
+                            {% for i in clients %}
+                            <option value="{{i.id}}">{{i.client_name}}</option>
+                            {% endfor %}
+                        </select>    
+                            
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-12 grid-margin">
+                    
+                            <div class="row">
+                                <div class="col-lg-5 col-md-5 col-sm-4 grid-margin">
+                                    <input type="date" class="form-control text-white">
+                                </div>
+                                <div class="col-lg-5 col-md-5 col-sm-4 grid-margin">
+                                    <input type="date" class="form-control text-white">
+                                </div>
+                                <div class="col-lg-2 col-md-2 col-sm-4 grid-margin">
+                                    <button type="submit" class="btn btn-outline-primary mdi mdi-magnify"></button>
+                                </div>
+                            </div>
+                    
+                            
+                    </div>
+                    <div class="col-lg-1 col-md-1 col-sm-3 grid-margin">
+                        <span class="mdi mdi-file-pdf text-danger"></span>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-3 grid-margin">
+                        <select name="client-select" id="#" class="form-control text-white" >
+                            <option value="" hidden>-- Select Platform --</option>
+                            {% for i in clients %}
+                            <option value="{{i.id}}">{{i.client_name}}</option>
+                            {% endfor %}
+                        </select>    
+                            
+                    </div>
+                    <div class="col-lg-8 col-md-8 col-sm-8 grid-margin">
+                        <div class="add-items d-flex ">
+              
+                            <input  class="form-control text-offwhite" name="#" id="search-data" placeholder="search here..">
+                            <button class="btn btn-outline-danger mdi mdi-close" id="closeBtn" type="button"></button> 
+                        </div>
+                    </div>
+                    
+                </div>
+            </form>
+
+
+            <div>
+                <div>
+                    <h6 class="text-secondary"> Lead List </h6>
+                </div>
+            </div>
+
+            <table class="table mt-4 mb-4" id="table-data">
+                <thead>
+                  <tr>
+                    <th> No. </th>
+                    <th> Date </th>
+                    <th> Client Name \ Lead Category</th>
+                    <th> Action</th>
+                    <th> Lead Name</th>
+                    <th> Lead Final Status</th>   
+                    <th>Lead Collected by</th>
+                     
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                  {% for i in databank_obj %}  
+                  <tr>
+                    <td>{{forloop.counter}}</td>
+                    <td>{{i.Genarated_date|date:"d-m-y"}}</td>
+                    <td>{{i.lead_Id.lead_work_regId.clientId.client_name}}
+                        <p class="mt-2">( {{i.lead_Id.lead_category_id.lead_collection_for}} )</p>
+                    </td>
+                    <td><span class="mdi mdi-dots-vertical"> </span></td>
+                    <td>{{i.lead_Id.lead_name}}
+                        <p class="mt-2">{{i.lead_Id.lead_email}}</p>
+                        <p class="mt-2">{{i.lead_contact}}</p>
+                        <p class="mt-2">Source : {{i.lead_Id.lead_source }}</p>
+                    </td>
+                    <td>{{i.lead_status}}</td>
+                    <td>{{i.lead_Id.lead_collect_Emp_id.emp_name}}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+            </table>
+                    
+        </div>         
+    </div>
+
+    
+
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+   
+    const inputField = document.getElementById('search-data');
+    const closeBtn = document.getElementById('closeBtn');
+    const empTable = document.getElementById('table-data');
+    closeBtn.style.display = 'none';
+
+    inputField.addEventListener('input', function() {
+        filterTable();
+    });
+
+    function filterTable() {
+        const filterValue = inputField.value.toLowerCase();
+        const rows = empTable.getElementsByTagName('tr');
+
+        for (let i = 1; i < rows.length; i++) {
+            const Cell1 = rows[i].getElementsByTagName('td')[1];
+            const Cell2 = rows[i].getElementsByTagName('td')[2];
+            const Cell3 = rows[i].getElementsByTagName('td')[4];
+            const Cell4 = rows[i].getElementsByTagName('td')[5];
+            const Cell5 = rows[i].getElementsByTagName('td')[6];
+            
+
+            if (Cell1 || Cell2 || Cell3 || Cell4|| Cell5) {
+
+                const datacell1 = Cell1.textContent || Cell1.innerText;
+                const datacell2 = Cell2.textContent || Cell2.innerText;
+                const datacell3 = Cell3.textContent || Cell3.innerText;
+                const datacell4 = Cell4.textContent || Cell4.innerText;
+                const datacell5 = Cell5.textContent || Cell5.innerText;
+                
+                
+
+                if (datacell1.toLowerCase().includes(filterValue) || datacell2.toLowerCase().includes(filterValue) || datacell3.toLowerCase().includes(filterValue)
+                || datacell4.toLowerCase().includes(filterValue) || datacell5.toLowerCase().includes(filterValue) ) 
+                {
+                    rows[i].style.display = '';
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+        }
+    }
+
+     // To display the close button and hide the close button based on the search input 
+    inputField.addEventListener('input', function() {
+    if (inputField.value == '') {
+        closeBtn.style.display = 'none';
+       
+    } else {
+        closeBtn.style.display = 'block';
+        
+    }
+    });
+
+    closeBtn.addEventListener('click', function() {
+    inputField.value = '';
+    closeBtn.style.display = 'none';
+    filterTable(); // Display the full table data
+    });
+</script>
+
+
+
+{% endblock %}

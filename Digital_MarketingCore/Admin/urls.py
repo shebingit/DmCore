@@ -82,6 +82,7 @@ urlpatterns = [
     path('Admin-Leads',views.admin_leads_page,name='admin_leads_page'),
     path('Admin-LeadDetails',views.admin_get_client_leaddetails,name='admin_get_client_leaddetails'),
     path('Admin_lead_categories',views.get_lead_categories, name='get_lead_categories'),
+    path('Admin-Lead-DetailsPage/<int:pk>',views.admin_lead_details, name='admin_lead_details'),
     path('Admin_lead_collected_employees',views.get_lead_collected_employees, name='get_lead_collected_employees'),
     path('Admin-Employee-LeadDetails',views.admin_get_client_employee_leaddetails,name='admin_get_client_employee_leaddetails'),
     path('Admin-Waste-Leads',views.admin_wasteleads_page,name='admin_wasteleads_page'),
@@ -98,6 +99,10 @@ urlpatterns = [
     
     path('admin_pltformdata', views.admin_pltformdata, name='admin_pltformdata'),
     path('admin_pltformleads_page/<str:lead_source>', views.admin_pltformleads_page, name='admin_pltformleads_page'),
+
+    # Reports ============================
+
+    path('admin_reports', views.admin_reports, name='admin_reports'),
 
 
     

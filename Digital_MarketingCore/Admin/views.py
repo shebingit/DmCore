@@ -2375,10 +2375,10 @@ def admin_followupleads_page(request):
 
         works=WorkRegister.objects.filter(wcompId=dash_details)
 
-        followup_leads=leads=Leads.objects.filter(lead_work_regId__in=works,waste_data=0,lead_transfer_status=1).order_by('-lead_add_date', '-lead_add_time')
-        followup_lead_details=lead_Details.objects.filter(leadId__in=followup_leads)
-        followup_followup_details = FollowupDetails.objects.filter(lead_Id__in=followup_leads).order_by('response_date')
-        followup_history_details = FollowupHistory.objects.filter(hs_lead_Id__in=followup_leads)
+        followup_leads=Leads.objects.filter(lead_work_regId__in=works,waste_data=0,lead_transfer_status=1).order_by('-lead_add_date', '-lead_add_time')
+        #followup_lead_details=lead_Details.objects.filter(leadId__in=followup_leads)
+        #followup_followup_details = FollowupDetails.objects.filter(lead_Id__in=followup_leads).order_by('response_date')
+        #followup_history_details = FollowupHistory.objects.filter(hs_lead_Id__in=followup_leads)
         hr_telecaller=EmployeeRegister_Details.objects.filter(emp_designation_id__dashboard_id=4,emp_comp_id=dash_details)
         followup_status=FollowupStatus.objects.filter(company_Id=dash_details)
        
@@ -2387,10 +2387,10 @@ def admin_followupleads_page(request):
             'Admin_dash':Admin_dash,
             'dash_details':dash_details,
             'clients':clients,
-            'followup_leads':followup_leads,
-            'followup_lead_details':followup_lead_details,
-            'followup_followup_details': followup_followup_details,
-            'followup_history_details': followup_history_details,
+            #'followup_leads':followup_leads,
+            #'followup_lead_details':followup_lead_details,
+            #'followup_followup_details': followup_followup_details,
+            #'followup_history_details': followup_history_details,
             'hr_telecaller':hr_telecaller,
             'followup_status':followup_status,
             
@@ -2401,6 +2401,46 @@ def admin_followupleads_page(request):
 
     else:
         return redirect('/')
+    
+
+
+def admin_lead_details(request,pk):
+    if 'admin_id' in request.session:
+        if request.session.has_key('admin_id'):
+            admin_id = request.session['admin_id']
+           
+        else:
+            return redirect('/')
+        
+        Admin_dash = LogRegister_Details.objects.get(id=admin_id)
+        dash_details = BusinessRegister_Details.objects.get(log_id=Admin_dash)
+
+  
+
+        followup_leads=Leads.objects.get(id=pk,waste_data=0,lead_transfer_status=1)
+        followup_lead_details=lead_Details.objects.filter(leadId=followup_leads)
+        followup_followup_details = FollowupDetails.objects.filter(lead_Id=followup_leads).order_by('response_date')
+        followup_history_details = FollowupHistory.objects.filter(hs_lead_Id=followup_leads)
+       
+       
+       
+        content = {
+            'Admin_dash':Admin_dash,
+            'dash_details':dash_details,
+            'followup_leads':followup_leads,
+            'followup_lead_details':followup_lead_details,
+            'followup_followup_details': followup_followup_details,
+            'followup_history_details': followup_history_details,
+           
+            
+            
+        }
+
+        return render(request,'AD_followupleads_Detailspage.html',content)
+
+    else:
+        return redirect('/')
+
 
 def get_leadcategory(request):
     client_id = request.GET.get('client_id')
@@ -2737,3 +2777,38 @@ def admin_pltformleads_page(request,lead_source):
 
     else:
             return redirect('/')
+    
+
+
+
+def admin_reports(request):
+    if 'admin_id' in request.session:
+        if request.session.has_key('admin_id'):
+            admin_id = request.session['admin_id']
+           
+        else:
+            return redirect('/')
+        
+        Admin_dash = LogRegister_Details.objects.get(id=admin_id)
+        dash_details = BusinessRegister_Details.objects.get(log_id=Admin_dash)
+
+    
+        databank_obj = DataBank.objects.filter(lead_Id__lead_work_regId__wcompId=dash_details)
+        databank_obj_count = DataBank.objects.filter(lead_Id__lead_work_regId__wcompId=dash_details).count()
+
+           
+
+        content = {
+            'Admin_dash':Admin_dash,
+            'dash_details':dash_details,
+            'databank_obj':databank_obj,
+            'databank_obj_count':databank_obj_count
+            
+            
+        }
+
+        return render(request,'AD_hr_lead_Report.html',content)
+
+    else:
+            return redirect('/')
+    
