@@ -1,3 +1,4 @@
+from datetime import date
 from Registration_Login.models import *
 from DataManager.models import DataBank
 from django.db.models import Q
@@ -2470,9 +2471,18 @@ def filter_lead(request):
             waste_data=0
         ).order_by('-lead_add_date', '-lead_add_time')
 
+        lcount = Leads.objects.filter(
+            lead_taskAssignId__ta_taskId__client_Id_id=client_id, 
+            lead_transfer_status=1, 
+            waste_data=0
+        ).count()
         # Build a list of dictionaries for follow-up leads
         lead_list = []
+        db_obj=None
+
         for lead in followup_leads:
+           
+
             lead_list.append({
                 'date': lead.lead_transfer_date,
                 'client_name': lead.lead_taskAssignId.ta_taskId.client_Id.client_name,
@@ -2482,11 +2492,12 @@ def filter_lead(request):
                 'contact': lead.lead_contact,
                 'source': lead.lead_source,
                 'modalid': lead.id,
+               
                 'collected_by': lead.lead_collect_Emp_id.emp_name,
             })
         
         context={
-            'details1': lead_list,
+            'details1': lead_list,'lcount':lcount,
         }
 
         return JsonResponse(context)
@@ -2508,9 +2519,17 @@ def filter_lead_category(request):
             lead_category_id=category_id
         ).order_by('-lead_add_date', '-lead_add_time')
 
+        lcount  = Leads.objects.filter(
+            lead_taskAssignId__ta_taskId__client_Id_id=client_id, 
+            lead_transfer_status=1,
+            waste_data=0,
+            lead_category_id=category_id
+        ).count()
         # Build a list of dictionaries for follow-up leads
         leadcategory_list = []
         for lead in followup_leads_category:
+            
+
             leadcategory_list.append({
                 'date': lead.lead_transfer_date,
                 'client_name': lead.lead_taskAssignId.ta_taskId.client_Id.client_name,
@@ -2519,12 +2538,13 @@ def filter_lead_category(request):
                 'email': lead.lead_email,
                 'contact': lead.lead_contact,
                 'source': lead.lead_source,
+                
                 'modalid': lead.id,
                 'collected_by': lead.lead_collect_Emp_id.emp_name,
             })
         
         context={
-            'details2': leadcategory_list,
+            'details2': leadcategory_list,'lcount':lcount,
         }
 
         return JsonResponse(context)
@@ -2552,7 +2572,7 @@ def filter_lead_hr_telecaller(request):
             followup_details= FollowupDetails.objects.filter(comp_Id=dash_details,  hr_telecaller_Id=caller_id)
 
             if client_id and category_id:
-                # Get corresponding Leads details for the filtered FollowupHistory instances
+                
                 related_leads_details1 = Leads.objects.filter(
                     lead_taskAssignId__ta_taskId__client_Id_id=client_id,
                     lead_category_id=category_id,
@@ -2568,12 +2588,14 @@ def filter_lead_hr_telecaller(request):
                     id__in=followup_details.values_list('lead_Id', flat=True)
                 ).order_by('-lead_add_date', '-lead_add_time')
             else:
-                # Get corresponding Leads details for the filtered FollowupHistory instances
+              
+
                 related_leads_details1 = Leads.objects.filter(
                     lead_transfer_status=1,
                     waste_data=0,
                     id__in=followup_history_details.values_list('hs_lead_Id', flat=True)
                 ).order_by('-lead_add_date', '-lead_add_time')
+
                 related_leads_details2 = Leads.objects.filter(
                     lead_transfer_status=1,
                     waste_data=0,
@@ -2583,8 +2605,9 @@ def filter_lead_hr_telecaller(request):
 
             # Build a list of dictionaries for follow-up leads
             leadhr_list = []
-
+            lcount=0
             for lead in chain(related_leads_details1, related_leads_details2):
+                lcount = lcount+1
                 leadhr_list.append({
                     'date': lead.lead_transfer_date,
                     'client_name': lead.lead_taskAssignId.ta_taskId.client_Id.client_name,
@@ -2594,11 +2617,12 @@ def filter_lead_hr_telecaller(request):
                     'contact': lead.lead_contact,
                     'source': lead.lead_source,
                     'modalid': lead.id,
+                    
                     'collected_by': lead.lead_collect_Emp_id.emp_name,
                 })
 
             context = {
-                'details3': sorted(leadhr_list, key=lambda x: (x['date'], x['modalid']), reverse=True),
+                'details3': sorted(leadhr_list, key=lambda x: (x['date'], x['modalid']), reverse=True),'lcount':lcount
             }
 
             return JsonResponse(context)
@@ -2670,9 +2694,10 @@ def filter_lead_status(request):
 
             # Build a list of dictionaries for follow-up leads
             leadstatus_list = []
-
+            lcount = 0
             # Combine the results from both queries
             for lead in chain(related_leads_details1, related_leads_details2):
+                lcount=lcount+1
                 leadstatus_list.append({
                     'date': lead.lead_transfer_date,
                     'client_name': lead.lead_taskAssignId.ta_taskId.client_Id.client_name,
@@ -2687,7 +2712,7 @@ def filter_lead_status(request):
 
            
             context = {
-                'details4': sorted(leadstatus_list, key=lambda x: (x['date'], x['modalid']), reverse=True),
+                'details4': sorted(leadstatus_list, key=lambda x: (x['date'], x['modalid']), reverse=True),'lcount':lcount
             }
 
             return JsonResponse(context)
@@ -2697,6 +2722,86 @@ def filter_lead_status(request):
     else:
         return redirect('/')        
     
+
+
+
+def filter_lead_date(request):
+    if 'admin_id' in request.session:
+        if request.session.has_key('admin_id'):
+            admin_id = request.session['admin_id']
+        else:
+            return redirect('/')
+
+        Admin_dash = LogRegister_Details.objects.get(id=admin_id)
+        dash_details = BusinessRegister_Details.objects.get(log_id=Admin_dash)
+
+        if request.method == 'POST':
+            client_id = request.POST.get('client_id')
+            category_id = request.POST.get('category_id')
+            caller_id = request.POST.get('caller_id')
+            status = request.POST.get('status_id')
+            d1 = request.POST.get('fdate')
+            d2 = request.POST.get('todate')
+
+            print('hai-',client_id,category_id,caller_id,status,d1,d2)
+
+            # Define the base queryset
+            databank_obj = DataBank.objects.all()
+
+           
+            if client_id:
+                databank_obj = databank_obj.filter(lead_Id__lead_work_regId__clientId__id=client_id)
+            if category_id:
+                databank_obj = databank_obj.filter(lead_Id__lead_category_id__id=category_id)
+
+            if caller_id:
+              
+                followup_statusdetails =FollowupDetails.objects.filter(comp_Id=dash_details, hr_telecaller_Id=caller_id)
+                databank_obj.filter(lead_Id__in=followup_statusdetails.values_list('lead_Id', flat=True))
+
+            if status:
+                followup_statusdetails =FollowupDetails.objects.filter(comp_Id=dash_details,response_status=status)
+                databank_obj.filter(lead_Id__in=followup_statusdetails.values_list('lead_Id', flat=True))
+
+            if d1 and d2:
+                databank_obj = databank_obj.filter(allocated_date__gte=d1, allocated_date__lte=d2)
+
+            # Execute the final query
+            result_obj = databank_obj.filter(lead_Id__lead_work_regId__wcompId=dash_details)
+            lcount = databank_obj.filter(lead_Id__lead_work_regId__wcompId=dash_details).count()
+
+
+            
+            leadstatus_list = []
+            
+           
+            for lead in result_obj:
+                leadstatus_list.append({
+                    'date': lead.lead_Id.lead_transfer_date,
+                    'client_name': lead.lead_Id.lead_taskAssignId.ta_taskId.client_Id.client_name,
+                    'category': lead.lead_Id.lead_category_id.lead_collection_for,
+                    'name': lead.lead_Id.lead_name,
+                    'email': lead.lead_Id.lead_email,
+                    'contact': lead.lead_Id.lead_contact,
+                    'source': lead.lead_Id.lead_source,
+                    'modalid': lead.lead_Id.id,
+                    'collected_by': lead.lead_Id.lead_collect_Emp_id.emp_name,
+                })
+
+           
+            context = {
+                'lcount':lcount,
+                'details5': leadstatus_list,
+            }
+
+            return JsonResponse(context)
+        else:
+            return JsonResponse({'error': 'Invalid request'}, status=400)
+
+    else:
+        return redirect('/')        
+    
+
 
 
 
@@ -2794,7 +2899,24 @@ def admin_reports(request):
 
     
         databank_obj = DataBank.objects.filter(lead_Id__lead_work_regId__wcompId=dash_details)
+
+
+        tasks_with_lead_collection = ClientTask_Register.objects.filter(task_name='lead collection',cTcompId=dash_details)
+
+        clients = ClientRegister.objects.filter(clienttask_register__in=tasks_with_lead_collection)
+        hr_telecaller=EmployeeRegister_Details.objects.filter(emp_designation_id__dashboard_id=4,emp_comp_id=dash_details)
+        followup_status=FollowupStatus.objects.filter(company_Id=dash_details)
+
+        platform_obj = PlatForms.objects.filter(company_Id=dash_details)
+        
+
+        # Count section -----
+
         databank_obj_count = DataBank.objects.filter(lead_Id__lead_work_regId__wcompId=dash_details).count()
+        TNC = DataBank.objects.filter(lead_Id__lead_work_regId__wcompId=dash_details,Genarated_date=date.today()).count()
+        APC = DataBank.objects.filter(lead_Id__lead_work_regId__wcompId=dash_details,lead_allocate_status=0).count()
+        TFC = DataBank.objects.filter(lead_Id__lead_work_regId__wcompId=dash_details,lead_allocate_status=1).count()
+        TDFC = DataBank.objects.filter(lead_Id__lead_work_regId__wcompId=dash_details,followup_date=date.today()).count()
 
            
 
@@ -2802,8 +2924,11 @@ def admin_reports(request):
             'Admin_dash':Admin_dash,
             'dash_details':dash_details,
             'databank_obj':databank_obj,
-            'databank_obj_count':databank_obj_count
-            
+            'databank_obj_count':databank_obj_count,
+            'TNC':TNC,'APC':APC,'TFC':TFC,'TDFC':TDFC,
+            'clients':clients,'hr_telecaller':hr_telecaller,
+            'followup_status':followup_status,
+            'platform_obj':platform_obj            
             
         }
 
