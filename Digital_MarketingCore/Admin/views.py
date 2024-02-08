@@ -1,4 +1,5 @@
 from datetime import date
+from Telecaller.models import Leads_assignto_tc
 from Registration_Login.models import *
 from DataManager.models import DataBank
 from django.db.models import Q
@@ -10,6 +11,8 @@ from django.core.serializers import serialize
 from itertools import chain 
 from django.db.models import Count
 from django.shortcuts import render,redirect
+
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 # Dashboard section---------------------------------
@@ -2742,8 +2745,8 @@ def filter_lead_date(request):
             status = request.POST.get('status_id')
             d1 = request.POST.get('fdate')
             d2 = request.POST.get('todate')
-
-            print('hai-',client_id,category_id,caller_id,status,d1,d2)
+            
+          
 
             # Define the base queryset
             databank_obj = DataBank.objects.all()
@@ -2751,6 +2754,7 @@ def filter_lead_date(request):
            
             if client_id:
                 databank_obj = databank_obj.filter(lead_Id__lead_work_regId__clientId__id=client_id)
+
             if category_id:
                 databank_obj = databank_obj.filter(lead_Id__lead_category_id__id=category_id)
 
@@ -2764,11 +2768,13 @@ def filter_lead_date(request):
                 databank_obj.filter(lead_Id__in=followup_statusdetails.values_list('lead_Id', flat=True))
 
             if d1 and d2:
+                
                 databank_obj = databank_obj.filter(allocated_date__gte=d1, allocated_date__lte=d2)
 
             # Execute the final query
             result_obj = databank_obj.filter(lead_Id__lead_work_regId__wcompId=dash_details)
             lcount = databank_obj.filter(lead_Id__lead_work_regId__wcompId=dash_details).count()
+           
 
 
             
@@ -2776,8 +2782,9 @@ def filter_lead_date(request):
             
            
             for lead in result_obj:
+               
                 leadstatus_list.append({
-                    'date': lead.lead_Id.lead_transfer_date,
+                    'date': lead.allocated_date, #lead_Id.lead_transfer_date,
                     'client_name': lead.lead_Id.lead_taskAssignId.ta_taskId.client_Id.client_name,
                     'category': lead.lead_Id.lead_category_id.lead_collection_for,
                     'name': lead.lead_Id.lead_name,
@@ -2801,6 +2808,59 @@ def filter_lead_date(request):
     else:
         return redirect('/')        
     
+
+def filter_lead_platform(request):
+    if request.method == 'POST':
+        client_id = request.POST.get('client_id')
+        category_id = request.POST.get('category_id')
+        platform_id = request.POST.get('platformName')
+        plf= PlatForms.objects.get(id=platform_id)
+
+       
+        # Fetch follow-up leads based on the client_id, categor_id
+        followup_leads_platforms = Leads.objects.filter(
+            lead_taskAssignId__ta_taskId__client_Id_id=client_id, 
+            lead_transfer_status=1,
+            waste_data=0,
+            lead_category_id=category_id,
+            lead_source=plf.platform_Name
+        ).order_by('-lead_add_date', '-lead_add_time')
+
+        lcount  = Leads.objects.filter(
+            lead_taskAssignId__ta_taskId__client_Id_id=client_id, 
+            lead_transfer_status=1,
+            waste_data=0,
+            lead_category_id=category_id,
+            lead_source=plf.platform_Name
+        ).count()
+        # Build a list of dictionaries for follow-up leads
+        leadplatform_list = []
+
+        for lead in followup_leads_platforms:
+            
+
+            leadplatform_list.append({
+                'date': lead.lead_transfer_date,
+                'client_name': lead.lead_taskAssignId.ta_taskId.client_Id.client_name,
+                'category': lead.lead_category_id.lead_collection_for,
+                'name': lead.lead_name,
+                'email': lead.lead_email,
+                'contact': lead.lead_contact,
+                'source': lead.lead_source,
+                
+                'modalid': lead.id,
+                'collected_by': lead.lead_collect_Emp_id.emp_name,
+            })
+        
+        context={
+            'details6': leadplatform_list,'lcount':lcount,
+        }
+
+        return JsonResponse(context)
+    else:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+    
+
 
 
 
@@ -2937,3 +2997,104 @@ def admin_reports(request):
     else:
             return redirect('/')
     
+
+
+def admin_analysis(request):
+    if 'admin_id' in request.session:
+        admin_id = request.session.get('admin_id')
+        if not admin_id:
+            return redirect('/')
+        
+        Admin_dash = LogRegister_Details.objects.get(id=admin_id)
+        dash_details = BusinessRegister_Details.objects.get(log_id=Admin_dash)
+        hr_telecaller = EmployeeRegister_Details.objects.filter(emp_designation_id__dashboard_id=4, emp_comp_id=dash_details)
+        tasks_with_lead_collection = ClientTask_Register.objects.filter(task_name='lead collection', cTcompId=dash_details)
+        clients = ClientRegister.objects.filter(clienttask_register__in=tasks_with_lead_collection)
+        followup_status=FollowupStatus.objects.filter(company_Id=dash_details)
+
+        db_obj = DataBank.objects.filter(lead_Id__lead_work_regId__wcompId=dash_details)
+        db_obj_count = db_obj.filter(lead_Id__lead_work_regId__wcompId=dash_details).count()
+
+        # Performance Calculation
+        AL = db_obj.filter(lead_status='Allocated').count()
+        JL = 0
+        FL = db_obj.filter(lead_status='Opend').exclude(current_status='No updation').count()
+        APT = db_obj.filter(lead_status='Opend', current_status='No updation').count()
+
+        AL_Pending = db_obj_count - AL
+        APT_Pending = AL - APT
+        FL_Pending = APT - FL
+
+        hr_Performance = int((JL / AL) * 100) if AL != 0 else 0
+        hr_Performance_roundof = round(((JL / AL) * 100), 2) if AL != 0 else 0
+
+        # Apply filtering if form is submitted
+        if request.method == 'POST':
+            hr_id = request.POST.get('hr_select')
+            cl_id = request.POST.get('client-select')
+            ct_id = request.POST.get('leadcatagory')
+            flup_name = request.POST.get('status_select')
+
+            d1 = request.POST.get('sdate')
+            d2 = request.POST.get('edate')
+
+
+           
+
+            result_obj = Leads_assignto_tc.objects.filter(leadId__lead_work_regId__wcompId=dash_details)
+
+            if hr_id:
+                result_obj = result_obj.filter(TC_Id__id=hr_id).values_list('dataBank_ID__id')
+                db_obj = db_obj.filter(id__in=result_obj)
+                
+
+            if cl_id:
+                result_obj = result_obj.filter(leadId__lead_work_regId__clientId__id=cl_id).values_list('dataBank_ID__id')
+                db_obj = db_obj.filter(id__in=result_obj)
+
+            if ct_id:
+                result_obj = result_obj.filter(leadId__lead_category_id__id=cl_id).values_list('dataBank_ID__id')
+                db_obj = db_obj.filter(id__in=result_obj)
+
+            if flup_name:
+                result_obj = result_obj.filter(Response=flup_name).values_list('dataBank_ID__id')
+                db_obj = db_obj.filter(id__in=result_obj)
+
+            if d1 and d2:
+                result_obj = result_obj.filter(Assign_Date__gte=d1,Assign_Date__lte=d2,).values_list('dataBank_ID__id')
+                db_obj = db_obj.filter(id__in=result_obj)
+
+
+            db_obj_count = db_obj.count()
+
+
+        # Pagination
+        paginator = Paginator(db_obj, 5)
+        page = request.GET.get('page', 1)
+        try:
+            items = paginator.page(page)
+        except PageNotAnInteger:
+            items = paginator.page(1)
+        except EmptyPage:
+            items = paginator.page(paginator.num_pages)
+
+        content = {
+            'Admin_dash': Admin_dash,
+            'dash_details': dash_details,
+            'hr_telecaller': hr_telecaller,
+            'hr_Performance': hr_Performance,
+            'hr_Performance_roundof': hr_Performance_roundof,
+            'clients': clients,
+            'db_obj': items,
+            'followup_status':followup_status,
+            'db_obj_count': db_obj_count,
+            'AL': AL, 'JL': JL, 'FL': FL, 'APT': APT,
+            'AL_Pending': AL_Pending,
+            'APT_Pending': APT_Pending,
+            'FL_Pending': FL_Pending,
+            
+        }
+
+        return render(request, 'AD_analysis.html', content)
+    else:
+        return redirect('/')

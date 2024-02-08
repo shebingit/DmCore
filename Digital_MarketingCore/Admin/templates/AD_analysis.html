@@ -1,0 +1,456 @@
+{% extends 'AD_base.html' %}
+{% load static %}
+{% block body %}
+
+<!-- Pagination Styling -->
+<style>
+    .pagination-box
+    {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1rem;
+    }
+    .pagination-ul li a
+    {
+        border: none !important;
+        color: #c9c9c9;
+        font-size: 13px;
+    }
+    .pagination-ul li:hover a{
+        background: #dc1a1a;
+        color: #f8f7f7;
+    }
+    
+   
+   
+    .top-section
+    {
+        justify-content: space-between;
+        align-items: center;
+    }
+    ul li{
+        list-style: none;
+    }
+    @media(max-width:768px)
+    {
+      .pagination-box
+    {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    }
+  </style>
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'admin_dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a class="text-underline-remove text-md" href="{% url 'admin_leads_section' %}">DataBank</a></li>
+            <li class="breadcrumb-item active text-md" aria-current="page">Analysis</li>
+        </ol>
+      </nav>
+</div>
+<div class="card">
+    <div class="card-body">
+        <form action="{% url 'admin_analysis' %}" method="post">
+            {% csrf_token %}
+    
+            <div class="row ">
+                <div class="col-lg-2 col-md-3 col-sm-6 grid-margin">
+                    
+                    
+                        <select name="hr_select" id="hr-select" class="form-control text-white" >
+                        <option value="" hidden>-- Select Hr -- </option>
+                        {% for i in hr_telecaller %}
+                        <option value="{{i.id}}">{{i.emp_name}}</option>
+                        {% endfor %}
+                        </select>
+                   
+                        
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-6 grid-margin">
+                   
+                        <select name="client-select" id="client-select"  class="form-control text-white" >
+                        <option value="" hidden>-- Select Client -- </option>
+                        {% for i in clients %}
+                        <option value="{{i.id}}">{{i.client_name}}</option>
+                        {% endfor %}
+                        </select>
+                  
+                        
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-6 grid-margin">
+                    <select name="leadcatagory" id="category-select" class="form-control text-white" onchange="clearDateInputs()">
+                        <option value="" hidden>-- Select Category -- </option>
+                    </select> 
+                        
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-6 grid-margin">
+                    <select name="status_select" id="status-select" class="form-control text-white" onchange="clearDateInputs()">
+                        <option value="" >--Select Status -- </option>
+                        {% for i in followup_status %}
+                        <option value="{{i.status_name}}">{{i.status_name}}</option>
+                        {% endfor %}
+                        
+                    </select>  
+                        
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-12 grid-margin">
+                    
+                        <div class="row">
+                            <div class="col-lg-5 col-md-5 col-sm-4 grid-margin">
+                                <input type="date" class="form-control text-white" name="sdate">
+                            </div>
+                            <div class="col-lg-5 col-md-5 col-sm-4 grid-margin">
+                                <input type="date" class="form-control text-white" name="edate">
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-4 grid-margin">
+                                <button type="submit" id="searchbtn" class="btn btn-outline-primary mdi mdi-magnify"></button>
+                            </div>
+                        </div>
+                
+                </div>
+            </div>
+        </form>
+            
+                    
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-lg-8 col-md-8 col-sm-12 grid-margin">
+        <div class="card">
+            <div class="card-body">
+                
+
+
+                <div class="d-flex top-section">
+                    <div>
+                        <h6 class="text-secondary"> Lead List - <span id="lead-count">{{db_obj_count}}</span> </h6>
+                    </div>
+                    
+    
+                </div>
+
+               
+
+                <div class="table-responsive" >
+
+                    <div class="pagination pagination-box ">
+                        <div>
+                          <p class="text-muted">Showing {{ db_obj.start_index }} to {{ db_obj.end_index }} of {{ db_obj.paginator.count }} entries</p>
+                        </div>
+                        <div>
+                            
+                          <ul class="pagination separated pagination-danger pagination-ul">
+                              {% if db_obj.has_previous %}
+                                  <li class="page-item"><a class="page-link" href="?page=1">&laquo;&laquo;</a></li>
+                                  <li class="page-item"><a class="page-link" href="?page={{ db_obj.previous_page_number }}">&laquo;</a></li>
+                              {% endif %}
+                      
+                              {% for i in db_obj.paginator.page_range %}
+                                {% if i > db_obj.number|add:'-3' and i < db_obj.number|add:'3' %}
+                                    <li class="page-item{% if db_obj.number == i %} active{% endif %}">
+                                        <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                      
+                              {% if db_obj.has_next %}
+                                  <li class="page-item"><a class="page-link" href="?page={{ db_obj.next_page_number }}">&raquo;</a></li>
+                                  <li class="page-item"><a class="page-link" href="?page={{ db_obj.paginator.num_pages }}">&raquo;&raquo;</a></li>
+                              {% endif %}
+                          </ul>
+                        </div>
+                        
+                    </div>
+
+                    <div class="add-items d-flex ">
+          
+                        <input  class="form-control text-offwhite" name="#" id="search-data" placeholder="search here..">
+                        <button class="btn btn-outline-danger mdi mdi-close" id="closeBtn" type="button"></button> 
+                    </div>
+
+                    <table class="table mt-4 mb-4" id="lead-details">
+                        <thead>
+                        <tr>
+                            <th> No. </th>
+                            <th> Date </th>
+                            <th> Client Name \ Lead Category</th>
+                        
+                            <th> Lead Name</th>
+                            <th> Details</th>
+                            
+                            <th>Lead Collected by</th>
+                            
+                        </tr>
+                        </thead>
+                        <tbody>
+                        
+                        {% for i in db_obj %}  
+                        <tr>
+                            <td>{{forloop.counter}}</td>
+                            <td>{{i.Genarated_date|date:"d-m-y"}}</td>
+                            <td>{{i.lead_Id.lead_work_regId.clientId.client_name}}
+                                <p class="mt-2">( {{i.lead_Id.lead_category_id.lead_collection_for}} )</p>
+                            </td>
+                            
+                            <td>{{i.lead_Id.lead_name}}
+                                <p class="mt-2">{{i.lead_Id.lead_email}}</p>
+                                <p class="mt-2">{{i.lead_contact}}</p>
+                                <p class="mt-2">Source : {{i.lead_Id.lead_source }}</p>
+                            </td>
+                            <td><a href="{% url 'admin_lead_details' i.lead_Id.id %}" class="text-white"><span class="mdi mdi-file-document ml-2"></span> lead Details </a> </span></td>
+                        
+                            <td>{{i.lead_Id.lead_collect_Emp_id.emp_name}}</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+    
+               
+            </div>
+            
+        </div>
+    </div>
+    <style>
+        .p{
+            background-color: rgb(136, 16, 221);
+        }
+    </style>
+    <div class="col-lg-4 col-md-4 col-sm-12 grid-margin">
+        <div class="card">
+            <div class="card-body">
+            <h6 class="mb-5 text-center mt-1"> Perfoamance Summery </h6>
+
+            <div class="row mt-2">
+                <div class="col-lg-6 col-md-6 col-sm-12 grid-margin">
+                    <p class="text-center small mb-0 p-0">Allocated Leads</p>
+                    <div id="circleProgress5" class="progressbar-js-circle  rounded p-3">
+                        
+                        <svg viewBox="0 0 100 100" style="display: block; width: 100%;">
+                            <path d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke="#eee" stroke-width="4" fill-opacity="0"></path>
+                            <path id="AL-lead" d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke="rgb(136, 16, 221)" stroke-width="4" fill-opacity="0" ></path>
+                    
+                        </svg>
+                        <div class="progressbar-text" style="position: absolute; left: 50%; top: 50%; padding: 0px; margin: 0px; transform: translate(-50%, -50%); color: rgb(255, 255, 255); font-size: 1rem;">
+                             <p><span class="h5">{{AL}}</span>    </p>
+                            </div>
+                    </div>
+                    {% if AL_Pending > 0 %}
+                    <p class="text-center text-small mb-0 p-0">Allocation  pending  - <span class="text-danger">{{ AL_Pending }}</span>  </p>
+                    {% endif %}
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-12 grid-margin">
+                    <p class="text-center small mb-0 p-0">Hr Accepted Leads</p>
+                    <div id="circleProgress5" class="progressbar-js-circle  rounded p-3">
+                        
+                        <svg viewBox="0 0 100 100" style="display: block; width: 100%;">
+                            <path d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke="#eee" stroke-width="4" fill-opacity="0"></path>
+                            <path id="APT-lead" d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke=" rgb(22, 171, 208)" stroke-width="4" fill-opacity="0" ></path>
+                    
+                        </svg>
+                        <div class="progressbar-text" style="position: absolute; left: 50%; top: 50%; padding: 0px; margin: 0px; transform: translate(-50%, -50%); color: rgb(255, 255, 255); font-size: 1rem;">
+                             <p> <span class="h5">{{APT}} </span>   </p>
+                            </div>
+                    </div>
+                    {% if APT_Pending > 0 %}
+                    <p class="text-center text-small mb-0 p-0">Hr pending to accepte - <span class="text-danger">{{ APT_Pending }}</span>  </p>
+                    {% endif %}
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-12 grid-margin">
+                    <p class="text-center small mb-0 p-0">Follow Up Leads</p>
+                    <div id="circleProgress5" class="progressbar-js-circle  rounded p-3">
+                        
+                        <svg viewBox="0 0 100 100" style="display: block; width: 100%;">
+                            <path d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke="#eee" stroke-width="4" fill-opacity="0"></path>
+                            <path id="FL-lead" d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke="rgb(238, 220, 18)" stroke-width="4" fill-opacity="0" ></path>
+                    
+                        </svg>
+                        <div class="progressbar-text" style="position: absolute; left: 50%; top: 50%; padding: 0px; margin: 0px; transform: translate(-50%, -50%); color: rgb(255, 255, 255); font-size: 1rem;">
+                             <p> <span class="h5">{{FL}} </span>    </p>
+                            </div>
+                    </div>
+                    {% if FL_Pending > 0 %}
+                    <p class="text-center text-small mb-0 p-0">Follow up pending  - <span class="text-danger">{{ FL_Pending }}</span>  </p>
+                    {% endif %}
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-12 grid-margin">
+                    <p class="text-center small mb-0 p-0">Joined Leads</p>
+                    <div id="circleProgress5" class="progressbar-js-circle  rounded p-3">
+                        
+                        <svg viewBox="0 0 100 100" style="display: block; width: 100%;">
+                            <path d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke="#eee" stroke-width="4" fill-opacity="0"></path>
+                            <path id="JL-lead" d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke="rgb(10, 182, 13)" stroke-width="4" fill-opacity="0" ></path>
+                    
+                        </svg>
+                        <div class="progressbar-text" style="position: absolute; left: 50%; top: 50%; padding: 0px; margin: 0px; transform: translate(-50%, -50%); color: rgb(255, 255, 255); font-size: 1rem;">
+                             <p> <span class="h5">{{JL}} </span>   </p>
+                            </div>
+                    </div>
+                   
+                </div>
+
+                <div class="col-lg-12 col-md-12 col-sm-12 grid-margin">
+                    <h6 class="mb-4 text-center mt-1">Overall Perfoamance </h6>
+                    <div id="circleProgress5" class="progressbar-js-circle  rounded p-3">
+                        <svg viewBox="0 0 100 100" style="display: block; width: 100%;">
+                            <path d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke="#eee" stroke-width="4" fill-opacity="0"></path>
+                            <path id="progressPath" d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke="rgb(252,66,74)" stroke-width="4" fill-opacity="0" style="stroke-dasharray: 301.635, 301.635; stroke-dashoffset: 220.194;"></path>
+                    
+                        </svg>
+                        <div class="progressbar-text" style="position: absolute; left: 50%; top: 50%; padding: 0px; margin: 0px; transform: translate(-50%, -50%); color: rgb(255, 255, 255); font-size: 1rem;">
+                             <p> Perfomance {{hr_Performance_roundof}} % </p>
+                            </div>
+                    </div>
+                </div>
+               
+            </div>
+
+            
+            
+            
+               
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+
+<script>
+  $(document).ready(function() {
+    // Function to update lead categories based on selected client
+    function updateLeadCategories() {
+      var client_id = $('#client-select').val(); // Assuming your client dropdown has the id 'client-select'
+
+      $.ajax({
+        url: '{% url "get_leadcategory" %}',  // Replace with the actual URL
+        data: {
+          'client_id': client_id,
+        },
+        dataType: 'json',
+        success: function(data) {
+          // Update lead category dropdown options
+          var categorySelect = $('#category-select');  // Assuming your category dropdown has the id 'catagory-select'
+          categorySelect.empty();  // Clear existing options
+          console.log("Received data:", data);
+
+          // Add "Select" option
+          categorySelect.append('<option value="" hidden>-- Select Category --  </option>');
+
+          // Add new options based on the Ajax response
+          $.each(data.categories, function(index, category) {
+            categorySelect.append('<option value="' + category.id + '">' + category.name + '</option>');
+          });
+        },
+        error: function(xhr, status, error) {
+          console.error('Error fetching lead categories:', status, error);
+        }
+      });
+    }
+
+    // Attach the function to the client dropdown change event
+    $('#client-select').change(function() {
+      updateLeadCategories();
+    });
+  });
+</script>
+
+<!-- Table sorting -->
+<script>
+   
+    const inputField = document.getElementById('search-data');
+    const closeBtn = document.getElementById('closeBtn');
+    const empTable = document.getElementById('lead-details');
+    closeBtn.style.display = 'none';
+
+    inputField.addEventListener('input', function() {
+        filterTable();
+    });
+
+    function filterTable() {
+        const filterValue = inputField.value.toLowerCase();
+        const rows = empTable.getElementsByTagName('tr');
+
+        for (let i = 1; i < rows.length; i++) {
+            const Cell1 = rows[i].getElementsByTagName('td')[1];
+            const Cell2 = rows[i].getElementsByTagName('td')[2];
+            const Cell3 = rows[i].getElementsByTagName('td')[3];
+            const Cell4 = rows[i].getElementsByTagName('td')[4];
+            const Cell5 = rows[i].getElementsByTagName('td')[5];
+            
+            
+
+            if (Cell1 || Cell2 || Cell3 || Cell4|| Cell5) {
+
+                const datacell1 = Cell1.textContent || Cell1.innerText;
+                const datacell2 = Cell2.textContent || Cell2.innerText;
+                const datacell3 = Cell3.textContent || Cell3.innerText;
+                const datacell4 = Cell4.textContent || Cell4.innerText;
+                const datacell5 = Cell5.textContent || Cell5.innerText;
+                
+                
+                
+
+                if (datacell1.toLowerCase().includes(filterValue) || datacell2.toLowerCase().includes(filterValue) || datacell3.toLowerCase().includes(filterValue)
+                || datacell4.toLowerCase().includes(filterValue) || datacell5.toLowerCase().includes(filterValue) ) 
+                {
+                    rows[i].style.display = '';
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+        }
+    }
+
+     // To display the close button and hide the close button based on the search input 
+    inputField.addEventListener('input', function() {
+    if (inputField.value == '') {
+        closeBtn.style.display = 'none';
+       
+    } else {
+        closeBtn.style.display = 'block';
+        
+    }
+    });
+
+    closeBtn.addEventListener('click', function() {
+    inputField.value = '';
+    closeBtn.style.display = 'none';
+    filterTable(); // Display the full table data
+    });
+</script>
+
+<script>
+    // Retrieve hr_Performance value
+    var hr_Performance = parseFloat("{{hr_Performance}}");
+    // Calculate the dash offset based on hr_Performance value
+    var dashOffset = 301.635 * (1 - hr_Performance / 100);
+   
+
+    // Apply the dash offset to the progress bar
+    var progressPath = document.getElementById("progressPath");
+    progressPath.style.strokeDashoffset = dashOffset;
+
+    // Change color based on hr_Performance value
+    if (hr_Performance >= 80) {
+        progressPath.setAttribute("stroke", "rgb(0, 255, 0)"); // green
+    } else if (hr_Performance >= 50) {
+        progressPath.setAttribute("stroke", "rgb(255, 255, 0)"); // yellow
+    } else {
+        progressPath.setAttribute("stroke", "rgb(255, 0, 0)"); // red
+    }
+</script>
+
+
+{% endblock %}

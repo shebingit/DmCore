@@ -1076,7 +1076,7 @@ def head_transfer_lead(request):
         clients_objs = ClientTask_Register.objects.filter(task_name='Lead Collection',cTcompId__id=dash_details.emp_comp_id.id)
         
         page = request.GET.get('page', 1)
-        paginator = Paginator(leads_obj,5)  # Show 5 items per page
+        paginator = Paginator(leads_obj,5)  
         try:
             items = paginator.page(page)
         

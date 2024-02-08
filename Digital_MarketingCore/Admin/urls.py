@@ -99,11 +99,18 @@ urlpatterns = [
     
     path('admin_pltformdata', views.admin_pltformdata, name='admin_pltformdata'),
     path('admin_pltformleads_page/<str:lead_source>', views.admin_pltformleads_page, name='admin_pltformleads_page'),
+   
 
     # Reports ============================
 
     path('admin_reports', views.admin_reports, name='admin_reports'),
     path('filter_lead_date', views.filter_lead_date, name='filter_lead_date'),
+    path('filter_lead_platform', views.filter_lead_platform, name='filter_lead_platform'),
+
+
+    # Analysis
+    path('admin_analysis', views.admin_analysis, name='admin_analysis'),
+     
     
 
 

@@ -117,7 +117,7 @@
                     <form action="" method="post">
                         {% csrf_token %}
                         
-                        <select name="#" id="platform-select" class="form-control text-white">
+                        <select name="#" id="pltform-select" class="form-control text-white">
                             <option value="" hidden>-- Select Platform --</option>
                           {% for i in platform_obj %}
                           <option value="{{i.id}}">{{i.platform_Name}}</option>
@@ -504,6 +504,7 @@
               // Populate the table with the received data
               for (var i = 0; i < data.details4.length; i++) {
                 var lead = data.details4[i];
+                var lid = lead.modalid
                 var url ="{% url 'admin_lead_details' 0 %}".replace('0', lid);
                 var more_detail =  `<a href="${url}" class="text-white"><span class="mdi mdi-file-document ml-2"></span> lead Details </a>`;
                 
@@ -548,8 +549,10 @@
         var selectedCategory = $('#category-select').val(); // Assuming you have a category select element
         var selectedCaller = $('#caller-select').val(); // Assuming you have a caller select element
         var selectedstatus = $('#status-select').val();
+
+        console.log(fdate,todate,)
   
-        if (selectedstatus) {
+        if (fdate,todate) {
           // Show the table
           
   
@@ -574,6 +577,8 @@
               // Populate the table with the received data
               for (var i = 0; i < data.details5.length; i++) {
                 var lead = data.details5[i];
+                var lid = lead.modalid
+                console.log(lead)
                 var url ="{% url 'admin_lead_details' 0 %}".replace('0', lid);
                 var more_detail = `<a href="${url}" class="text-white"><span class="mdi mdi-file-document ml-2"></span> lead Details </a>`;
                 
@@ -606,6 +611,81 @@
           $('#leadtable').hide();
         }
       });
+    });
+  </script>
+
+  <script>
+    $(document).ready(function () {
+      $('#pltform-select').change(function () {
+        clearCallerSelect();
+        clearstatusSelect();
+        var selectedPltform = $(this).val();
+        var selectedClient = $('#client-select').val(); // Assuming you have a client select element
+        var selectedCategory = $('#category-select').val(); 
+        console.log(selectedPltform)
+        if (selectedPltform) {
+          // Show the table
+          
+  
+          $.ajax({
+            type: 'POST',
+            url: '{% url "filter_lead_platform" %}',
+            data: {
+              'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val(),
+              'category_id': selectedCategory,
+              'client_id': selectedClient,
+              'platformName':selectedPltform
+            },
+            success: function (data) {
+              // Clear the table body
+              $('#lead-details tbody').empty();
+              console.log("Received data:", data);
+              $('#lead-count').text(data.lcount);
+  
+              // Populate the table with the received data
+              for (var i = 0; i < data.details6.length; i++) {
+                var lead = data.details6[i];
+                var lid = lead.modalid
+                var url ="{% url 'admin_lead_details' 0 %}".replace('0', lid);
+                var more_detail =  `<a href="${url}" class="text-white"><span class="mdi mdi-file-document ml-2"></span> lead Details </a>`;
+               
+                
+                
+                var newRow = `
+                <tr>
+                  <td>${i + 1}</td>
+                  <td>${lead.date}</td>
+                  <td>${lead.client_name}
+                      <p class="mt-2">(${lead.category})</p>
+                  </td>
+                 
+                  <td>${lead.name}
+                      <p class="mt-2">${lead.email}
+                      <p class="mt-2">${lead.contact}
+                      <p class="mt-2">Source:${lead.source}
+                  </td>
+                  <td>${more_detail}</td>
+                  <td>${lead.collected_by}</td>
+                </tr>
+              `;
+                $('#lead-details tbody').append(newRow);
+              }
+            },
+            error: function (error) {
+              console.error('Error:', error.responseText);
+            }
+          });
+        } else {
+          // If no option is selected, hide the table
+          $('#leadtable').hide();
+        }
+      });
+      function clearCallerSelect() {
+        $('#caller-select').val('');
+      }
+      function clearstatusSelect() {
+        $('#status-select').val('');
+      }
     });
   </script>
 
