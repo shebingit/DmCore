@@ -1090,7 +1090,7 @@ def head_transfer_lead(request):
                     'notifications':notifications,
                     'works_obj':works_obj,
                     'clients_objs':clients_objs,
-                    'leads_obj':leads_obj,
+                    'leads_obj':items,
                     
                     }
 

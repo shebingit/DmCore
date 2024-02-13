@@ -1,0 +1,116 @@
+{% extends 'HD_base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'head_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Employee Feedback</li>
+        </ol>
+      </nav>
+</div>
+
+<div class="row ">
+  <div class="col-12 grid-margin">
+    <div class="card">
+      <div class="card-body">
+          <div class="d-flex">
+              <h4 class="card-title">Feedback 
+                  {% if emp_obj %}
+                  
+                  - {{emp_obj.emp_name|default:" "}}
+                  {% endif %}
+              
+              </h4>
+              
+          </div>
+
+          <form action="{% url 'head_employee_feedback' %}" method="post">
+              {% csrf_token %}
+
+            <div class="row">
+              <div class="col-sm-12 col-lg-7 col-md-7">
+                <div class="form-group">
+                    <label> select employee</label>
+                    <select class="form-control text-offwhite" name="emp_name" id="#" required>
+                      <option value="0">----select employee----</option>
+                      {% for emp in employees %}
+                        <option value="{{emp.id}}">{{emp.emp_name}}</option>
+                      {% endfor %}
+                    </select>                        
+                  </div>
+              </div>
+              <div class="col-sm-12 col-lg-4 col-md-4">
+                <div class="form-group">
+                  <label>Type</label>
+                  <select class="form-control text-offwhite" name="feed_type" id="#" required>
+                    <option value="0" selected>All</option>
+                    <option value="1" >Feedback Given</option>
+                    <option value="2">Feedback Recived</option>
+                    
+                  </select>                        
+                </div>
+              </div>
+              <div class="col-sm-12 col-lg-1 col-md-1 d-flex  justify-content-center  align-items-center">
+                     
+                <button class=" btn btn-primary " type="submit"><i class="mdi mdi-magnify mdi-18px"></i></button> 
+
+              </div>     
+            </div>
+          </form>
+
+
+
+          <div class="row  mt-3">
+              <div class="col-12 grid-margin">
+                <div class="card">
+                  <div class="card-body">
+                    
+                    {% if feedback_obj %}
+                    <div class="table-responsive">
+                      <table class="table">
+                        <thead>
+                          <tr>
+                            <th> No</th>
+                            <th> Date  </th>
+                            <th> From who </th>
+                            <th> To whom </th>
+                            <th> feedback </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for feedback_data in feedback_obj %}
+                          <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ feedback_data.feedback_date }}</td>
+                            <td> {{ feedback_data.from_name }} </td>
+                            <th> {{ feedback_data.feedback_emp_id.emp_name }}</th>
+                            <td> {{ feedback_data.feedback_content|tostr|split_into_paragraphs:65|safe }} </td>
+                          
+                          </tr>
+                          {% endfor %}
+                         
+                        </tbody>
+                      </table>
+                    </div>
+                    {% else %}
+                    <div class="d-flex justify-content-center">
+                      <img src="{% static 'images\file-icons\no-data-file.png' %}">
+                    </div>
+                    {% endif %}
+
+                  </div>
+                </div>
+              </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+{% endblock %}

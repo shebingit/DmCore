@@ -4,44 +4,29 @@
 
 <!-- Pagination Styling -->
 <style>
-    .pagination-box
-    {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 1rem;
+    div.dataTables_wrapper div.dataTables_paginate ul.pagination {
+        margin: 1rem 0.5rem;
+        white-space: nowrap;
+        justify-content: flex-end;
     }
-    .pagination-ul li a
+    
+    div.dataTables_wrapper div.dataTables_paginate ul.pagination  li a
     {
         border: none !important;
         color: #c9c9c9;
         font-size: 13px;
     }
-    .pagination-ul li:hover a{
-        background: #dc1a1a;
+    
+    div.dataTables_wrapper div.dataTables_paginate ul.pagination li:hover a{
+        background: #dc1a1a  !important;
         color: #f8f7f7;
     }
     
-   
-   
     .top-section
     {
-        justify-content: space-between;
-        align-items: center;
+        margin-bottom: 1rem;
     }
-    ul li{
-        list-style: none;
-    }
-    @media(max-width:768px)
-    {
-      .pagination-box
-    {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    }
+    
   </style>
 
 <div>
@@ -121,7 +106,7 @@
 </div>
 
 <div class="row mt-3">
-    <div class="col-lg-8 col-md-8 col-sm-12 grid-margin">
+    <div class="col-lg-12 col-md-12 col-sm-12 grid-margin">
         <div class="card">
             <div class="card-body">
                 
@@ -139,41 +124,7 @@
 
                 <div class="table-responsive" >
 
-                    <div class="pagination pagination-box ">
-                        <div>
-                          <p class="text-muted">Showing {{ db_obj.start_index }} to {{ db_obj.end_index }} of {{ db_obj.paginator.count }} entries</p>
-                        </div>
-                        <div>
-                            
-                          <ul class="pagination separated pagination-danger pagination-ul">
-                              {% if db_obj.has_previous %}
-                                  <li class="page-item"><a class="page-link" href="?page=1">&laquo;&laquo;</a></li>
-                                  <li class="page-item"><a class="page-link" href="?page={{ db_obj.previous_page_number }}">&laquo;</a></li>
-                              {% endif %}
-                      
-                              {% for i in db_obj.paginator.page_range %}
-                                {% if i > db_obj.number|add:'-3' and i < db_obj.number|add:'3' %}
-                                    <li class="page-item{% if db_obj.number == i %} active{% endif %}">
-                                        <a class="page-link" href="?page={{ i }}">{{ i }}</a>
-                                    </li>
-                                {% endif %}
-                            {% endfor %}
-                      
-                              {% if db_obj.has_next %}
-                                  <li class="page-item"><a class="page-link" href="?page={{ db_obj.next_page_number }}">&raquo;</a></li>
-                                  <li class="page-item"><a class="page-link" href="?page={{ db_obj.paginator.num_pages }}">&raquo;&raquo;</a></li>
-                              {% endif %}
-                          </ul>
-                        </div>
-                        
-                    </div>
-
-                    <div class="add-items d-flex ">
-          
-                        <input  class="form-control text-offwhite" name="#" id="search-data" placeholder="search here..">
-                        <button class="btn btn-outline-danger mdi mdi-close" id="closeBtn" type="button"></button> 
-                    </div>
-
+                   
                     <table class="table mt-4 mb-4" id="lead-details">
                         <thead>
                         <tr>
@@ -220,15 +171,16 @@
     <style>
         .p{
             background-color: rgb(136, 16, 221);
+            
         }
     </style>
-    <div class="col-lg-4 col-md-4 col-sm-12 grid-margin">
+    <div class="col-lg-12 col-md-12 col-sm-12 grid-margin">
         <div class="card">
             <div class="card-body">
             <h6 class="mb-5 text-center mt-1"> Perfoamance Summery </h6>
 
             <div class="row mt-2">
-                <div class="col-lg-6 col-md-6 col-sm-12 grid-margin">
+                <div class="col-lg-2 col-md-3 col-sm-6 grid-margin">
                     <p class="text-center small mb-0 p-0">Allocated Leads</p>
                     <div id="circleProgress5" class="progressbar-js-circle  rounded p-3">
                         
@@ -245,7 +197,7 @@
                     <p class="text-center text-small mb-0 p-0">Allocation  pending  - <span class="text-danger">{{ AL_Pending }}</span>  </p>
                     {% endif %}
                 </div>
-                <div class="col-lg-6 col-md-6 col-sm-12 grid-margin">
+                <div class="col-lg-2 col-md-3 col-sm-6 grid-margin">
                     <p class="text-center small mb-0 p-0">Hr Accepted Leads</p>
                     <div id="circleProgress5" class="progressbar-js-circle  rounded p-3">
                         
@@ -262,7 +214,7 @@
                     <p class="text-center text-small mb-0 p-0">Hr pending to accepte - <span class="text-danger">{{ APT_Pending }}</span>  </p>
                     {% endif %}
                 </div>
-                <div class="col-lg-6 col-md-6 col-sm-12 grid-margin">
+                <div class="col-lg-2 col-md-3 col-sm-6 grid-margin">
                     <p class="text-center small mb-0 p-0">Follow Up Leads</p>
                     <div id="circleProgress5" class="progressbar-js-circle  rounded p-3">
                         
@@ -279,7 +231,7 @@
                     <p class="text-center text-small mb-0 p-0">Follow up pending  - <span class="text-danger">{{ FL_Pending }}</span>  </p>
                     {% endif %}
                 </div>
-                <div class="col-lg-6 col-md-6 col-sm-12 grid-margin">
+                <div class="col-lg-2 col-md-3 col-sm-6 grid-margin">
                     <p class="text-center small mb-0 p-0">Joined Leads</p>
                     <div id="circleProgress5" class="progressbar-js-circle  rounded p-3">
                         
@@ -294,9 +246,25 @@
                     </div>
                    
                 </div>
+                <div class="col-lg-2 col-md-3 col-sm-6 grid-margin">
+                    <p class="text-center small mb-0 p-0">Waste Leads</p>
+                    <div id="circleProgress5" class="progressbar-js-circle  rounded p-3">
+                        
+                        <svg viewBox="0 0 100 100" style="display: block; width: 100%;">
+                            <path d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke="#eee" stroke-width="4" fill-opacity="0"></path>
+                            <path id="JL-lead" d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke="rgb(221, 16, 40)" stroke-width="4" fill-opacity="0" ></path>
+                    
+                        </svg>
+                        <div class="progressbar-text" style="position: absolute; left: 50%; top: 50%; padding: 0px; margin: 0px; transform: translate(-50%, -50%); color: rgb(255, 255, 255); font-size: 1rem;">
+                             <p> <span class="h5">{{JL}} </span>   </p>
+                            </div>
+                    </div>
+                   
+                </div>
 
-                <div class="col-lg-12 col-md-12 col-sm-12 grid-margin">
-                    <h6 class="mb-4 text-center mt-1">Overall Perfoamance </h6>
+                <div class="col-lg-2 col-md-3 col-sm-6 grid-margin">
+                    <p class="text-center small mb-0 p-0">Overall Perfoamance</p>
+                  
                     <div id="circleProgress5" class="progressbar-js-circle  rounded p-3">
                         <svg viewBox="0 0 100 100" style="display: block; width: 100%;">
                             <path d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke="#eee" stroke-width="4" fill-opacity="0"></path>
@@ -304,7 +272,7 @@
                     
                         </svg>
                         <div class="progressbar-text" style="position: absolute; left: 50%; top: 50%; padding: 0px; margin: 0px; transform: translate(-50%, -50%); color: rgb(255, 255, 255); font-size: 1rem;">
-                             <p> Perfomance {{hr_Performance_roundof}} % </p>
+                             <p>  {{hr_Performance_roundof}} % </p>
                             </div>
                     </div>
                 </div>
@@ -325,6 +293,16 @@
 
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    new DataTable('#lead-details');
+    
+});
+</script>
 
 
 <script>

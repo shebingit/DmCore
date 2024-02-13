@@ -3013,20 +3013,9 @@ def admin_analysis(request):
         followup_status=FollowupStatus.objects.filter(company_Id=dash_details)
 
         db_obj = DataBank.objects.filter(lead_Id__lead_work_regId__wcompId=dash_details)
-        db_obj_count = db_obj.filter(lead_Id__lead_work_regId__wcompId=dash_details).count()
+        
 
-        # Performance Calculation
-        AL = db_obj.filter(lead_status='Allocated').count()
-        JL = 0
-        FL = db_obj.filter(lead_status='Opend').exclude(current_status='No updation').count()
-        APT = db_obj.filter(lead_status='Opend', current_status='No updation').count()
-
-        AL_Pending = db_obj_count - AL
-        APT_Pending = AL - APT
-        FL_Pending = APT - FL
-
-        hr_Performance = int((JL / AL) * 100) if AL != 0 else 0
-        hr_Performance_roundof = round(((JL / AL) * 100), 2) if AL != 0 else 0
+        
 
         # Apply filtering if form is submitted
         if request.method == 'POST':
@@ -3065,19 +3054,24 @@ def admin_analysis(request):
                 db_obj = db_obj.filter(id__in=result_obj)
 
 
-            db_obj_count = db_obj.count()
+        db_obj_count = db_obj.count()
+
+        
+        # Performance Calculation
+        AL = db_obj.filter(lead_allocate_status=1).count()
+        JL = 0
+        FL = db_obj.filter(lead_status='Opend').exclude(current_status='No updation').count()
+        APT = db_obj.filter(lead_status='Opend', current_status='No updation').count()
+
+        AL_Pending = db_obj_count - AL
+        APT_Pending = AL - APT
+        FL_Pending = APT - FL
+
+        hr_Performance = int((JL / AL) * 100) if AL != 0 else 0
+        hr_Performance_roundof = round(((JL / AL) * 100), 2) if AL != 0 else 0
 
 
-        # Pagination
-        paginator = Paginator(db_obj, 5)
-        page = request.GET.get('page', 1)
-        try:
-            items = paginator.page(page)
-        except PageNotAnInteger:
-            items = paginator.page(1)
-        except EmptyPage:
-            items = paginator.page(paginator.num_pages)
-
+       
         content = {
             'Admin_dash': Admin_dash,
             'dash_details': dash_details,
@@ -3085,7 +3079,7 @@ def admin_analysis(request):
             'hr_Performance': hr_Performance,
             'hr_Performance_roundof': hr_Performance_roundof,
             'clients': clients,
-            'db_obj': items,
+            'db_obj': db_obj,
             'followup_status':followup_status,
             'db_obj_count': db_obj_count,
             'AL': AL, 'JL': JL, 'FL': FL, 'APT': APT,

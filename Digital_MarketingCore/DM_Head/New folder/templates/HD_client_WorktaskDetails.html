@@ -1,0 +1,269 @@
+{% extends 'HD_base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block body %}
+
+  <div>
+      <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'head_dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active text-md" aria-current="page"> Client Task Details</li>
+          </ol>
+        </nav>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div>
+        <h6 class="text-offwhite">Task : <span class="custom-letter-spacing "> {{ client_task_obj.task_name }}</span></h6>
+      </div>
+    
+      <div class="progress progress-sm mt-3 mb-3">
+        <div class="progress-bar bg-warning progress-bar-animated progress-bar-striped" role="progressbar" aria-valuenow="{{client_task_obj.task_total_progress}}" style="width: {{client_task_obj.task_total_progress}}% " aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
+     
+    </div>
+  </div>
+
+  <!-- Employee Task Details Section -->
+
+  {% if task_assign_obj %}
+
+  <div class="mt-4 mb-3">
+    <h6 class="text-offwhite custom-letter-spacing ">Task Allocated To</h6>
+  </div>
+  
+  <div class="row mt-2">
+    {% for t in task_assign_obj %}
+
+    <div class="col-xl-4 col-sm-12 grid-margin ">
+      <a href="#" class="a-hover">
+        <div class="card">
+          <div class="card-body">
+          <div class="row">
+              <div class="col-9 col-sm-9">
+              <div class="d-flex align-items-center align-self-start">
+                  <h4 class="mb-0">{{ t.ta_workerId.emp_name }} </h4>
+                  <p class="text-success ml-2 mb-0 font-weight-medium">{{ t.ta_progress|default:"0" }} %</p>
+              </div>
+              </div>
+              <div class="col-3 col-sm-3">
+              <div class="icon icon-box-primary">
+                  <span class="mdi mdi-format-list-checks  icon-item"></span>
+              </div>
+              </div>
+          </div>
+         
+          <p class="text-muted font-weight-normal mt-1"> 
+            <span> Start on : {{ t.ta_start_date}}</span>
+            <span class="ml-3"> Due on : {{ t.ta_due_date}}</span>
+          </p>
+          <p class="text-muted font-weight-normal mt-1">
+            <span>Target : {{ t.ta_target}}</span> 
+            <span class="ml-3">Achived Target : {{ t.ta_target_achived}}</span>  
+          </p>
+          <p class="text-muted font-weight-normal mt-1">Team Lead : {{ t.ta_workAssignId.wa_work_allocate.emp_name }} </p>
+        
+          
+          <p class="text-muted font-weight-normal mt-2"> About Task : {{ t.ta_discription }} </p>
+          <button class="ml-3 btn btn-outline-primary">
+            <span class="mdi mdi-arrow-collapse-down"></span>
+          </button>
+          </div>
+        </div>   
+      </a>
+    </div>
+
+    {% endfor %}
+  </div>
+
+  {% else %}
+
+  <div class="card mt-2">
+    <div class="card-body">
+      <div class="d-flex justify-content-center">
+        <img src="{% static 'images\file-icons\no-data-file.png' %}">
+      </div>
+    </div>
+  </div>
+
+  {% endif %}
+
+
+  <!-- Task Details -->
+
+  <div class="mt-4 mb-3">
+    <h6 class="text-offwhite custom-letter-spacing ">Task Details section</h6>
+  </div>
+  
+
+  <div class="row  mt-3">
+    <div class="col-12 grid-margin">
+      <div class="card">
+        <div class="card-body">
+          
+          
+          <form action="#" method="post">
+            {% csrf_token %}
+            <div class="row mt-3">
+              <div class="col-sm-12 col-lg-3 col-md-6">
+                <div class="form-group">
+                  <label>Select employee</label>
+                  <select class="form-control text-offwhite" name="task_emp" id="#" required>
+                    <option value="0">--- select employee </option>
+                    {% for emp in task_assign_obj %}
+                    <option value="{{ emp.ta_workerId.id }}">{{ emp.ta_workerId.emp_name }}</option>
+                    {% endfor %}
+                  </select>                      
+                </div>
+              </div>
+              <div class="col-sm-12 col-lg-2 col-md-6">
+                <div class="form-group">
+                  <label>From date</label>
+                  <input type="date" class="form-control text-offwhite" name="task_sdate" id="#"  >                    
+                </div>
+              </div>
+              <div class="col-sm-12 col-lg-2 col-md-6">
+                <div class="form-group">
+                  <label>To date</label>
+                  <input type="date" class="form-control text-offwhite" name="task_todate" id="#"  >                    
+                </div>
+              </div>
+              <div class="col-sm-12 col-lg-1 col-md-12 d-flex  justify-content-center  align-items-center">       
+                <button class=" btn btn-outline-primary" type="submit"><i class="mdi mdi-magnify mdi-18px"></i></button> 
+              </div>
+              <div class="col-sm-12 col-lg-4 col-md-6 d-flex justify-content-center align-items-center">
+            
+                <input  class="form-control mt-2 text-offwhite" name="#" id="search-data" placeholder="search here..">
+                <span class="text-danger mdi mdi-close ml-1" id="closeBtn" type="button"></span> 
+               
+              </div>
+            </div>
+          </form>
+
+          
+          {% if task_details_obj%}
+          <div class="table-responsive mt-5">
+            <table class="table" id="task-details">
+              <thead>
+                <tr>
+                  <th> No</th>
+                  <th> Collected By </th>
+                  <th> Date  </th>
+                  <th> Title </th>
+                  <th> Data </th>
+                  <th> File </th>
+                  <th> Achived </th>
+                  <th> Verified/Unverified </th>
+                 
+                </tr>
+              </thead>
+              <tbody>
+                {% for task_details in task_details_obj %}
+                <tr>
+                  <td> {{ forloop.counter }}</td>
+                  <td> {{ task_details.tad_taskAssignId.ta_workerId.emp_name }}</td>
+                  <td> {{ task_details.tad_collect_date }}</td>
+                  <td> {{ task_details.tad_title }}</td>
+                  <td> {{ task_details.tad_discription|tostr|split_into_paragraphs:60|safe }}</td>
+                  <td> No file</td>
+                  <!-- <td> {{ task_details.tad_file }}</th> -->
+                  <td> <button class="btn btn-outline-danger">{{ task_details.tad_target|default:"0" }}</button></td>
+                  <td>
+                     {% if task_details.tad_status == 1 %}
+                     <p><span class="mdi mdi-check-circle text-success"></span> Verified</p>
+                     {% else %}
+                     <p><span class="mdi mdi-close-circle text-danger "></span> Unverified</p>
+                     {% endif %}
+
+                  </td>
+                  
+                </tr>
+                {% endfor %}
+               
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="d-flex justify-content-center">
+            <img src="{% static 'images\file-icons\no-data-file.png' %}">
+          </div>
+
+          {% endif %}
+         
+        </div>
+      </div>
+    </div>
+</div>
+
+
+
+<!-- Task Details Search Script -->
+<script>
+   
+  const inputField = document.getElementById('search-data');
+  const closeBtn = document.getElementById('closeBtn');
+  const empTable = document.getElementById('task-details');
+  closeBtn.style.display = 'none';
+
+  inputField.addEventListener('input', function() {
+      filterTable();
+  });
+
+  function filterTable() {
+      const filterValue = inputField.value.toLowerCase();
+      const rows = empTable.getElementsByTagName('tr');
+
+      for (let i = 1; i < rows.length; i++) {
+          const Cell1 = rows[i].getElementsByTagName('td')[1];
+          const Cell2 = rows[i].getElementsByTagName('td')[2];
+          const Cell3 = rows[i].getElementsByTagName('td')[3];
+          const Cell4 = rows[i].getElementsByTagName('td')[4];
+          const Cell5 = rows[i].getElementsByTagName('td')[5];
+          const Cell6 = rows[i].getElementsByTagName('td')[6];
+          const Cell7 = rows[i].getElementsByTagName('td')[7];
+          const Cell8 = rows[i].getElementsByTagName('td')[8];
+
+          if (Cell1 || Cell2 || Cell3 || Cell4|| Cell5 || Cell6 || Cell7 || Cell8) {
+
+              const datacell1 = Cell1.textContent || Cell1.innerText;
+              const datacell2 = Cell2.textContent || Cell2.innerText;
+              const datacell3 = Cell3.textContent || Cell3.innerText;
+              const datacell4 = Cell4.textContent || Cell4.innerText;
+              const datacell5 = Cell5.textContent || Cell5.innerText;
+              const datacell6 = Cell6.textContent || Cell6.innerText;
+              const datacell7 = Cell7.textContent || Cell7.innerText;
+              const datacell8 = Cell7.textContent || Cell8.innerText;
+              
+
+              if (datacell1.toLowerCase().includes(filterValue) || datacell2.toLowerCase().includes(filterValue) || datacell3.toLowerCase().includes(filterValue)
+              || datacell4.toLowerCase().includes(filterValue) || datacell5.toLowerCase().includes(filterValue) || datacell6.toLowerCase().includes(filterValue) 
+              || datacell7.toLowerCase().includes(filterValue) || datacell8.toLowerCase().includes(filterValue) ) 
+              {
+                  rows[i].style.display = '';
+              } else {
+                  rows[i].style.display = 'none';
+              }
+          }
+      }
+  }
+
+   // To display the close button and hide the close button based on the search input 
+  inputField.addEventListener('input', function() {
+  if (inputField.value == '') {
+      closeBtn.style.display = 'none';
+     
+  } else {
+      closeBtn.style.display = 'block';
+      
+  }
+  });
+
+  closeBtn.addEventListener('click', function() {
+  inputField.value = '';
+  closeBtn.style.display = 'none';
+  filterTable(); // Display the full table data
+  });
+</script>
+
+{% endblock %}

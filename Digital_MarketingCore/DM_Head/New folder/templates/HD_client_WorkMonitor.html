@@ -1,0 +1,307 @@
+{% extends 'HD_base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'head_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Work Progress Monitor</li>
+        </ol>
+      </nav>
+</div>
+
+<div class="row">
+  <div class="col-xl-4 col-sm-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="mb-3">Client Details</h4>
+        <div class="row">
+          <div class="col-xl-3 col-lg-3 col-md-3 col-sm-12 grid-margin ">
+            <div class="d-flex mt-3 justify-content-center">
+              {% if client.bussiness_logo %}
+              <img src="{{client.bussiness_logo.url}}" style="border-radius: 50%;" height="50px;" width="50px;"  alt="logo">
+              {% endif %}
+            </div>
+          </div>
+          <div class="col-xl-9 col-lg-9 col-md-9 col-sm-12 grid-margin "> 
+            <p> Name : {{client.client_name }}</p>
+            <p> Email : {{client.client_email_primary }}</p>
+            <p> Phone : {{client.client_phone }}</p>
+           
+           
+          </div>
+          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 grid-margin "> 
+            <p> Bussiness : {{ client.client_bussiness_name }} </p>
+            <p> Website : {{ client.client_bussiness_website }} </p>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-4 col-sm-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="mb-0">Work Progress</h4>
+        <div class="row mt-3">
+          <div class="col-xl-12 col-sm-12 grid-margin stretch-card d-flex justify-content-center">
+          {% if works.work_progress <= 10 %}
+            <div class="progress-danger mt-2">
+              <span class="progress-left"><span class="progress-bar"></span></span>
+              <span class="progress-right"> <span class="progress-bar"></span> </span>
+              <div class="progress-value">{{ works.work_progress }}%</div>
+            </div>
+               
+            {% elif works.work_progress > 10 and works.work_progress <= 75 %}
+            <div class="progress-warning  mt-2">
+              <span class="progress-left">
+                <span class="progress-bar"></span>
+              </span>
+              <span class="progress-right">
+                  <span class="progress-bar"></span>
+              </span>
+              <div class="progress-value">{{ works.work_progress }}%</div>
+            </div>  
+            {% else %}
+            <div class="progress-success  mt-2">
+              <span class="progress-left">
+                <span class="progress-bar"></span>
+              </span>
+              <span class="progress-right">
+                  <span class="progress-bar"></span>
+              </span>
+              <div class="progress-value">{{ works.work_progress }}%</div>
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="col-xl-6 col-sm-12 grid-margin stretch-card" >
+            <p>Start Date : {{ works.work_create_date}} </p>
+          </div>
+
+          <div class="col-xl-6 col-sm-12 grid-margin stretch-card" >
+            <p>Due Date : {{ works.work_end_date}} </p>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-xl-4 col-sm-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="mb-0">Task Details</h4>
+        <div class="row mt-3">
+          <div class="col-sm-12 col-md-12 col-xl-12">
+            <ul>
+              {% for task in tasks %}
+              <li class="mt-2" style="list-style: none;">
+                <p><span class="mdi mdi-check text-success mr-1"></span> {{ task.task_name }}</p>
+              </li>
+              {% endfor %}
+            </ul>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="card">
+  <div class="card-body">
+
+    <div class="table-responsive">
+      <table class="table" id="task-allocate">
+        <thead>
+          <tr>
+            <th> No </th>
+           
+            <th>Task Name</th>
+            <th>Task Discription</th>
+            <th>File </th>
+            <th class="text-center">progress </th>
+            <th>Details </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for task in tasks %}
+          <tr>
+            <td>{{forloop.counter}}</td>
+            <td>
+              <h6>{{ task.task_name }}</h6>
+              <p class="mt-1">( {{ task.task_create_date }} )</p>
+
+            </td>
+
+            <td>{{ task.task_discription|tostr|split_into_paragraphs:50|safe|default:"No Description available" }}</td>
+            <td>
+              {% if task.task_file %}
+              <a href="#" class="btn btn-outline-primary"><span class="mdi mdi-arrow-collapse-down"></span></a>
+              {% else %}
+              <a href="#" class="btn btn-outline-danger"><span class="mdi mdi-close"></span></a>
+              {% endif %}
+
+            </td>
+            <td>
+              <div class="d-flex justify-content-center mt-3">
+                {% if task.task_total_progress <= 20 %}
+                <div class="progress-danger  mt-2">
+                {% elif task.task_total_progress > 20 and task.task_total_progress <= 75 %}
+                    <div class="progress-warning  mt-2">
+                {% else %}
+                    <div class="progress-success  mt-2">
+                {% endif %}
+                  <span class="progress-left">
+                    <span class="progress-bar"></span>
+                  </span>
+                  <span class="progress-right">
+                      <span class="progress-bar"></span>
+                  </span>
+                  <div class="progress-value">{{task.task_total_progress}}%</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <a href="{% url 'head_clientTaskDetails' works.id task.id  %}">
+                <button class="btn btn-outline-primary ">
+                <span class="small">View Details</span>
+                </button>
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+
+<style>
+
+  .progress-work,
+  .progress-danger,
+  .progress-warning,
+  .progress-success  {
+    width: 70px;
+    height: 70px !important;
+    float: left; 
+    line-height: 150px;
+    background: none;
+    margin: 20px;
+    box-shadow: none;
+    position: relative;
+  }
+  .progress-work:after,
+  .progress-danger:after,
+  .progress-warning:after,
+  .progress-success:after
+  {
+    content: "";
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 8px solid #ba2b2b;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .progress-danger:after
+  {
+    border: 8px solid #e12525;
+  }
+  .progress-warning:after
+  {
+    border: 8px solid #e6df2a;
+  }
+  .progress-success:after
+  {
+    border: 8px solid #57d820;
+  }
+  .progress-work>span,
+  .progress-danger>span,
+  .progress-warning>span,
+  .progress-success>span {
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    z-index: 1;
+  }
+  .progress-work .progress-left,
+  .progress-danger .progress-left,
+  .progress-success .progress-left,
+  .progress-warning .progress-left {
+    left: 0;
+  }
+  .progress-work .progress-bar,
+  .progress-danger .progress-bar,
+  .progress-warning .progress-bar,
+  .progress-success .progress-bar  {
+    width: 100%;
+    height: 100%;
+    background: none;
+    border-width: 6px;
+    border-style: solid;
+    position: absolute;
+    top: 0;
+  }
+  .progress-work .progress-left .progress-bar,
+  .progress-danger .progress-left .progress-bar,
+  .progress-warning .progress-left .progress-bar,
+  .progress-success .progress-left .progress-bar {
+    left: 100%;
+    border-top-right-radius: 80px;
+    border-bottom-right-radius: 80px;
+    border-left: 0;
+    -webkit-transform-origin: center left;
+    transform-origin: center left;
+  }
+  .progress-work .progress-right,
+  .progress-danger .progress-right,
+  .progress-warning .progress-right,
+  .progress-success .progress-right
+   {
+    right: 0;
+  }
+  .progress-work .progress-right .progress-bar,
+  .progress-danger .progress-right .progress-bar,
+  .progress-warning .progress-right .progress-bar,
+  .progress-success .progress-right .progress-bar 
+   {
+    left: -100%;
+    border-top-left-radius: 80px;
+    border-bottom-left-radius: 80px;
+    border-right: 0;
+    -webkit-transform-origin: center right;
+    transform-origin: center right;
+   
+   
+  }
+  .progress-work .progress-value,
+  .progress-danger .progress-value,
+  .progress-warning .progress-value,
+  .progress-success .progress-value {
+    width: 90%;
+    height: 90%;
+    border-radius: 50%;
+    background: #151515;
+    font-size: 14px;
+    color: #fff;
+    line-height: 60px;
+    text-align: center;
+    position: absolute;
+    top: 5%;
+    left: 5%;
+  }
+
+
+</style>
+{% endblock %}
