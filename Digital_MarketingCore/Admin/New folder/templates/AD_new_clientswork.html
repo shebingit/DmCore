@@ -1,0 +1,139 @@
+{% extends 'AD_base.html' %}
+{% load static %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'admin_all_works' %}">Works</a></li>
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'admin_clientswork_page' %}">Clients</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">New Clients</li>
+        </ol>
+    </nav>
+</div>
+  
+  
+<div class="row">
+    
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                
+                <h4 class="card-title mt-3 mb-3">Clients<sup><span class="badge text-danger">New*</span></sup></h4>
+                <div class="row mt-4 mb-5">
+                    <div class="table-responsive">
+                        <div class="row mt-3 mb-3">
+
+                            <div class=" col-md-5">
+                              <div class="form-group">
+                                <label>From date</label>
+                                <input type="date" class="form-control text-offwhite" name="#" id="fdate1" required >                    
+                              </div>
+                            </div>
+                            <div class=" col-md-5">
+                              <div class="form-group">
+                                <label>To date</label>
+                                <input type="date" class="form-control text-offwhite" name="#" id="edate1" required  >                    
+                              </div>
+                            </div>
+                            <div class="col-md-2"></div>
+                            
+                                      
+                        </div>
+                        <table class="table" id="clienttable">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Registered Date</th>
+                                    <th>Client Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Address</th>
+                                    <th>status</th>
+    
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in newclients %}
+                                <tr>
+                                  <td>{{forloop.counter}}</td>
+                                  <td>{{i.client_reg_date|date:"Y-m-d"}}</td>
+                                  <td>{{i.client_name}}</td>
+                                  <td>{{i.client_email_primary}}</td>
+                                  <td>{{i.client_phone}}</td>
+                                  <td>
+                                    <p>Place: {{i.client_place}}</p>
+                                    <p>District: {{i.client_district}}</p>
+                                    <p>State: {{i.client_state}}</p>
+
+                                  </td>
+                                  <td>
+                                    {% if i.client_status %}
+                                    <p class="badge badge-outline-success  mb-2">Active</p>
+                                    {% else %}
+                                    <p class="badge badge-outline-danger mb-2">Inactive</p>
+                                    {% endif %}
+                                  </td>
+                                </tr>
+                                {% endfor %}
+                                  
+                            </tbody>
+                        </table>
+                    </div>
+    
+                </div>
+                
+            </div>
+        </div>
+    </div>
+   
+  
+
+</div>
+ 
+
+<style>
+  a{
+      text-decoration: none;
+  }
+  a:hover{
+      text-decoration: none;
+  }
+</style>  
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+<script>
+    // Wait for the DOM to be ready
+    $(document).ready(function() {
+      // Add event listener for client date input changes
+      $('#fdate1, #edate1').on('change', function() {
+        filterTableByDate('clienttable', 'fdate1', 'edate1');
+      });
+  
+      function filterTableByDate(tableId, fromDateId, toDateId) {
+        var startDate = $('#' + fromDateId).val();
+        var endDate = $('#' + toDateId).val();
+  
+        // Convert date strings to Date objects for proper comparison
+        startDate = startDate ? new Date(startDate) : null;
+        endDate = endDate ? new Date(endDate) : null;
+  
+        // Iterate through the specified table rows and hide/show them based on the date range
+        $('#' + tableId + ' tbody tr').each(function() {
+          var rowAssignedDate = new Date($(this).find('td:eq(1)').text()); // Assuming assigned date is in the second column
+  
+          if ((startDate === null || rowAssignedDate >= startDate) && (endDate === null || rowAssignedDate <= endDate)) {
+            $(this).show();
+          } else {
+            $(this).hide();
+          }
+        });
+      }
+    });
+</script>
+    
+
+
+{% endblock %}

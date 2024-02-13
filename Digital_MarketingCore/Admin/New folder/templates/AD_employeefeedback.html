@@ -1,0 +1,204 @@
+{% extends 'AD_base.html' %}
+{% load static %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'admin_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'admin_employees_section' %}">Employees</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Employees Feedbacks</li>
+        </ol>
+      </nav>
+</div>
+
+
+<div class="row">
+  <div class="col-12 grid-margin">
+    <div class="card">
+      <div class="card-body">
+
+        <div class="d-flex">
+          <h4 class="card-title">Select <span class="text-danger">Employee</span></h4>        
+        </div>
+
+        <div class="row mb-5 mt-3">
+          <div class="col-md-4">
+            <form action="" method="post">
+              {% csrf_token %}
+              <select name="employeeselect" id="employee-select" class="form-control text-white" onchange="clearDateInputs()">
+                <option value="" hidden>Select</option>
+                {% for i in employees %}
+                <option value="{{i.id}}">{{i.emp_name}}</option>
+                {% endfor %}
+              </select>
+            </form>
+          </div>
+          <div class="col-md-4"></div>
+          <div class="col-md-4"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row" id="feedbacktable" style="display: none;">
+  <div class="col-12 grid-margin">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex">
+          <h4 class="card-title">All Feedbacks</h4>
+            
+        </div>
+        
+        <div class="table-responsive" >
+
+          <div class="row mt-3">
+
+            <div class=" col-md-5">
+              <div class="form-group">
+                <label>From date</label>
+                <input type="date" class="form-control text-offwhite" name="#" id="fdate" required >                    
+              </div>
+            </div>
+            <div class=" col-md-5">
+              <div class="form-group">
+                <label>To date</label>
+                <input type="date" class="form-control text-offwhite" name="#" id="edate" required  >                    
+              </div>
+            </div>
+            <div class="col-md-2"></div>
+            
+                      
+          </div>
+
+
+          <table class="table mt-4 mb-4" id="employee-details">
+            <thead>
+              <tr>
+                <th> No. </th>
+                <th> Date </th>
+                <th> Feedback to </th>
+                <th> Feedbacks </th>
+                
+              </tr>
+            </thead>
+            <tbody>
+              {% for emp in details %}
+              <tr>
+                <td>
+                  {{forloop.counter}}
+                </td>
+                <td> {{emp.feedback_date}} </td>
+                <td> {{emp.feedback_to}} </td>
+                <td> {{emp.feedback_content}} </td>
+               
+                
+                
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $('#employee-select').change(function () {
+      var selectedEmployee = $(this).val();
+      
+      if (selectedEmployee) {
+        // Show the table
+        $('#feedbacktable').show();
+        
+        $.ajax({
+          type: 'POST',
+          url: '{% url "admin_get_employee_feedbackdetails" %}',
+          data: {
+            'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val(),
+            'employee_id': selectedEmployee
+          },
+          success: function (data) {
+            // Clear the table body
+            $('#employee-details tbody').empty();
+  
+            // Populate the table with the received data
+            for (var i = 0; i < data.details.length; i++) {
+              var emp = data.details[i];
+              
+              var newRow = `
+                <tr>
+                  <td>${i + 1}</td>
+                  <td>${emp.feedback_date}</td>
+                  <td>${emp.feedback_to}</td>
+                  <td>${emp.feedback_content}</td>
+                 
+                  
+                </tr>
+              `;
+              $('#employee-details tbody').append(newRow);
+            }
+          }
+        });
+      } else {
+        // If no option is selected, hide the table
+        $('#feedbacktable').hide();
+      }
+    });
+  });
+  
+</script>
+<script>
+  // Add event listener for date input changes
+  $('#fdate, #edate').on('change', function () {
+    filterTableByDate();
+  });
+  function filterTableByDate() {
+    var startDate = $('#fdate').val();
+    var endDate = $('#edate').val();
+
+    // Iterate through the table rows and hide/show them based on the date range
+    $('#employee-details tbody tr').each(function () {
+      var rowStartDate = $(this).find('td:eq(1)').text(); // Assuming start date is in the second column
+      var rowEndDate = $(this).find('td:eq(1)').text(); // Assuming end date is in the third column
+
+      if ((startDate === '' || rowStartDate >= startDate) && (endDate === '' || rowEndDate <= endDate)) {
+        $(this).show();
+      } else {
+        $(this).hide();
+      }
+    });
+  }
+
+</script>
+
+<!-- clear date input whenever an employee is selecte -->
+
+<script>
+
+  function clearDateInputs() {
+    document.getElementById("fdate").value = "";
+    document.getElementById("edate").value = "";
+  }
+  
+</script> 
+
+<style>
+  a{
+    text-decoration: none;
+  }
+  a:hover{
+    text-decoration: none;
+  }
+</style> 
+
+{% endblock %}

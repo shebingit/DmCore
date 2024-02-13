@@ -1040,8 +1040,9 @@ def Tc_follow_upLeads(request):
 
 
 
-        data = Leads_assignto_tc.objects.filter(TC_Id=dash_details, Status=1).order_by('Next_update_date').exclude(Response='Mark as waste')
+        data = Leads_assignto_tc.objects.filter(TC_Id=dash_details,Status=1).order_by('Next_update_date').exclude(Response='Mark as waste')
 
+        
         leads_obj_count = Leads_assignto_tc.objects.filter(TC_Id=dash_details,Status=1).exclude(Response='Mark as waste').count()
         record =  Leads_Call_Record.objects.all()
         more = lead_Details.objects.all()

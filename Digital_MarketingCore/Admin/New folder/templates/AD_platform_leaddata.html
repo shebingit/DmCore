@@ -1,0 +1,84 @@
+{% extends 'AD_base.html' %}
+{% load static %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'admin_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'admin_pltformdata' %}">Platform Data</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Platform Lead</li>
+        </ol>
+      </nav>
+</div>
+
+<div class="row" >
+    <div class="col-12 grid-margin">
+      <div class="card">
+        <div class="card-body">
+            <form action="{% url 'admin_pltformdata' %}" method="post">
+                {% csrf_token %}
+                <div class="row mt-4">
+                    
+                    
+                <div class=" col-md-5">
+                    <div class="form-group">
+                    <label>From date</label>
+                    <input type="date" class="form-control text-offwhite" name="#" id="fdate" required >                    
+                    </div>
+                </div>
+                <div class=" col-md-5">
+                    <div class="form-group">
+                    <label>To date</label>
+                    <input type="date" class="form-control text-offwhite" name="#" id="edate" required  >                    
+                    </div>
+                </div>
+                
+                <div class="col-md-2 d-flex align-items-center">
+                    <button class="btn btn-outline-primary" type="submit"><span class="mdi mdi-magnify"></span></button>
+                </div>
+                
+                            
+                </div>
+            </form>
+         
+          <div class="table-responsive" >
+            
+  
+  
+            <table class="table mt-4 mb-4" id="lead-details">
+              <thead>
+                <tr>
+                  <th> No. </th>
+                  <th> Date </th>
+                  <th> Lead collected Employee</th>
+                  <th> Lead Category</th>
+                  <th> Lead Name</th>
+                  <th> Lead Email</th>
+                  <th> Lead Contact</th>
+                  
+                </tr>
+              </thead>
+              <tbody>
+                
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                 
+                </tr>
+                
+              </tbody>
+            </table>
+  
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

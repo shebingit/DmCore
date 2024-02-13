@@ -58,23 +58,23 @@
 
 <div class="card">
     <div class="card-body">
-        <form action="{% url 'admin_analysis' %}" method="post">
+        <form action="{% url 'admin_employee_analysis' %}" method="post">
             {% csrf_token %}
     
             <div class="row ">
-                <div class="col-lg-2 col-md-3 col-sm-6 grid-margin">
+                <div class="col-lg-3 col-md-3 col-sm-6 grid-margin">
                     
                     
-                        <select name="hr_select" id="hr-select" class="form-control text-white" >
-                        <option value="" hidden>-- Select Hr -- </option>
-                        {% for i in hr_telecaller %}
+                        <select name="emp_select" id="emp-select" class="form-control text-white" >
+                        <option value="" hidden>-- Select Employee -- </option>
+                        {% for i in emps_obj %}
                         <option value="{{i.id}}">{{i.emp_name}}</option>
                         {% endfor %}
                         </select>
                    
                         
                 </div>
-                <div class="col-lg-2 col-md-3 col-sm-6 grid-margin">
+                <div class="col-lg-3 col-md-3 col-sm-6 grid-margin">
                    
                         <select name="client-select" id="client-select"  class="form-control text-white" >
                         <option value="" hidden>-- Select Client -- </option>
@@ -91,16 +91,7 @@
                     </select> 
                         
                 </div>
-                <div class="col-lg-2 col-md-3 col-sm-6 grid-margin">
-                    <select name="status_select" id="status-select" class="form-control text-white" onchange="clearDateInputs()">
-                        <option value="" >--Select Status -- </option>
-                        {% for i in followup_status %}
-                        <option value="{{i.status_name}}">{{i.status_name}}</option>
-                        {% endfor %}
-                        
-                    </select>  
-                        
-                </div>
+                
                 <div class="col-lg-4 col-md-4 col-sm-12 grid-margin">
                     
                         <div class="row">
@@ -136,119 +127,8 @@
 </div>
 
 <div class="row mt-3">
-    <div class="col-lg-12 col-md-12 col-sm-12 grid-margin">
-        <div class="card">
-            <div class="card-body">
-            <h6 class="mb-5 text-center mt-1"> Perfoamance Summery </h6>
-
-            <div class="row mt-2">
-                <div class="col-lg-2 col-md-3 col-sm-6 grid-margin">
-                    <p class="text-center small mb-0 p-0">Allocated Leads</p>
-                    <div id="circleProgress5" class="progressbar-js-circle  rounded p-3">
-                        
-                        <svg viewBox="0 0 100 100" style="display: block; width: 100%;">
-                            <path d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke="#eee" stroke-width="4" fill-opacity="0"></path>
-                            <path id="AL-lead" d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke="rgb(136, 16, 221)" stroke-width="4" fill-opacity="0" ></path>
-                    
-                        </svg>
-                        <div class="progressbar-text" style="position: absolute; left: 50%; top: 50%; padding: 0px; margin: 0px; transform: translate(-50%, -50%); color: rgb(255, 255, 255); font-size: 1rem;">
-                             <p><span class="h5">{{AL}}</span>    </p>
-                            </div>
-                    </div>
-                    {% if AL_Pending > 0 %}
-                    <p class="text-center text-small mb-0 p-0">Allocation  pending  - <span class="text-danger">{{ AL_Pending }}</span>  </p>
-                    {% endif %}
-                </div>
-                <div class="col-lg-2 col-md-3 col-sm-6 grid-margin">
-                    <p class="text-center small mb-0 p-0">Hr Accepted Leads</p>
-                    <div id="circleProgress5" class="progressbar-js-circle  rounded p-3">
-                        
-                        <svg viewBox="0 0 100 100" style="display: block; width: 100%;">
-                            <path d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke="#eee" stroke-width="4" fill-opacity="0"></path>
-                            <path id="APT-lead" d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke=" rgb(22, 171, 208)" stroke-width="4" fill-opacity="0" ></path>
-                    
-                        </svg>
-                        <div class="progressbar-text" style="position: absolute; left: 50%; top: 50%; padding: 0px; margin: 0px; transform: translate(-50%, -50%); color: rgb(255, 255, 255); font-size: 1rem;">
-                             <p> <span class="h5">{{APT}} </span>   </p>
-                            </div>
-                    </div>
-                    {% if APT_Pending > 0 %}
-                    <p class="text-center text-small mb-0 p-0">Hr pending to accepte - <span class="text-danger">{{ APT_Pending }}</span>  </p>
-                    {% endif %}
-                </div>
-                <div class="col-lg-2 col-md-3 col-sm-6 grid-margin">
-                    <p class="text-center small mb-0 p-0">Follow Up Leads</p>
-                    <div id="circleProgress5" class="progressbar-js-circle  rounded p-3">
-                        
-                        <svg viewBox="0 0 100 100" style="display: block; width: 100%;">
-                            <path d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke="#eee" stroke-width="4" fill-opacity="0"></path>
-                            <path id="FL-lead" d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke="rgb(238, 220, 18)" stroke-width="4" fill-opacity="0" ></path>
-                    
-                        </svg>
-                        <div class="progressbar-text" style="position: absolute; left: 50%; top: 50%; padding: 0px; margin: 0px; transform: translate(-50%, -50%); color: rgb(255, 255, 255); font-size: 1rem;">
-                             <p> <span class="h5">{{FL}} </span>    </p>
-                            </div>
-                    </div>
-                    {% if FL_Pending > 0 %}
-                    <p class="text-center text-small mb-0 p-0">Follow up pending  - <span class="text-danger">{{ FL_Pending }}</span>  </p>
-                    {% endif %}
-                </div>
-                <div class="col-lg-2 col-md-3 col-sm-6 grid-margin">
-                    <p class="text-center small mb-0 p-0">Joined Leads</p>
-                    <div id="circleProgress5" class="progressbar-js-circle  rounded p-3">
-                        
-                        <svg viewBox="0 0 100 100" style="display: block; width: 100%;">
-                            <path d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke="#eee" stroke-width="4" fill-opacity="0"></path>
-                            <path id="JL-lead" d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke="rgb(10, 182, 13)" stroke-width="4" fill-opacity="0" ></path>
-                    
-                        </svg>
-                        <div class="progressbar-text" style="position: absolute; left: 50%; top: 50%; padding: 0px; margin: 0px; transform: translate(-50%, -50%); color: rgb(255, 255, 255); font-size: 1rem;">
-                             <p> <span class="h5">{{JL}} </span>   </p>
-                            </div>
-                    </div>
-                   
-                </div>
-                <div class="col-lg-2 col-md-3 col-sm-6 grid-margin">
-                    <p class="text-center small mb-0 p-0">Waste Leads</p>
-                    <div id="circleProgress5" class="progressbar-js-circle  rounded p-3">
-                        
-                        <svg viewBox="0 0 100 100" style="display: block; width: 100%;">
-                            <path d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke="#eee" stroke-width="4" fill-opacity="0"></path>
-                            <path id="JL-lead" d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke="rgb(221, 16, 40)" stroke-width="4" fill-opacity="0" ></path>
-                    
-                        </svg>
-                        <div class="progressbar-text" style="position: absolute; left: 50%; top: 50%; padding: 0px; margin: 0px; transform: translate(-50%, -50%); color: rgb(255, 255, 255); font-size: 1rem;">
-                             <p> <span class="h5">{{WL}} </span>   </p>
-                            </div>
-                    </div>
-                   
-                </div>
-                <div class="col-lg-2 col-md-3 col-sm-6 grid-margin">
-                    <p class="text-center small mb-0 p-0">Overall Perfoamance</p>
-                  
-                    <div id="circleProgress5" class="progressbar-js-circle  rounded p-3">
-                        <svg viewBox="0 0 100 100" style="display: block; width: 100%;">
-                            <path d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke="#eee" stroke-width="4" fill-opacity="0"></path>
-                            <path id="progressPath" d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke="rgb(252,66,74)" stroke-width="4" fill-opacity="0" style="stroke-dasharray: 301.635, 301.635; stroke-dashoffset: 220.194;"></path>
-                    
-                        </svg>
-                        <div class="progressbar-text" style="position: absolute; left: 50%; top: 50%; padding: 0px; margin: 0px; transform: translate(-50%, -50%); color: rgb(255, 255, 255); font-size: 1rem;">
-                             <p>  {{hr_Performance_roundof}} % </p>
-                            </div>
-                    </div>
-                </div>
-               
-            </div>
-
-            
-            
-            
-               
-            </div>
-            
-        </div>
-    </div>
-    <div class="col-lg-12 col-md-12 col-sm-12 grid-margin">
+    
+    <div class="col-lg-9 col-md-9 col-sm-12 grid-margin">
         <div class="card">
             <div class="card-body">
                 
@@ -256,7 +136,7 @@
 
                 <div class="d-flex top-section">
                     <div>
-                        <h6 class="text-secondary"> Lead List - <span id="lead-count">{{db_obj_count}}</span> </h6>
+                        <h6 class="text-secondary"> Lead List - <span id="lead-count">{{ld_obj_count}}</span> </h6>
                     </div>
                     
     
@@ -283,28 +163,93 @@
                         </thead>
                         <tbody>
                         
-                        {% for i in db_obj %}  
+                        {% for i in ld_obj %}  
                         <tr>
                             <td>{{forloop.counter}}</td>
-                            <td>{{i.Genarated_date|date:"d-m-y"}}</td>
-                            <td>{{i.lead_Id.lead_work_regId.clientId.client_name}}
-                                <p class="mt-2">( {{i.lead_Id.lead_category_id.lead_collection_for}} )</p>
+                            <td>{{i.lead_add_date|date:"d-m-y"}}</td>
+                            <td>{{i.lead_work_regId.clientId.client_name}}
+                                <p class="mt-2">( {{i.lead_category_id.lead_collection_for}} )</p>
                             </td>
                             
-                            <td>{{i.lead_Id.lead_name}}
-                                <p class="mt-2">{{i.lead_Id.lead_email}}</p>
-                                <p class="mt-2">{{i.lead_Id.lead_contact}}</p>
-                                <p class="mt-2">Source : {{i.lead_Id.lead_source }}</p>
+                            <td>{{i.lead_name}}
+                                <p class="mt-2">{{i.lead_email}}</p>
+                                <p class="mt-2">{{i.lead_contact}}</p>
+                                <p class="mt-2">Source : {{i..lead_source }}</p>
                             </td>
-                            <td><a href="{% url 'admin_lead_details' i.lead_Id.id %}" class="text-white"><span class="mdi mdi-file-document ml-2"></span> lead Details </a> </span></td>
+                            <td><a href="{% url 'admin_lead_details' i.id %}" class="text-white"><span class="mdi mdi-file-document ml-2"></span> lead Details </a> </span></td>
                         
-                            <td>{{i.lead_Id.lead_collect_Emp_id.emp_name}}</td>
+                            <td>{{i.lead_collect_Emp_id.emp_name}}</td>
                         </tr>
                         {% endfor %}
                         </tbody>
                     </table>
                 </div>
     
+               
+            </div>
+            
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-12 grid-margin">
+        <div class="card">
+            <div class="card-body">
+            <h6 class="mb-5 text-center mt-1"> Perfoamance Summery </h6>
+
+            <div class="row mt-2">
+                
+                <div class="col-lg-12 col-md-12 col-sm-6 grid-margin">
+                    <p class="text-center small mb-0 p-0">Collected Leads</p>
+                    <div id="circleProgress5" class="progressbar-js-circle  rounded p-3">
+                        
+                        <svg viewBox="0 0 100 100" style="display: block; width: 100%;">
+                            <path d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke="#eee" stroke-width="4" fill-opacity="0"></path>
+                            <path id="APT-lead" d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke=" rgb(22, 171, 208)" stroke-width="4" fill-opacity="0" ></path>
+                    
+                        </svg>
+                        <div class="progressbar-text" style="position: absolute; left: 50%; top: 50%; padding: 0px; margin: 0px; transform: translate(-50%, -50%); color: rgb(255, 255, 255); font-size: 1rem;">
+                             <p> <span class="h5">{{CL}} </span>   </p>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                
+                <div class="col-lg-12 col-md-12 col-sm-6 grid-margin">
+                    <p class="text-center small mb-0 p-0">Waste Leads</p>
+                    <div id="circleProgress5" class="progressbar-js-circle  rounded p-3">
+                        
+                        <svg viewBox="0 0 100 100" style="display: block; width: 100%;">
+                            <path d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke="#eee" stroke-width="4" fill-opacity="0"></path>
+                            <path id="JL-lead" d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke="rgb(221, 16, 40)" stroke-width="4" fill-opacity="0" ></path>
+                    
+                        </svg>
+                        <div class="progressbar-text" style="position: absolute; left: 50%; top: 50%; padding: 0px; margin: 0px; transform: translate(-50%, -50%); color: rgb(255, 255, 255); font-size: 1rem;">
+                             <p> <span class="h5">{{WL}} </span>   </p>
+                            </div>
+                    </div>
+                   
+                </div>
+
+                <div class="col-lg-12 col-md-12 col-sm-6 grid-margin">
+                    <p class="text-center small mb-0 p-0">Overall Perfoamance</p>
+                  
+                    <div id="circleProgress5" class="progressbar-js-circle  rounded p-3">
+                        <svg viewBox="0 0 100 100" style="display: block; width: 100%;">
+                            <path d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke="#eee" stroke-width="4" fill-opacity="0"></path>
+                            <path id="progressPath" d="M 50,50 m 0,-48 a 48,48 0 1 1 0,96 a 48,48 0 1 1 0,-96" stroke="rgb(252,66,74)" stroke-width="4" fill-opacity="0" style="stroke-dasharray: 301.635, 301.635; stroke-dashoffset: 220.194;"></path>
+                    
+                        </svg>
+                        <div class="progressbar-text" style="position: absolute; left: 50%; top: 50%; padding: 0px; margin: 0px; transform: translate(-50%, -50%); color: rgb(255, 255, 255); font-size: 1rem;">
+                             <p>  {{emp_Performance_roundof}} % </p>
+                            </div>
+                    </div>
+                </div>
+               
+            </div>
+
+            
+            
+            
                
             </div>
             
@@ -440,20 +385,20 @@ $(document).ready(function() {
 </script>
 
 <script>
-    // Retrieve hr_Performance value
-    var hr_Performance = parseFloat("{{hr_Performance}}");
-    // Calculate the dash offset based on hr_Performance value
-    var dashOffset = 301.635 * (1 - hr_Performance / 100);
+    // Retrieve Employee Performance value
+    var EMP_Performance = parseFloat("{{emp_Performance}}");
+   
+    var dashOffset = 301.635 * (1 - EMP_Performance / 100);
    
 
     // Apply the dash offset to the progress bar
     var progressPath = document.getElementById("progressPath");
     progressPath.style.strokeDashoffset = dashOffset;
 
-    // Change color based on hr_Performance value
-    if (hr_Performance >= 80) {
+   
+    if (EMP_Performance >= 80) {
         progressPath.setAttribute("stroke", "rgb(0, 255, 0)"); // green
-    } else if (hr_Performance >= 50) {
+    } else if (EMP_Performance >= 50) {
         progressPath.setAttribute("stroke", "rgb(255, 255, 0)"); // yellow
     } else {
         progressPath.setAttribute("stroke", "rgb(255, 0, 0)"); // red
