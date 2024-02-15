@@ -1,0 +1,22 @@
+{% extends 'TC_base.html' %}
+{% load static %}
+{% block body %}
+
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item "><a class="text-underline-remove text-md" href="{% url 'Tc_follow_upLeads' %}">Followup Leads</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Followup Update</li>
+        </ol>
+      </nav>
+  </div>
+
+
+  {% for f in FBH_obj %}
+  <p>{{f.hr_telecaller_Id.emp_name}}</p>
+  {% endfor %}
+
+
+
+{% endblock %}

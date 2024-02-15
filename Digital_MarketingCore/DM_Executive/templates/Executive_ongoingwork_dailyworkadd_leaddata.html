@@ -8,7 +8,47 @@
     {
         background: transparent;
     }
- </style>
+    /*Pagination Styling */
+    
+        div.dataTables_wrapper div.dataTables_paginate ul.pagination {
+            margin: 1rem 0.5rem;
+            white-space: nowrap;
+            justify-content: flex-end;
+        }
+        
+        div.dataTables_wrapper div.dataTables_paginate ul.pagination  li a
+        {
+            border: none !important;
+            color: #c9c9c9;
+            font-size: 13px;
+        }
+        
+        div.dataTables_wrapper div.dataTables_paginate ul.pagination li:hover a{
+            background: #dc1a1a  !important;
+            color: #f8f7f7;
+        }
+        
+        .top-section
+        {
+            margin-bottom: 1rem;
+        }
+        .top-boxCard
+        {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .top-boxCard div{
+            padding: 0.80rem 1.2rem;
+            box-shadow: rgba(73, 76, 78, 0.2) 0px 8px 24px;
+        }
+        .top-boxCard a{
+            color: #f8f7f7;
+            font-weight: 500;
+            font-size: 0.90rem;
+        }
+        
+      </style>
 
 <div>
     <nav aria-label="breadcrumb">
@@ -21,23 +61,27 @@
 
 
 <div class="row mt-1">
-    <div class="col-12 grid-margin">
+    <div class="col-lg-12 cpl-md-12 col-sm-12 grid-margin">
         <div class="card">
             <div class="card-body">
             
-            
+            <style>
+               .error
+               {
+                color: #dc1a1a;
+               }
+               .info
+               {
+                color: #dcc21a;
+               }
+            </style>
                 <div class="row">
                     <div class="col-sm-12 col-lg-6 col-md-6 col-xl-8  grid-margin">
                     <h5 class="card-title custom-letter-spacing"> {{ works_obj.clientId.client_name }} -  Lead List </h5>
                     
                     </div>
                     
-                    <!-- <div class="col-sm-12 col-lg-6 col-md-6 col-xl-4 d-flex justify-content-end  grid-margin">
-                    <div class="d-flex ">
-                        <input  class="form-control text-offwhite mr-1" name="#" id="search-data" placeholder="search here..">
-                        <span class="text-danger mdi mdi-close" id="closeBtn" type="button"></span> 
-                    </div>
-                    </div> -->
+                  
                     
                 </div>
                 <div class="row">
@@ -75,67 +119,80 @@
                         </a>
                     </div>
                 </div>
+
+                {% if messages %}
+                <div class="messages d-flex  align-items-center justify-content-start  mb-2 p-1 w-50">
+                    
+                        {% for message in messages %}
+                        <p {% if message.tags %} class= "small  {{ message.tags }}"{% endif %}>
+                            {% if message.tags == 'error' %}
+                            <span class="mdi mdi-account-remove mr-1 mdi-18px"></span> 
+                            {% elif message.tags == 'info'  %}
+                            <span class="mdi mdi-exclamation mr-1 mdi-18px"></span> 
+                            {% endif %}
+                        {{ message }}<p>
+                        {% endfor %}
+                   
+                </div>
+                {% endif %}
+                
         
                 <div class="table-responsive">
                     <table class="table" id="leads-data">
-                    <thead>
-                        <tr>
-                        
-                            <th>No</th>
-                            <th>Collected Date</th>
-                            <th>Lead Full Name</th>
-                            <th>Email id  </th>
-                            <th>Contact No </th>
-                            <th>Lead Source</th>
-                            <th> Details  </th>
-                            <th> Status </th>
-                           
+                        <thead>
+                            <tr>
                             
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for lead in leads_obj %}
-                        <tr>
-                        
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ lead.lead_add_date }}</td>
-                        <td>{{ lead.lead_name }}</td>
-                        <td>{{ lead.lead_email }}</td>
-                        <td>{{ lead.lead_contact }}</td>
-                        <td>{{ lead.lead_source }}</td>
-                        <td>
+                                <th>No</th>
+                                <th>Action</th>
+                                <th>Collected Date</th>
+                                <th>Lead Full Name</th>
+                                <th>Email id  </th>
+                                <th>Contact No </th>
+                                <th>Lead Source</th>
+                                <th> Details  </th>
+                                <th> Status </th>
                             
-                            <ol>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for lead in leads_obj %}
+                            <tr>
+                            
+                            <td>{{ forloop.counter }}</td>
+                            <td><a href="{% url 'executive_collect_leadRemove' lead.id lead_category_assign.id %}"> <span class="mdi mdi-delete text-danger"></span></a></td>
+                            <td>{{ lead.lead_add_date }}</td>
+                            <td>{{ lead.lead_name }}</td>
+                            <td>{{ lead.lead_email }}</td>
+                            <td>{{ lead.lead_contact }}</td>
+                            <td>{{ lead.lead_source }}</td>
+                            <td>
+
+
+                                <a href="#">
+                                    <button class="btn btn-outline-primary" data-toggle="modal" data-target="#details{{lead.id}}">
+                                        <span class="mdi mdi-arrow-expand-up mr-1"></span><span class="small">Details</span>
+                                    </button>
+                                </a>
                                
-                                {% for Details in lead_Details_obj %}
-                                {% if Details.leadId.id == lead.id %}
-                                <li>
-                                    <p>
-                                        <span class="mr-1"> {{ Details.lead_field_name }} :</span>
-                                        <span> {{ Details.lead_field_data }} </span>
-                                    </p>
-                                </li>
+                            
+                            </td>
+                            <td>
+                                {% if lead.lead_status == 1 %}
+                                <p class=" badge badge-outline-success "> Verified</p>
+                                {% else %}
+                                <p class="badge badge-outline-warning">Pending</p>
                                 {% endif %}
-                                {% endfor %}
-                            </ol>
-                           
-                        </td>
-                        <td>
-                            {% if lead.lead_status == 1 %}
-                            <p class=" badge badge-outline-success "> Verified</p>
-                            {% else %}
-                            <p class="badge badge-outline-warning">Pending</p>
-                            {% endif %}
-                           
-                        </td>
+                            
+                            </td>
+                            
+                            
+                            
+                            
+                            </tr>
+                            {% endfor %}
                         
-                        
-                        
-                        
-                        </tr>
-                        {% endfor %}
-                    
-                    </tbody>
+                        </tbody>
                     </table>
                 </div>
 
@@ -186,6 +243,48 @@
       </div>
     </div>
 </div>
+
+<!-- Details view -->
+
+ 
+
+{% for lead in leads_obj %}
+<div class="modal fade" id="details{{lead.id}}">
+    <div class="modal-dialog ">
+      <div class="modal-content">
+  
+        <div class="card">
+          <div class="card-head d-flex justify-content-between align-items-center mt-3 mb-0 ">
+            <h4 class="card-title mt-3 ml-3">Upload Data File </h4>
+            <span class="mdi mdi-close-box mdi-18px text-danger mr-2"  data-dismiss="modal"></span>
+          </div>
+          <p class="mt-1 ml-3"> * You can upload only excel file data here</p>
+          
+          <div class="card-body mt-0">
+  
+           <ol>
+            {% for Details in lead_Details_obj %}
+            {% if Details.leadId.id == lead.id %}
+                <li>
+                    <p>
+                        <span class="mr-1"> {{ Details.lead_field_name }} :</span>
+                        <span> {{ Details.lead_field_data }} </span>
+                    </p>
+                </li>
+            {% endif %}
+            {% endfor %}
+            </ol>
+  
+                                
+                                    
+          </div>
+  
+        </div>
+      
+      </div>
+    </div>
+</div>
+{% endfor %}
 
 
 <!--  Single  lead Entry-->
@@ -260,6 +359,17 @@
     </div>
 </div>
 
-  
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    new DataTable('#leads-data');
+    
+});
+</script>
+
   
 {% endblock %}

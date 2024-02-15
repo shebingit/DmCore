@@ -104,7 +104,8 @@ urlpatterns = [
     path('Executive-Progress-Save',views.executive_progress_save,name='executive_progress_save'),
     path('download_progressfile/<int:progress_id>/<int:file_index>/', views.download_progressfile, name='download_progressfile'),
 
-
+    
+    path('Executive-Collect-LeadRemove/<int:pk>/<int:leadCID>/',views.executive_collect_leadRemove,name='executive_collect_leadRemove'),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -41,6 +41,7 @@ urlpatterns = [
     # follow up setion -----------------------
 
     path('Follow-UpLeads',views.Tc_follow_upLeads,name='Tc_follow_upLeads'),
+    path('Lead-Follow-Updates/<int:flID>',views.Lead_FollowUp_Updates,name='Lead_FollowUp_Updates'),
     path('Tc_followupDetails/<int:lID>',views.Tc_followupDetails,name='Tc_followupDetails'),
 
 

@@ -12,6 +12,39 @@
       color: aliceblue;
     }
 </style>
+<!-- Pagination Styling -->
+<style>
+  div.dataTables_wrapper div.dataTables_paginate ul.pagination {
+      margin: 1rem 0.5rem;
+      white-space: nowrap;
+      justify-content: flex-end;
+  }
+  
+  div.dataTables_wrapper div.dataTables_paginate ul.pagination  li a
+  {
+      border: none !important;
+      color: #c9c9c9;
+      font-size: 13px;
+  }
+  
+  div.dataTables_wrapper div.dataTables_paginate ul.pagination li:hover a{
+      background: #dc1a1a  !important;
+      color: #f8f7f7;
+  }
+  
+  
+  
+</style>
+<style>
+  .error
+  {
+   color: #dc1a1a;
+  }
+  .info
+  {
+   color: #dcc21a;
+  }
+</style>
 
 <div>
     <nav aria-label="breadcrumb">
@@ -22,194 +55,224 @@
       </nav>
 </div>
 
+<div class="row">
+  <div class="col-lg-12 grid-margin">
+    <div class="card">
+      <div class="card-body">
+        <form action="{% url 'DAM_Dashboard_followups' %}" method="post">
+          {% csrf_token %}
+          <div class="row">
+              <div class="col-xl-1 col-sm-12 grid-margin d-flex align-items-center justify-content-center ">
+                  <a href="{% url 'DAM_Dashboard_followups' %}" class="btn btn-secondary small">All</a>
+              </div>
+              <div class="col-xl-10 col-sm-12 grid-margin ">
+                  
+                  <div class="form-group">
+                      <label class="text-offwhite">Select HR\Telecaller *</label>
+                      <select class="form-control text-offwhite"  name="selected_emp" required>
+                      <option value="">Select Employee</option>
+                      {% for emp in employees %}
+                      <option value="{{emp.id}}">{{ emp.emp_name }}</option>
+                      {% endfor %}
+                      </select>
+          
+                  </div>
+              </div>
+              <div class="col-xl-1 col-sm-12 grid-margin d-flex align-items-center justify-content-center">
+                  <button class="btn btn-outline-primary"><span class="mdi mdi-magnify"></span></button>
+              </div>
+              <div class=" col-xl-2 col-sm-12 grid-margin d-flex justify-content-center">
+                  <p class="" data-toggle="modal" data-target="#followupStatus"><span class="mdi mdi-plus text-success"></span>
+                      <span class="small ">Follow Up Status</span></p>
+                  
+              </div>
+              <div class=" col-xl-2 col-sm-12 grid-margin d-flex justify-content-center">
+                <p class="" data-toggle="modal" data-target="#deleteBox"><span class="mdi mdi-delete-circle text-danger mdi-18px"></span>
+                    <span class="small text-danger">Delete By Check</span></p>
+                
+            </div>
+          
+              
+          </div>
+      </form>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+
 
 <div class="card" >
 
-    <div class="card-body">       
-       
+    <div class="card-body">    
+      
+      
             <div class="row ">
                 <div class="col-12 grid-margin">
-                    
-                
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between">
-                        <h6 class="card-title text-offwhite">
-                             Leads We Have - ( {{ dataBank_count }} ) 
-                            <span id="dotsElement" class="mdi mdi-dots-vertical text-secondary" onclick="exicutionActions(this)"></span>
-                        </h6>
-                        <div id="fileActionDropdown" class="file-dactiondropdown card" style="display: none;z-index:99; position: absolute; top:10%;">
-                            <ul class="list-group p-3">
-                            <li class="mb-3 li-none">
-                                <span class="mdi  mdi-printer text-primary "></span>
-                                <a href="" class="ml-2 text-offwhite"><span class="small">Print</span></a>
-                            </li>
-                            <li class="mb-3 li-none">
-                                <span class="mdi mdi-file-pdf text-danger"></span>
-                                <a href="" class=" ml-2 text-offwhite"><span class="small">Pdf</span></a>
-                            </li>
-                            <li class="mb-3 li-none">
-                                <span class="mdi mdi-file-excel text-secondary"></span>
-                                <a href="" class=" ml-2 text-offwhite"><span class="small">Excel</span></a>
-                            </li>
-                            </ul>
-                        </div>
-                        
-                        
-                                    
-                            <div class="add-items d-flex ">
-                        
-                                <input  class="form-control text-offwhite" name="#" id="search-data" placeholder="search here..">
-                                <button class="btn btn-outline-danger mdi mdi-close" id="closeBtn" type="button"></button> 
+                   
+                  <div class="card">
+                      <div class="card-body">
+                       
+                       
+                          <div class="d-flex justify-content-between">
+                            <h6 class="card-title text-offwhite">
+                                Leads We Have - ( {{ dataBank_count }} ) 
+                                <span id="dotsElement" class="mdi mdi-dots-vertical text-secondary" onclick="exicutionActions(this)"></span>
+                            </h6>
+                            <div id="fileActionDropdown" class="file-dactiondropdown card" style="display: none;z-index:99; position: absolute; top:10%;">
+                                <ul class="list-group p-3">
+                                <li class="mb-3 li-none">
+                                    <span class="mdi  mdi-printer text-primary "></span>
+                                    <a href="" class="ml-2 text-offwhite"><span class="small">Print</span></a>
+                                </li>
+                                <li class="mb-3 li-none">
+                                    <span class="mdi mdi-file-pdf text-danger"></span>
+                                    <a href="" class=" ml-2 text-offwhite"><span class="small">Pdf</span></a>
+                                </li>
+                                <li class="mb-3 li-none">
+                                    <span class="mdi mdi-file-excel text-secondary"></span>
+                                    <a href="" class=" ml-2 text-offwhite"><span class="small">Excel</span></a>
+                                </li>
+                                </ul>
                             </div>
-                            
-                        </div>
-            
-                    
-                        
-                  
-                    <form action="{% url 'DAM_Dashboard_followups' %}" method="post">
-                        {% csrf_token %}
-                        <div class="row">
-                            <div class="col-xl-1 col-sm-12 grid-margin d-flex align-items-center justify-content-center ">
-                                <a href="{% url 'DAM_Dashboard_followups' %}" class="btn btn-secondary small">All</a>
-                            </div>
-                            <div class="col-xl-4 col-sm-12 grid-margin ">
-                                
-                                <div class="form-group">
-                                    <label class="text-offwhite">Select HR\Telecaller *</label>
-                                    <select class="form-control text-offwhite"  name="selected_emp" required>
-                                    <option value="">Select Employee</option>
-                                    {% for emp in employees %}
-                                    <option value="{{emp.id}}">{{ emp.emp_name }}</option>
-                                    {% endfor %}
-                                    </select>
-                        
-                                </div>
-                            </div>
-                            <div class="col-xl-1 col-sm-12 grid-margin d-flex align-items-center justify-content-center">
-                                <button class="btn btn-outline-primary"><span class="mdi mdi-magnify"></span></button>
-                            </div>
-                            <div class=" col-xl-6 col-sm-12 grid-margin d-flex justify-content-end">
-                                <p class="" data-toggle="modal" data-target="#followupStatus"><span class="mdi mdi-plus text-success"></span>
-                                    <span class="small ">Follow Up Status</span></p>
-                                
-                            </div>
-                        
-                            
-                        </div>
-                    </form>
-                    {% if dataBank_objs %} 
-                    <div class="table-responsive">
-                        
-                        <table class="table" id="table-details">
-                        <thead>
-                            <tr>
-                            
-                               
-                                <th> No </th>
-                                <th> Action </th>
-                                <th> Allocated To </th>
 
-                                <th> Lead  Details </th>
-                                <th>FollowUp Details</th>
-                                <th> Client name \ Lead Category </th>
-                                <th> Added Date </th>
-                               
-                            
-                            </tr>
-                        </thead>
-                        <tbody  id="lead-data">
-                        {% for d in dataBank_objs %}
-                            <tr >
-            
-                               
-                                
-                                <td>{{ forloop.counter }}</td> 
-                                <td>
-                                        
-                                        <span class="mdi mdi-dots-vertical close-action text-secondary" onclick="showActions(this)"></span>
-                                        <div class="actions-dropdown card" style="display: none; position: absolute;">
-                                        
-                                        <ul class="list-group p-3">
-                                            
-                                            <li class="mb-3 li-none">
-                                                <span class="mdi mdi-phone text-secondary"></span>
-                                                <a href="{% url 'DAM_dataBnak_followup' d.dataBank_ID.id %}" class="small ml-2 text-offwhite">FollowUp</a>
-                                            </li>
-                                            <li class="mb-3 li-none">
-                                            <span class="mdi mdi-file-account text-secondary"></span>
-                                            <a href="{% url 'DAM_dataBnak_followup' d.dataBank_ID.id %}" class="small ml-2 text-offwhite">Details</a>
-                                            </li>
-                                        
-                                            
-                                        </ul>
-                                        </div>
-                                        
-                                </td> 
-                                    
-                            
-                                
-                               
-                                <td> <p>{{ d.TC_Id.emp_name }}</span></p>
-                                  <p> {{ d.dataBank_ID.allocated_date}}</p>
-                                  
-                                  {% if d.dataBank_ID.lead_status == 'Not Attended' %}
-                                    <p>Status :
-                                        <span class="mdi mdi-information-outline text-warning mr-1"></span>
-                                        {{ d.dataBank_ID.lead_status }}</p>
-                                    {% elif  d.dataBank_ID.lead_status == 'Allocated' %}
-                                    <p>Status : <span class="mdi mdi-check text-primary mr-1"></span>  {{ d.dataBank_ID.lead_status }}</p> 
-                                    {% elif  d.dataBank_ID.lead_status == 'Opend' %}
-                                    <p> Status : <span class="mdi mdi-file-check text-success mr-1"></span>  {{ d.dataBank_ID.lead_status }}</p> 
-                                    {% else %}
-                                    <p> Status : <span class="mdi mdi-check-circle text-success mr-1"></span>  {{ d.dataBank_ID.lead_status }} </p> 
-                                
-                                    {% endif %}
-                                </td>  
+                            {% if messages %}
+                            <div class="messages d-flex  align-items-center justify-content-start  mb-2 p-1 w-50">
                               
-                                {% if d.dataBank_ID.lead_status == 'Closed' %}
-                                <td class="bg-success">
-                                  <p class="h6">{{ d.dataBank_ID.lead_Id.lead_name }}</p> 
+                                    {% for message in messages %}
+                                    <p {% if message.tags %} class= "small  {{ message.tags }}"{% endif %}>
+                                        {% if message.tags == 'error' %}
+                                        <span class="mdi mdi-account-remove mr-1 mdi-18px"></span> 
+                                        {% elif message.tags == 'info'  %}
+                                        <span class="mdi mdi-exclamation mr-1 mdi-18px"></span> 
+                                        {% endif %}
+                                    {{ message }}<p>
+                                    {% endfor %}
                                
-                                  <p>{{ d.dataBank_ID.lead_Id.lead_email }}</p>
-                                  <p>{{ d.dataBank_ID.lead_Id.lead_contact }}</p>
-                                  <p>Data Sourse : {{ d.dataBank_ID.lead_Id.lead_source }}</p>
-                                </td>
-                                {% else %}
-                                <td><p class="h6">{{ d.dataBank_ID.lead_Id.lead_name }}</p> 
-                               
-                                  <p>{{ d.dataBank_ID.lead_Id.lead_email }}</p>
-                                  <p>{{ d.dataBank_ID.lead_Id.lead_contact }}</p>
-                                  <p>Data Sourse : {{ d.dataBank_ID.lead_Id.lead_source }}</p>
-                                </td>
-                                {% endif %}
-                               
-                                <td>{{ d.dataBank_ID.followup_date |default:'No Date Available !' }}
-                                  <p class="mt-2">Current Status : {{d.Response}}</p>
-                                </td>
-                                <td>
-                                  <p>{{ d.dataBank_ID.lead_Id.lead_work_regId.clientId.client_name }}</p>
-                                  <p>{{ d.dataBank_ID.lead_Id.lead_category_id.lead_collection_for }}</p>
-                                </td>
-                                <td> {{ d.dataBank_ID.Genarated_date}} </td>  
-                               
-                            
-                            </tr>
-            
-                            {% endfor %}
-                        
-                        </tbody>
-                        </table>
-                    </div>
-                    {% else %}
-                        <div class="d-flex justify-content-center">
-                        <img src="{% static 'images\file-icons\no-data-file.png' %}">
-                        </div>
-                    {% endif %}
+                            </div>
+                            {% endif %}
 
-                    </div>
-                </div>
+                          </div>
+              
+                    
+                          
+                    
+                      
+                      {% if dataBank_objs %} 
+                      <div class="table-responsive">
+                          
+                          <table class="table" id="table-details">
+                          <thead>
+                              <tr>
+                              
+                                
+                                  <th> No </th>
+                                  <th> Action </th>
+                                  <th> Allocated To </th>
+
+                                  <th> Lead  Details </th>
+                                  <th>FollowUp Details</th>
+                                  <th> Client name \ Lead Category </th>
+                                  <th> Added Date </th>
+                                
+                              
+                              </tr>
+                          </thead>
+                          <tbody  id="lead-data">
+                          {% for d in dataBank_objs %}
+                              <tr >
+              
+                                
+                                  
+                                  <td>{{ forloop.counter }}</td> 
+                                  <td>
+                                          
+                                          <span class="mdi mdi-dots-vertical close-action text-secondary" onclick="showActions(this)"></span>
+                                          <div class="actions-dropdown card" style="display: none; position: absolute;">
+                                          
+                                          <ul class="list-group p-2 pb-0">
+                                              
+                                              <li class="mb-2 li-none">
+                                                  <span class="mdi mdi-phone text-secondary"></span>
+                                                  <a href="{% url 'DAM_dataBnak_followup' d.dataBank_ID.id %}" class="small ml-2 text-offwhite">FollowUp</a>
+                                              </li>
+                                              <li class="mb-2 li-none">
+                                              <span class="mdi mdi-file-account text-secondary"></span>
+                                              <a href="{% url 'DAM_dataBnak_followup' d.dataBank_ID.id %}" class="small ml-2 text-offwhite">Details</a>
+                                              </li>
+                                              <li class="mb-2 li-none">
+                                                <span class="mdi mdi-delete text-secondary"></span>
+                                                <a href="{% url 'DAM_assign_remove' d.id %}" class="small ml-2 text-offwhite">Delete</a>
+                                              </li>
+                                          
+                                              
+                                            </ul>
+                                          </div>
+                                          
+                                  </td> 
+                                      
+                              
+                                  
+                                
+                                  <td> <p>{{ d.TC_Id.emp_name }}</span></p>
+                                    <p> {{ d.dataBank_ID.allocated_date}}</p>
+                                    
+                                    {% if d.dataBank_ID.lead_status == 'Not Attended' %}
+                                      <p>Status :
+                                          <span class="mdi mdi-information-outline text-warning mr-1"></span>
+                                          {{ d.dataBank_ID.lead_status }}</p>
+                                      {% elif  d.dataBank_ID.lead_status == 'Allocated' %}
+                                      <p>Status : <span class="mdi mdi-check text-primary mr-1"></span>  {{ d.dataBank_ID.lead_status }}</p> 
+                                      {% elif  d.dataBank_ID.lead_status == 'Opend' %}
+                                      <p> Status : <span class="mdi mdi-file-check text-success mr-1"></span>  {{ d.dataBank_ID.lead_status }}</p> 
+                                      {% else %}
+                                      <p> Status : <span class="mdi mdi-check-circle text-success mr-1"></span>  {{ d.dataBank_ID.lead_status }} </p> 
+                                  
+                                      {% endif %}
+                                  </td>  
+                                
+                                  {% if d.dataBank_ID.lead_status == 'Closed' %}
+                                  <td class="bg-success">
+                                    <p class="h6">{{ d.dataBank_ID.lead_Id.lead_name }}</p> 
+                                
+                                    <p>{{ d.dataBank_ID.lead_Id.lead_email }}</p>
+                                    <p>{{ d.dataBank_ID.lead_Id.lead_contact }}</p>
+                                    <p>Data Sourse : {{ d.dataBank_ID.lead_Id.lead_source }}</p>
+                                  </td>
+                                  {% else %}
+                                  <td><p class="h6">{{ d.dataBank_ID.lead_Id.lead_name }}</p> 
+                                
+                                    <p>{{ d.dataBank_ID.lead_Id.lead_email }}</p>
+                                    <p>{{ d.dataBank_ID.lead_Id.lead_contact }}</p>
+                                    <p>Data Sourse : {{ d.dataBank_ID.lead_Id.lead_source }}</p>
+                                  </td>
+                                  {% endif %}
+                                
+                                  <td>{{ d.dataBank_ID.followup_date |default:'No Date Available !' }}
+                                    <p class="mt-2">Current Status : {{d.Response}}</p>
+                                  </td>
+                                  <td>
+                                    <p>{{ d.dataBank_ID.lead_Id.lead_work_regId.clientId.client_name }}</p>
+                                    <p>{{ d.dataBank_ID.lead_Id.lead_category_id.lead_collection_for }}</p>
+                                  </td>
+                                  <td> {{ d.dataBank_ID.Genarated_date}} </td>  
+                                
+                              
+                              </tr>
+              
+                              {% endfor %}
+                          
+                          </tbody>
+                          </table>
+                      </div>
+                      {% else %}
+                          <div class="d-flex justify-content-center">
+                          <img src="{% static 'images\file-icons\no-data-file.png' %}">
+                          </div>
+                      {% endif %}
+
+                      </div>
+                  </div>
                 </div>
             </div>
 
@@ -290,96 +353,83 @@
       
       </div>
     </div>
-  </div>
+</div>
 
 
-  <script>
-   
-    const inputField = document.getElementById('search-data');
-    const closeBtn = document.getElementById('closeBtn');
-    const empTable = document.getElementById('table-details');
-    closeBtn.style.display = 'none';
-  
-    inputField.addEventListener('input', function() {
-        filterTable();
-    });
-  
-    function filterTable() {
-        const filterValue = inputField.value.toLowerCase();
-        const rows = empTable.getElementsByTagName('tr');
-  
-        for (let i = 1; i < rows.length; i++) {
-            const Cell1 = rows[i].getElementsByTagName('td')[1];
-            const Cell2 = rows[i].getElementsByTagName('td')[2];
-            const Cell3 = rows[i].getElementsByTagName('td')[3];
-            const Cell4 = rows[i].getElementsByTagName('td')[4];
-            const Cell5 = rows[i].getElementsByTagName('td')[5];
-            const Cell6 = rows[i].getElementsByTagName('td')[6];
-           
-        
-           
-           
-  
-  
-            if (Cell1 || Cell2 || Cell3 || Cell4|| Cell5 || Cell6 ) {
-  
-                const datacell1 = Cell1.textContent || Cell1.innerText;
-                const datacell2 = Cell2.textContent || Cell2.innerText;
-                const datacell3 = Cell3.textContent || Cell3.innerText;
-                const datacell4 = Cell4.textContent || Cell4.innerText;
-                const datacell5 = Cell5.textContent || Cell5.innerText;
-                const datacell6 = Cell6.textContent || Cell6.innerText;
+<!-- Multiple Delete Box -->
 
-               
-                
-                
-                
-  
-                if (datacell1.toLowerCase().includes(filterValue) || 
-                    datacell2.toLowerCase().includes(filterValue) || 
-                    datacell3.toLowerCase().includes(filterValue) ||
-                    datacell4.toLowerCase().includes(filterValue) || 
-                    datacell5.toLowerCase().includes(filterValue) || 
-                    datacell6.toLowerCase().includes(filterValue))
-                    
-                {
-                    rows[i].style.display = '';
-                } else {
-                    rows[i].style.display = 'none';
-                }
-            }
-        }
-    }
-  
-     // To display the close button and hide the close button based on the search input 
-    inputField.addEventListener('input', function() {
-    if (inputField.value == '') {
-        closeBtn.style.display = 'none';
+<div class="modal fade" id="deleteBox">
+  <div class="modal-dialog  ">
+    <div class="modal-content">
+
+      <div class="card">
+        <div class="card-head d-flex justify-content-between align-items-center mt-3 mb-0 ">
+          <h5 class="card-title mt-3 ml-3">Remove Allocated Leads -  {{ dataBank_count }} </h5>
+          <span class="mdi mdi-close-box mdi-18px text-danger mr-2"  data-dismiss="modal"></span>
+        </div>
        
-    } else {
-        closeBtn.style.display = 'block';
         
-    }
-    });
+        <div class="card-body mt-0">
+
+          <form action="{% url 'DAM_assign_remove' 0 %}" method="post"  enctype="multipart/form-data">
+           
+            {% csrf_token %}
+            {% for d in dataBank_objs %}
+              <div class="form-check form-check-primary">
+                <label class="form-check-label">
+                <input class="checkbox check-single" name="allocated_check" value="{{ d.id }}" id="" type="checkbox">
+                Name : {{ d.dataBank_ID.lead_Id.lead_name }} &nbsp; &nbsp;&nbsp;
+                Email : {{ d.dataBank_ID.lead_Id.lead_email }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+                Contact No : {{ d.dataBank_ID.lead_Id.lead_contact }}
+                </label>
+              </div>
+              {% endfor %}
+        
+            <div class="add-items d-flex justify-content-center ">
+              <button class=" btn btn-outline-info " type="reset">
+                <span class="mdi mdi-refresh  "></span>
+                <span class="small">Clear</span>
+              </button> 
+              <button class=" btn btn-outline-danger " type="submit">
+                <span class="mdi mdi-delete-empty small"></span>
+                <span class="small">Remove </span>
+              </button> 
+              <button class=" btn btn-outline-secondary " data-dismiss="modal" type="button">
+                  <span class="mdi mdi-close  small"></span>
+                  <span class="small">Close</span>
+              </button> 
+            </div>
+        
+          </form>
+
+        </div>
+
+      </div>
+    
+    </div>
+  </div>
+</div>
+
+
+
   
-    closeBtn.addEventListener('click', function() {
-    inputField.value = '';
-    closeBtn.style.display = 'none';
-    filterTable(); // Display the full table data
-    });
-
-
-   
-  </script>
 
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+  <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
 
+  
+  <script>
+    $(document).ready(function() {
+        new DataTable('#table-details');
+        
+    });
+    </script>
+    
 
-
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
   <script>
     function exicutionActions(element) {

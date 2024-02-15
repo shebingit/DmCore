@@ -29,6 +29,7 @@ urlpatterns = [
     # Data Manager Follow Up 
 
      path('FollowUp-Management',views.DAM_Dashboard_followups,name='DAM_Dashboard_followups'),
+     path('DAM_assign_remove/<int:lassignID>',views.DAM_assign_remove,name='DAM_assign_remove'),
     
     # Data Manager Notification Section ----------------
 

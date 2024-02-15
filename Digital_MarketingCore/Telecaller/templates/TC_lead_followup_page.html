@@ -15,6 +15,7 @@
     color: rgb(225, 226, 226);
   }
 </style>
+
 <div>
   <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
@@ -49,18 +50,14 @@
               <thead>
                 <tr>
                   <th scope="col">ID</th>
-                 
-                  <th scope="col">Name</th>
-                  <th scope="col">Email</th>
-        
-                  <th scope="col">Contact</th>
                   <th scope="col" >Client Name \ Lead Category</th>
+                  <th scope="col">Name</th>
+    
+                 
                   <th scope="col">Next Update Date</th>
                   <th scope="col">Status</th>
-                  <th scope="col">Details</th>
                   <th scope="col">Follow up</th>
-                  <th scope="col">Mark as Waste</th>
-                  <th scope="col">Closed</th>
+                 
         
                 </tr>
               </thead>
@@ -70,14 +67,18 @@
                 {% if d.Next_update_date < t_date %}
                 <tr class="bg-danger" >
                   <td class="">{{forloop.counter }}</td>
-                  
-                  <td><a href="{% url 'Tc_followupDetails' d.leadId.id %}" class="">{{d.leadId.lead_name}}</a></td>
-                  <td class="">{{d.leadId.lead_email}}</td>
-                  <td class="">{{d.leadId.lead_contact}}</td>
+
                   <td class="">
-                    <p class=""> {{d.leadId.lead_work_regId.clientId.client_name}} \
-                    <span > {{d.leadId.lead_category_id.lead_collection_for}} </span>  </p>
+                    <p class=" mt-2 mb-2"> {{d.leadId.lead_work_regId.clientId.client_name}}  </p>
+                    <p> {{d.leadId.lead_category_id.lead_collection_for}} </p> 
                   </td>
+                  
+                  <td><a href="{% url 'Tc_followupDetails' d.leadId.id %}" class="text-offwhite mb-2">{{d.leadId.lead_name}}</a>
+                    <p class=" mt-2 mb-2">{{d.leadId.lead_email}}</p>
+                    <p>{{d.leadId.lead_contact}}</p>
+                  </td>
+                  
+                  
                     
                   <td class="">{{d.Next_update_date | default:'No date available'}}</td> 
 
@@ -90,15 +91,12 @@
                   {% endif %}
                  
         
-                  <td class="text-white"><a href="" class="btn btn-secondary" data-toggle="modal"
-                    data-target="#myModal2{{d.id}}"><span class="mdi mdi-file-document text-dark"></span> </a></td>
-    
-                  
+          
     
                   <td class="text-white"><a href="" class="btn btn-success" data-toggle="modal"
                       data-target="#myModal{{d.id}}"><span class="mdi mdi-phone"></span> </a>
                   </td>
-                  <td>
+                  <!-- <td>
                     <a href="" class="btn btn-outline-warning text-small mr-2"
                     data-toggle="modal"
                     data-target="#wastemodal{{d.id}}"><span class="text-small">waste Lead</span> </a>
@@ -106,21 +104,24 @@
                   <td>
                     <a href="{% url 'TC_complete_lead' d.id %}" class="btn btn-outline-danger"><span class="mdi mdi-checkall"></span>
                       <span class="text-small"> Complete Lead </span> </a>
-                  </td>
+                  </td> -->
         
         
                 </tr>
                 {% elif d.Next_update_date == t_date %}
                 <tr class="bg-warning" >
                   <td class="">{{forloop.counter }}</td>
-                  
-                  <td><a href="{% url 'Tc_followupDetails' d.leadId.id %}" class="">{{d.leadId.lead_name}}</a></td>
-                  <td class="">{{d.leadId.lead_email}}</td>
-                  <td class="">{{d.leadId.lead_contact}}</td>
                   <td class="">
-                    <p class=""> {{d.leadId.lead_work_regId.clientId.client_name}} \
-                    <span > {{d.leadId.lead_category_id.lead_collection_for}} </span>  </p>
+                    <p class=""> {{d.leadId.lead_work_regId.clientId.client_name}} </p>
+                    <p > {{d.leadId.lead_category_id.lead_collection_for}} </p>  
                   </td>
+                  
+                  <td><a href="{% url 'Tc_followupDetails' d.leadId.id %}" class="mb-2 text-offwhite">{{d.leadId.lead_name}}</a>
+                    <p class=" mt-2 mb-2">{{d.leadId.lead_email}}</p>
+                    <p>{{d.leadId.lead_contact}}</p>
+                  </td>
+                 
+                 
                     
                   <td class="">{{d.Next_update_date | default:'No date available'}}</td> 
 
@@ -133,15 +134,11 @@
                   {% endif %}
                  
         
-                  <td class="text-white"><a href="" class="btn btn-secondary" data-toggle="modal"
-                    data-target="#myModal2{{d.id}}"><span class="mdi mdi-file-document text-dark"></span> </a></td>
-    
-                  
     
                   <td class="text-white"><a href="" class="btn btn-success" data-toggle="modal"
                       data-target="#myModal{{d.id}}"><span class="mdi mdi-phone"></span> </a>
                   </td>
-                  <td>
+                  <!-- <td>
                     <a href="" class="btn btn-outline-secondary text-small mr-2"
                     data-toggle="modal"
                     data-target="#wastemodal{{d.id}}"><span class="text-small">waste Lead</span> </a>
@@ -149,22 +146,25 @@
                   <td>
                     <a href="{% url 'TC_complete_lead' d.id %}" class="btn btn-outline-danger"><span class="mdi mdi-checkall"></span>
                       <span class="text-small"> Complete Lead </span> </a>
-                  </td>
+                  </td> -->
         
         
                 </tr>
                 {% else %}
                 <tr class="text-offwhite" >
                   <td class="">{{forloop.counter }}</td>
-                  
-                  <td><a href="{% url 'Tc_followupDetails' d.leadId.id %}" class="text-offwhite">{{d.leadId.lead_name}}</a></td>
-                  <td class="">{{d.leadId.lead_email}}</td>
-                  <td class="">{{d.leadId.lead_contact}}</td>
                   <td class="">
-                    <p class=""> {{d.leadId.lead_work_regId.clientId.client_name}} \
-                    <span > {{d.leadId.lead_category_id.lead_collection_for}} </span>  </p>
+                    <p class=""> {{d.leadId.lead_work_regId.clientId.client_name}} </p>
+                    <p > {{d.leadId.lead_category_id.lead_collection_for}} </span>  </p>
                   </td>
                     
+                  
+                  <td><a href="{% url 'Tc_followupDetails' d.leadId.id %}" class="text-offwhite mb-2">{{d.leadId.lead_name}}</a>
+                    <p class=" mt-2 mb-2">{{d.leadId.lead_email}}</p>
+                    <p>{{d.leadId.lead_contact}}</p>
+                  </td>
+                 
+                 
                   <td class="">{{d.Next_update_date | default:'No date available'}}</td> 
 
                   {% if d.Update_Action == 0 %}
@@ -176,15 +176,15 @@
                   {% endif %}
                  
         
-                  <td class="text-white"><a href="" class="btn btn-secondary" data-toggle="modal"
-                    data-target="#myModal2{{d.id}}"><span class="mdi mdi-file-document"></span> </a></td>
-    
                   
-    
-                  <td class="text-white"><a href="" class="btn btn-success" data-toggle="modal"
-                      data-target="#myModal{{d.id}}"><span class="mdi mdi-phone"></span> </a>
+                  <td class="text-white">
+                    <a href="{% url 'Lead_FollowUp_Updates' d.id %}" class="btn btn-success" ><span class="mdi mdi-phone"></span> 
+                    </a>
+                    <!-- <a href="" class="btn btn-success" data-toggle="modal"
+                      data-target="#myModal{{d.id}}"><span class="mdi mdi-phone"></span> 
+                    </a> -->
                   </td>
-                  <td>
+                  <!-- <td>
                     <a href="" class="btn btn-outline-warning text-small mr-2" data-toggle="modal"
                     data-target="#wastemodal{{d.id}}">
                       <span class="text-small">waste Lead</span> </a>
@@ -193,7 +193,7 @@
                     <a href="{% url 'TC_complete_lead' d.id %}" class="btn btn-outline-danger"><span class="mdi mdi-checkall"></span>
                       <span class="text-small"> Complete Lead </span> </a>
                   </td>
-        
+         -->
         
                 </tr>
                 {% endif %}
@@ -265,64 +265,7 @@
     </div>
   </div>
 
-  <!--Response Modal -->
-  <div class="modal fade" id="myModal2{{d.id}}" role="dialog">
-    <div class="modal-dialog">
 
-      <!-- Modal content-->
-      <div class="modal-content">
-        <div class="card">
-          <div class="card-body mt-0" style="padding: 0.875rem 0.5625rem">
-            <div class="modal-header">
-              <h4 class="modal-title text-center" >Clients Response</h4>
-              <button type="button" class="close text-danger" data-dismiss="modal" style="justify-content: end;">&times;</button>
-              
-            </div>
-            <div class="modal-body">
-              <div class="row p-2">
-                <div class="col-3"><p> Response </p></div>
-                <div class="col-9"><p> {{d.Response}} </p></div>
-              </div>
-              <div class="row p-2">
-                <div class="col-3"> <p> Reason </p></div>
-                <div class="col-9"> <p>{{d.Reason}} </p></div>
-              </div>
-              {% for m in more %}
-            
-              {% if m.leadId.id == d.leadId.id %}
-              <div class="row p-2">
-                <div class="col"> <p> {{m.lead_field_name}} </p></div>
-                <div class="col">: <p> {{m.lead_field_data}} </p></div>
-              </div>
-              {% endif %}
-              {% endfor%}
-
-              {% for r in record %}
-              {% if r.Record %}
-              {% if r.Leads_assignto_tc_id.id == d.id %}
-              
-              <div class="row p-2 pt-4">
-                <audio controls>
-                  <source src="{{r.Record.url}}">
-                </audio>
-              </div>
-              {% endif %}
-              {% endif %}
-              {% endfor %}
-            </div>
-          
-        
-            <div class="modal-footer">
-              
-              
-              <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
 
 
 

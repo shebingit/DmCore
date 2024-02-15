@@ -1042,26 +1042,57 @@ def Tc_follow_upLeads(request):
 
         data = Leads_assignto_tc.objects.filter(TC_Id=dash_details,Status=1).order_by('Next_update_date').exclude(Response='Mark as waste')
 
+        leads_obj_count = data.count()
         
-        leads_obj_count = Leads_assignto_tc.objects.filter(TC_Id=dash_details,Status=1).exclude(Response='Mark as waste').count()
-        record =  Leads_Call_Record.objects.all()
-        more = lead_Details.objects.all()
-        flstatus = FollowupStatus.objects.filter(company_Id__id=dash_details.emp_comp_id.id)
+        t_date = date.today() 
+        
+        content = {'emp_dash':emp_dash,
+                   'dash_details':dash_details,
+                   'data':data,
+                   'notifications':notifications,
+                   'leads_obj_count':leads_obj_count,
+                   't_date':t_date
+                  }
+        return render(request,'TC_lead_followup_page.html',content)
+
+
+
+def Lead_FollowUp_Updates(request,flID):
+    if 'emp_id' in request.session:
+        if request.session.has_key('emp_id'):
+            emp_id = request.session['emp_id']
+           
+        else:
+            return redirect('/')
+        
+        emp_dash = LogRegister_Details.objects.get(id=emp_id)
+        dash_details = EmployeeRegister_Details.objects.get(logreg_id=emp_dash)
         notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
+
+
+
+        data = Leads_assignto_tc.objects.get(id=flID)
+        flstatus = FollowupStatus.objects.filter(company_Id__id=dash_details.emp_comp_id.id)
+
+        FBH_obj = FollowupHistory.objects.filter(hs_lead_Id=data.leadId)
+        
+       
 
         t_date = date.today() 
         
         content = {'emp_dash':emp_dash,
                    'dash_details':dash_details,
                    'data':data,
-                   'record':record,
-                   'more':more,
+              
                    'flstatus':flstatus,
                    'notifications':notifications,
-                   'leads_obj_count':leads_obj_count,
-                   't_date':t_date
+                   't_date':t_date,
+                   'FBH_obj':FBH_obj,
                   }
-        return render(request,'TC_lead_followup_page.html',content)
+        return render(request,'TC_lead_followup_UpdatePage.html',content)
+
+
+
 
 
 def TC_complete_lead(request,laID):

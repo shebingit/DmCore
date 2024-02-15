@@ -21,6 +21,7 @@ from django.http import HttpResponse
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 import re
+from django.contrib import messages
 
 
 # Create your views here.
@@ -1540,7 +1541,6 @@ def executive_lead_add_page(request,pk,id):
         
        
 
-
         content = {
             'emp_dash':emp_dash,
             'dash_details':dash_details,
@@ -1556,9 +1556,23 @@ def executive_lead_add_page(request,pk,id):
         }
        
         return render(request,'Executive_ongoingwork_dailyworkadd_leaddata.html',content)
+    
 
-    else:
-        return redirect('/')
+def executive_collect_leadRemove(request,pk,leadCID):
+
+    try:
+        leads_obj = Leads.objects.get(id=pk,lead_transfer_status=0) 
+        tsID = leads_obj.lead_taskAssignId.id
+        leads_obj.delete()
+        lead_category_assign=LeadCateogry_Assign.objects.get(id=leadCID)
+        lead_category_assign.lca_target_achived = int(lead_category_assign.lca_target_achived) - 1
+        lead_category_assign.save()
+        messages.error(request, f'{leads_obj.lead_name} Lead deleted.')
+    except Leads.DoesNotExist:
+        messages.info(request, f'{leads_obj.lead_name} Lead already transferred.')
+    return redirect('executive_lead_add_page',tsID,leadCID)
+
+    
 
 
 def executive_lead_add(request,pk,id):
@@ -1753,6 +1767,8 @@ def executive_lead_file_upload(request,pk,id):
 
                     try:
                         validate_email(lead.lead_email)
+                        
+
                     except ValidationError:
                         # Invalid email, mark as waste data
                         lead.waste_data=1
@@ -1769,6 +1785,9 @@ def executive_lead_file_upload(request,pk,id):
                             lead_details = lead_Details(leadId=lead, lead_field_name=key, lead_field_data=value)
                             lead_details.leadId = lead
                             lead_details.save()
+                    
+                    lead_category_assign.lca_target_achived = int(lead_category_assign.lca_target_achived) + 1
+                    lead_category_assign.save()
 
 
                 success = True
@@ -1781,17 +1800,7 @@ def executive_lead_file_upload(request,pk,id):
         leads_obj = Leads.objects.filter(lead_work_regId=works_obj,lead_collect_Emp_id=dash_details,lead_add_date=today).order_by('-lead_add_date','-lead_add_time')
         leads_obj_count = Leads.objects.filter(lead_work_regId=works_obj,lead_collect_Emp_id=dash_details,lead_add_date=today).count()
         lead_Details_obj = lead_Details.objects.filter(leadId__in=leads_obj)
-        # leads_target_count = Leads.objects.filter(lead_work_regId=works_obj,lead_collect_Emp_id=dash_details,waste_data=0).count()
-
-        # task.ta_target_achived=leads_target_count
-        # task.save()
-
-        # category_id=lead_category_assign.lcta_id.lc_id
-        # leads_categorytarget_count = Leads.objects.filter(lead_work_regId=works_obj,lead_collect_Emp_id=dash_details,lead_category_id=category_id,waste_data=0).count()
-
-        # lead_category_assign.lca_target_achived=leads_categorytarget_count
-        # lead_category_assign.save()
-        
+      
 
 
         

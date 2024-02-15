@@ -10,6 +10,7 @@ from django.utils import timezone
 from datetime import date
 
 from django.http import JsonResponse
+from django.contrib import messages
 
 
 
@@ -846,11 +847,11 @@ def DAM_Dashboard_followups(request):
 
             emp_ID = request.POST['selected_emp']
             dataBank_objs = Leads_assignto_tc.objects.filter(TC_Id__id=emp_ID,dataBank_ID__lead_Id__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id,dataBank_ID__lead_allocate_status=1 )
-            dataBank_count = Leads_assignto_tc.objects.filter(TC_Id__id=emp_ID,dataBank_ID__lead_Id__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id,dataBank_ID__lead_allocate_status=1).count()
+            dataBank_count = dataBank_objs.count()
         
         else:
             dataBank_objs = Leads_assignto_tc.objects.filter(dataBank_ID__lead_Id__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id,dataBank_ID__lead_allocate_status=1 )
-            dataBank_count = Leads_assignto_tc.objects.filter(dataBank_ID__lead_Id__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id,dataBank_ID__lead_allocate_status=1).count()
+            dataBank_count = dataBank_objs.count()
        
         follow_obj = FollowupStatus.objects.filter(company_Id__id=dash_details.emp_comp_id.id)
 
@@ -864,7 +865,46 @@ def DAM_Dashboard_followups(request):
                 
         return render(request,'DAM_Dashboard_followup.html',content)
 
+def DAM_assign_remove(request,lassignID):
 
+    if request.POST:
+
+        lead_list = request.POST.getlist('allocated_check')
+
+        for l in lead_list:
+            try:
+                leadAssign_objs = Leads_assignto_tc.objects.get(id=l)
+                
+                db_obj=DataBank.objects.get(id=leadAssign_objs.dataBank_ID.id)
+                db_obj.lead_status='Not Attended'
+                db_obj.save()
+
+                leadAssign_objs.delete()
+                
+            except Leads.DoesNotExist:
+                messages.info(request, f'{leadAssign_objs.leadId.lead_name} Lead record Not Found')
+
+        return redirect('DAM_Dashboard_followups')
+    
+    else:
+
+        try:
+            leadAssign_objs = Leads_assignto_tc.objects.get(id=lassignID)
+            
+            db_obj=DataBank.objects.get(id=leadAssign_objs.dataBank_ID.id)
+            db_obj.lead_status='Not Attended'
+            db_obj.save()
+
+            leadAssign_objs.delete()
+
+            messages.error(request, f'{leadAssign_objs.leadId.lead_name} Lead Removed.')
+        except Leads.DoesNotExist:
+            messages.info(request, f'{leadAssign_objs.leadId.lead_name} Lead record Not Found')
+        return redirect('DAM_Dashboard_followups')
+
+
+    
+    
 
 #==============================================================
 
