@@ -1,6 +1,53 @@
 {% extends 'TC_base.html' %}
 {% load static %}
 {% block body %}
+
+
+
+<style>
+
+  /*Pagination Styling */
+  
+      div.dataTables_wrapper div.dataTables_paginate ul.pagination {
+          margin: 1rem 0.5rem;
+          white-space: nowrap;
+          justify-content: flex-end;
+      }
+      
+      div.dataTables_wrapper div.dataTables_paginate ul.pagination  li a
+      {
+          border: none !important;
+          color: #c9c9c9;
+          font-size: 13px;
+      }
+      
+      div.dataTables_wrapper div.dataTables_paginate ul.pagination li:hover a{
+          background: #dc1a1a  !important;
+          color: #f8f7f7;
+      }
+      .alert-fill-success {
+        color: white;
+        background: #00d25b;
+    }
+    .alert-fill-danger {
+      color: white;
+      background: #fc424a;
+    }
+    .alert {
+        font-size: 0.795rem;
+    }
+     
+    
+      .box-shadow
+      {
+        box-shadow: rgba(118, 122, 125, 0.2) 0px 8px 24px;
+        border-bottom-left-radius: 1.5rem ;
+        border-bottom-right-radius: 1.5rem ;
+      }
+    </style>
+
+
+
 <div>
   <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
@@ -10,50 +57,309 @@
     </nav>
 </div>
 
-<div class="card">
-  <div class="card-body">
-    <h6 class="card-title custom-letter-spacing"> New Assigned Leads List</h6>
-
-    <div class="table-responsive">
-      <table class="table" id="leave-datatable">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th >Email</th>
-  
-            <th>Contact</th>
-            <th>Status</th>
-            <th >Action</th>  
-          </tr>
-        </thead>
-        <tbody>
-          {% for d in data %}
-  
-          <tr>
-            <td class="text-white">{{d.id}}</th>
-            <td><b><a href="" class="text-white">{{d.leadId.lead_name}}</a></b></td>
-            <td class="text-white">{{d.leadId.lead_email}}</td>
-            <td class="text-white">{{d.leadId.lead_contact}}</td>
-            <th>
-              <p class="text-success text-small">New Lead</p>
-            </th>
-            <td class="text-white">
-              <a href="{% url 'TC_newleads_accept' d.id %}" class="btn btn-outline-danger">
-                <span class="mdi mdi-check"></span> <span class="text-small"> Accept</span></a>
-            </td>
-  
-  
-          </tr>
-         
-          {% endfor %}
-  
-        </tbody>
-      </table>
-    </div>
-
+<div class="row">
+  <div class="col-sm-3 grid-margin">
+    <a href="{% url 'head_createClient' %}" class="text-white text-decoration-none">
+      <div class="card">
+        <div class="card-body">
+          <h5> TAL - ( {{TAL}} )</h5>
+          <div class="row">
+            <div class="col-8 col-sm-12 col-xl-10 my-auto">
+              
+              <p class="text-muted font-weight-normal"> Total allocated leads ( AL )</p>
+            </div>
+            <div class="col-4 col-sm-12 col-xl-2 text-center text-xl-right">
+              <i class="icon-md mdi mdi-account-card-details text-secondary ml-auto"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-sm-3 grid-margin">
+    <a href="{% url 'head_createClient' %}" class="text-white text-decoration-none">
+      <div class="card">
+        <div class="card-body">
+          <h5> TACP - ( {{TACP}} )</h5>
+          <div class="row">
+            <div class="col-8 col-sm-12 col-xl-10 my-auto">
+              
+              <p class="text-muted font-weight-normal"> Total pending leads  ( TACP )</p>
+            </div>
+            <div class="col-4 col-sm-12 col-xl-2 text-center text-xl-right">
+              <i class="icon-md mdi mdi-account-card-details text-primary ml-auto"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-sm-3 grid-margin">
+    <a href="{% url 'head_createClient' %}" class="text-white text-decoration-none">
+      <div class="card">
+        <div class="card-body">
+          <h5> TFL - ( {{TFL}} )</h5>
+          <div class="row">
+            <div class="col-8 col-sm-12 col-xl-10 my-auto">
+              
+              <p class="text-muted font-weight-normal"> Total followup leads ( TFL )</p>
+            </div>
+            <div class="col-4 col-sm-12 col-xl-2 text-center text-xl-right">
+              <i class="icon-md mdi mdi-account-card-details text-warning ml-auto"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-sm-3 grid-margin">
+    <a href="{% url 'head_createClient' %}" class="text-white text-decoration-none">
+      <div class="card">
+        <div class="card-body">
+          <h5> TJL - ( {{TJL}} )</h5>
+          <div class="row">
+            <div class="col-8 col-sm-12 col-xl-10 my-auto">
+              
+              <p class="text-muted font-weight-normal"> Total joined leads ( TJL )</p>
+            </div>
+            <div class="col-4 col-sm-12 col-xl-2 text-center text-xl-right">
+              <i class="icon-md mdi mdi-account-card-details text-success ml-auto"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </a>
   </div>
 </div>
+
+<div class="row">
+  <div class="col-lg-4 col-md-4 col-sm-12 grid-margin">
+      <div class="card">
+        <div class="card-body">
+          <h6 class="card-title text-offwhite">
+             Leads Category Groups 
+          </h6>
+
+          <form action="{% url 'TC_newleads' %}" method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+            
+              <select class="form-control text-offwhite" name="lc_change">
+              <option value="0">Category Groups </option>
+              {% for lcg_Name in lcg_Names %}
+
+              <option value="{{lcg_Name.id}} ">{{lcg_Name.lead_collection_for}} </option>
+
+              {% endfor %}
+              
+              </select>
+
+            </div>
+            <div class="form-group">
+              <label class="text-offwhite">Allocation From  </label>
+              <input type="date" class="form-control" name="fdate" value="">
+            </div>
+            <div class="form-group">
+              <label class="text-offwhite">Allocation To </label>
+              <input type="date" class="form-control" name="edate" value="">
+            </div>
+            <div class="text-center">
+              <button type="submit" class="btn btn-outline-primary"> <span class="mdi mdi-magnify"></span></button>
+            </div>
+            
+          </form>
+        
+        </div>
+      </div>
+
+      <div class="card mt-2">
+        <div class="card-body">
+          <h6 class="card-title text-offwhite">
+             Today Leads
+          </h6>
+
+          <div class="d-flex justify-content-center align-items-center" id="reports">
+
+            <div class="card box-shadow">
+              <div class="card-body">
+                <h6 class="text-center">{% now 'F' %}</h6>
+                <h2 class="text-center font-weight-bold text-danger">{{ today_assingObjs }}</h2>
+                <p><span class="" >{% now 'd' %}</span><span class="ml-2" >{% now 'l' %}</span> <span class="ml-3"> {% now 'Y' %}</span></p>
+              </div>
+            </div>
+
+          </div>
+
+          
+        
+        </div>
+      </div>
+
+  </div>
+  <div class="col-lg-8 col-md-8 col-sm-12 grid-margin">
+   
+    <div class="card">
+      <div class="card-body">
+        <form action="{% url 'hr_leadAccept' %}" method="post">
+          {% csrf_token %}
+       
+          <div class="d-flex justify-content-between mb-2">
+            <h6 class="card-title text-offwhite">
+                All Leads  - ( {{ data_count }} ) 
+            </h6>
+            <div class="text-white">
+              <button type="submit" class="btn btn-outline-success"> <span class="small">Accept selected lead</span> </a>
+            </div> 
+
+          </div>
+          {% if allocate_count >= 0 %}
+          {% if messageStatus %}
+          <div class="alert alert-fill-success" role="alert">
+            <i class="mdi mdi-check-circle"></i> Well done! You successfully accepted {{allocate_count}} leads.
+          </div>
+          {% else %}
+          <div class="alert alert-fill-danger" role="alert">
+            <i class="mdi mdi-close-circle"></i> Oh snap! You have not selected any leads to accept. Please select at least one lead.
+          </div>
+          {% endif %}
+          {% endif %}
+          <div class="table-responsive">
+            <table class="table" id="data-table">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>
+                    <div class="d-flex">
+                        <div class="form-check form-check-primary m-0">
+                        <label class="form-check-label">
+                            <input type="checkbox" class="form-check-input check-all">
+                            select all
+                        </label>
+                        </div>
+                        
+                    </div>
+                  </th>
+                  <th> Assinged Date</th>
+                  <th> Lead Name | Email | Phone No </th>
+                 
+                
+                </tr>
+              </thead>
+              <tbody>
+                {% for d in assingObjs %}
+        
+                <tr>
+                  <td>  {{forloop.counter}}</td>
+                  <td>
+                            
+                      <div class="form-check form-check-primary">
+                          <label class="form-check-label">
+                          <input class="checkbox check-single" name="lead_check" value="{{ d.id }}" id="" type="checkbox">
+                        
+                          </label>
+                      </div>
+                    
+                  </td>
+                  <td>{{d.Assign_Date|date:'d-m-y'}}</td>
+                  <td>
+                    <p style="font-size: 13px;"><span class="mdi mdi-account mr-1"></span>{{d.leadId.lead_name}}</p>
+                    <p class="mt-1"><span class="mdi mdi-email mr-1"> {{d.leadId.lead_email}}</p>
+                    <p><span class="mdi mdi-phone mr-1"> {{d.leadId.lead_contact}}</p>
+                  </td>
+                 
+                </tr>
+              
+                {% endfor %}
+        
+              </tbody>
+            </table>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    // Listen for click event on #reports div
+    $('#reports').click(function() {
+        // Redirect to the next page
+        window.location.href = "{% url 'hr_leadReport' today_date %}";
+    });
+});
+</script>
+
+
+
+<script>
+
+$(document).ready(function() {
+  var table = $('#data-table').DataTable();
+
+  // Add event listener for checkbox clicks
+  $('#data-table').on('change', '.check-single', function() {
+      // Your checkbox change event handler code here
+      // For example, you can retrieve the value of the checkbox:
+      var value = $(this).val();
+      console.log('Checkbox value changed: ', value);
+  });
+});
+$(document).ready(function() {
+  new DataTable('#data-table',{
+   
+    paging: false,
+    scrollCollapse: false,
+    scrollX: true,
+    scrollY: 400,
+
+    
+});
+ 
+});
+$(document).ready(function() {
+  // Hide the alert after 3 seconds
+  setTimeout(function() {
+      $(".alert").fadeOut("slow");
+  }, 3000); // 3000 milliseconds = 3 seconds
+});
+
+
+
+
+// Check and Uncheck 
+$(document).ready(function() {
+  // Check/uncheck all checkboxes when the "select all" checkbox is clicked
+  $('.check-all').on('change', function() {
+      if ($(this).is(':checked')) {
+          $('.check-single').prop('checked', true);
+      } else {
+          $('.check-single').prop('checked', false);
+      }
+  });
+
+  // Update the "select all" checkbox state based on individual checkboxes
+  $('.check-single').on('change', function() {
+      var allChecked = true;
+      $('.check-single').each(function() {
+          if (!$(this).is(':checked')) {
+              allChecked = false;
+          }
+      });
+      $('.check-all').prop('checked', allChecked);
+  });
+});
+
+</script>
 
   
 

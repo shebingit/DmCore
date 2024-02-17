@@ -22,12 +22,12 @@ urlpatterns = [
     path('TC_complaints',views.TC_complaints,name='TC_complaints'),
     path('TC_complaint_add',views.TC_complaint_add,name='TC_complaint_add'),
     path('TC_leads/<id>',views.TC_leads,name='TC_leads'),
-    path('TC_newleads/<id>',views.TC_newleads,name='TC_newleads'),
+    path('TC_newleads/',views.TC_newleads,name='TC_newleads'),
     path('TC_ongoing_leads/<id>',views.TC_ongoing_leads,name='TC_ongoing_leads'),
     path('TC_waiting_leads/<id>',views.TC_waiting_leads,name='TC_waiting_leads'),
     path('TC_rejected_leads/<id>',views.TC_rejected_leads,name='TC_rejected_leads'),
     path('TC_completed_leads/<id>',views.TC_completed_leads,name='TC_completed_leads'),
-    path('TC_newleads_accept/<id>',views.TC_newleads_accept,name='TC_newleads_accept'),
+   
 
     path('TC_waste_leads',views.TC_waste_leads,name='TC_waste_leads'),
     path('TC_waste_leads_action/<id>',views.TC_waste_leads_action,name='TC_waste_leads_action'),
@@ -43,11 +43,18 @@ urlpatterns = [
     path('Follow-UpLeads',views.Tc_follow_upLeads,name='Tc_follow_upLeads'),
     path('Lead-Follow-Updates/<int:flID>',views.Lead_FollowUp_Updates,name='Lead_FollowUp_Updates'),
     path('Tc_followupDetails/<int:lID>',views.Tc_followupDetails,name='Tc_followupDetails'),
+    
 
 
     #closed Section ----------------------------
-    path('Complete-Leads/<int:laID>',views.TC_complete_lead,name='TC_complete_lead'),
+  
     path('Closed-Leads',views.Tc_closedlead,name='Tc_closedlead'),
+
+    path('HR-leadAccept',views.hr_leadAccept,name='hr_leadAccept'),
+    path('HR-leadClose/<int:laID>',views.hr_leadClose,name='hr_leadClose'),
+    path('HR-leadJoined/<int:ljID>',views.hr_leadJoined,name='hr_leadJoined'),
+    path('HR-leadReport/<str:date_str>',views.hr_leadReport,name='hr_leadReport'),
+     
     
     
 

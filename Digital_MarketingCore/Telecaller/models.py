@@ -26,6 +26,7 @@ class Leads_Call_Record(models.Model):
 
 class Waste_Leads(models.Model):
     leadId = models.ForeignKey(Leads, on_delete=models.CASCADE, null=True,default='')
+    assignto_tc_id = models.ForeignKey(Leads_assignto_tc, on_delete=models.CASCADE, null=True,default='')
     dbId = models.ForeignKey(DataBank, on_delete=models.CASCADE, null=True,default='')
     client_id = models.ForeignKey(ClientRegister, on_delete=models.CASCADE, null=True,default='') 
     TC_Id =  models.ForeignKey(EmployeeRegister_Details, on_delete=models.CASCADE, null=True,default='')

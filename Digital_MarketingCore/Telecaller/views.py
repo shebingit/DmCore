@@ -146,8 +146,7 @@ def TC_update_Clients_Response(request,id):
             print('Record found')
             tcr.save()
           
-          if  response != 'waiting':
-              data = Leads_assignto_tc.objects.filter(id=id).update(Update_Action = 1) 
+           
 
             #Adding Followuo respinse and details to FollowupDetails
           FD_obj = FollowupDetails()
@@ -156,7 +155,7 @@ def TC_update_Clients_Response(request,id):
           FD_obj.comp_Id = tc.TC_Id.emp_comp_id
           FD_obj.hr_telecaller_Id = tc.TC_Id
           FD_obj.response_date = date.today()
-          FD_obj.response = str(response) + ' - ' + str(reason)
+          FD_obj.response = str(reason)
           if next_date != '':
             FD_obj.nextfollowup_date = next_date
           else:
@@ -181,9 +180,11 @@ def TC_update_Clients_Response(request,id):
 
           FDHistory = FollowupHistory.objects.filter(hs_lead_Id__id=tc.leadId.id,hr_telecaller_Id__id=tc.TC_Id.id).last()
           FDHistory.final_status = response
+          FDHistory.note = 'Lead status changed.'
+          FDHistory.allocated_date = date.today() 
           FDHistory.save()
 
-          return redirect('Tc_follow_upLeads')
+          return redirect('Lead_FollowUp_Updates',id)
      
 def TC_previous_clients(request):
     if 'emp_id' in request.session:
@@ -706,7 +707,8 @@ def TC_leads(request,id):
                   }
      return render(request,'TC_leads.html',content)     
 
-def TC_newleads(request,id):
+
+def TC_newleads(request):
     
     if 'emp_id' in request.session:
         if request.session.has_key('emp_id'):
@@ -718,25 +720,143 @@ def TC_newleads(request,id):
         emp_dash = LogRegister_Details.objects.get(id=emp_id)
         dash_details = EmployeeRegister_Details.objects.get(logreg_id=emp_dash)
         company = BusinessRegister_Details.objects.get(id=dash_details.emp_comp_id.id)  
-        data = Leads_assignto_tc.objects.filter(TC_Id=dash_details,Update_Action=0,Status=0)
         notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date') 
+
+        assingObjs = Leads_assignto_tc.objects.filter(TC_Id=dash_details,Status=0).order_by('Assign_Date')
+        today_assingObjs = Leads_assignto_tc.objects.filter(TC_Id=dash_details,Assign_Date=date.today()).count()
+
+        if request.POST:
+            d1 = request.POST.get('fdate')
+            d2 = request.POST.get('edate')
+            lcStatus = int(request.POST.get('lc_change'))
+
+            if lcStatus:
+                  assingObjs =assingObjs.filter(leadId__lead_category_id__id=lcStatus) 
+
+            if d1:
+                
+                assingObjs = assingObjs.filter(Assign_Date__gte=d1) 
+               
+
+            if d2:
+                  assingObjs = assingObjs.filter(Assign_Date__lte=d2) 
+
+            
+
+        data = Leads_assignto_tc.objects.filter(TC_Id=dash_details)
+        data_count = assingObjs.count() 
+
+        lcg_Names = LeadCategory_Register.objects.filter(cTaskId__cTcompId=company)
+        TAL = data.count()
+        TACP = data.filter(Status=0).count()
+        TFL = data.filter(Status=1).count() 
+        TJL = data.filter(Status=2).count() 
+
+        today_date = date.today()
+
         content = {'emp_dash':emp_dash,
                    'dash_details':dash_details,
-                   'data':data,
-                   'notifications':notifications
+                   'assingObjs':assingObjs,'data_count':data_count,
+                    'lcg_Names':lcg_Names,
+                   'notifications':notifications,
+                   'today_assingObjs':today_assingObjs,'today_date':today_date,
+                   'TAL':TAL,'TACP':TACP,'TFL':TFL,'TJL':TJL
                   }
     return render(request,'TC_newleads.html',content) 
   
 
-def TC_newleads_accept(request,id):
-    data=Leads_assignto_tc.objects.get(id=id)
-    data.Status = 1
+def hr_leadAccept(request):
 
-    db = DataBank.objects.get(id= data.dataBank_ID.id)
-    db.lead_status ='Opend'
-    db.save()
-    data.save()
-    return redirect('TC_newleads',data.client_id.id)
+    if 'emp_id' in request.session:
+        if request.session.has_key('emp_id'):
+            emp_id = request.session['emp_id']
+           
+        else:
+            return redirect('/')
+        
+        emp_dash = LogRegister_Details.objects.get(id=emp_id)
+        dash_details = EmployeeRegister_Details.objects.get(logreg_id=emp_dash)
+        company = BusinessRegister_Details.objects.get(id=dash_details.emp_comp_id.id)  
+        notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date') 
+
+        # Accept Allocated leads
+        if request.POST:
+            leadSelected = request.POST.getlist('lead_check')
+
+            allocate_count = 0
+
+            for lid in leadSelected:
+
+                data=Leads_assignto_tc.objects.get(id=lid)
+                data.Status = 1
+
+                db = DataBank.objects.get(id= data.dataBank_ID.id)
+                db.lead_status ='Opend'
+                db.save()
+                data.save()
+                allocate_count = allocate_count + 1
+            
+            if allocate_count >= 1:
+                messageStatus = True
+            else:
+                messageStatus = False
+    
+        assingObjs = Leads_assignto_tc.objects.filter(TC_Id=dash_details,Status=0).order_by('-Assign_Date')
+
+        data = Leads_assignto_tc.objects.filter(TC_Id=dash_details)
+        data_count = assingObjs.count() 
+
+        lcg_Names = LeadCategory_Register.objects.filter(cTaskId__cTcompId=company)
+        TAL = data.count()
+        TACP = data.filter(Status=0).count()
+        TFL = data.filter(Status=1).count() 
+        TJL = data.filter(Status=2).count() 
+
+        content = {'emp_dash':emp_dash,
+                   'dash_details':dash_details,
+                   'assingObjs':assingObjs,'data_count':data_count,
+                    'lcg_Names':lcg_Names,
+                   'notifications':notifications,
+                   'TAL':TAL,'TACP':TACP,'TFL':TFL,'TJL':TJL,
+                   'messageStatus':messageStatus,'allocate_count':allocate_count,
+                  }
+    return render(request,'TC_newleads.html',content) 
+
+
+def hr_leadReport(request,date_str):
+    if 'emp_id' in request.session:
+        if request.session.has_key('emp_id'):
+            emp_id = request.session['emp_id']
+           
+        else:
+            return redirect('/')
+        
+        emp_dash = LogRegister_Details.objects.get(id=emp_id)
+        dash_details = EmployeeRegister_Details.objects.get(logreg_id=emp_dash)
+        company = BusinessRegister_Details.objects.get(id=dash_details.emp_comp_id.id)  
+        notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date') 
+
+        
+        TodayassingObjs = Leads_assignto_tc.objects.filter(TC_Id=dash_details,Assign_Date=date_str).order_by('-Assign_Date')
+        assingObjs = Leads_assignto_tc.objects.filter(TC_Id=dash_details,).order_by('-Assign_Date')
+        data_count = TodayassingObjs.count()
+       
+        data = assingObjs.values('Assign_Date').annotate(count=Count('id'))
+        result = {obj['Assign_Date']: obj['count'] for obj in data}
+        
+        
+
+        content = {'emp_dash':emp_dash,
+                   'dash_details':dash_details,
+                   'notifications':notifications,
+                   'assingObjs':assingObjs,
+                   'data_count':data_count,
+                   'result':result,
+                   'TodayassingObjs':TodayassingObjs,
+                   
+                  }
+    return render(request,'TC_leadsReport.html',content) 
+
 
 def TC_ongoing_leads(request,id):
     if 'emp_id' in request.session:
@@ -825,11 +945,16 @@ def TC_completed_leads(request,id):
         
         emp_dash = LogRegister_Details.objects.get(id=emp_id)
         dash_details = EmployeeRegister_Details.objects.get(logreg_id=emp_dash)
-        print(dash_details.id)
+
         company = BusinessRegister_Details.objects.get(id=dash_details.emp_comp_id.id)  
         data = Leads_assignto_tc.objects.filter(TC_Id=dash_details,Update_Action=1,Status=1,client_id=id)
         record =  Leads_Call_Record.objects.all()
         more = lead_Details.objects.all()
+
+        complete_obj = Leads_assignto_tc.objects.get(id=id)
+        complete_obj.Status=2
+        complete_obj.save()
+
         notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date') 
         content = {'emp_dash':emp_dash,
                    'dash_details':dash_details,
@@ -871,53 +996,21 @@ def TC_waste_leads(request):
                   }
     return render(request,'TC_waste_leads.html',content)
 
+
 def TC_waste_leads_action(request,id):
 
-    if 'emp_id' in request.session:
-        if request.session.has_key('emp_id'):
-            emp_id = request.session['emp_id']
-           
-        else:
-            return redirect('/')
-        
-        emp_dash = LogRegister_Details.objects.get(id=emp_id)
-        dash_details = EmployeeRegister_Details.objects.get(logreg_id=emp_dash)
-        notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
-
-        
         if request.POST:
-            data=Leads_assignto_tc.objects.get(leadId=id)
+            data=Leads_assignto_tc.objects.get(id=id)
             data.Response='Mark as waste'
             data.save()
         
             reason_data = request.POST['reason_for']
            
-            waste=Waste_Leads(client_id = data.client_id,TC_Id = data.TC_Id,leadId = data.leadId,dbId=data.dataBank_ID,reason=reason_data)
+            waste=Waste_Leads(client_id = data.client_id,TC_Id = data.TC_Id,leadId = data.leadId,dbId=data.dataBank_ID,reason=reason_data,assignto_tc_id=data)
             waste.save()
 
-        data = Leads_assignto_tc.objects.filter(TC_Id=dash_details,Status=1).order_by('Next_update_date').exclude(Response='Mark as waste')
-        leads_obj_count = Leads_assignto_tc.objects.filter(TC_Id=dash_details,Status=1).exclude(Response='Mark as waste').count()
-        record =  Leads_Call_Record.objects.all()
-        more = lead_Details.objects.all()
-        flstatus = FollowupStatus.objects.filter(company_Id__id=dash_details.emp_comp_id.id)
-        notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
-
-        t_date = date.today() 
-        
-        content = {'emp_dash':emp_dash,
-                   'dash_details':dash_details,
-                   'data':data,
-                   'record':record,
-                   'more':more,
-                   'flstatus':flstatus,
-                   'notifications':notifications,
-                   'leads_obj_count':leads_obj_count,
-                   't_date':t_date
-                  }
-        return render(request,'TC_lead_followup_page.html',content)
-
+            return redirect('Tc_follow_upLeads')
    
-    
     
 
 def TC_waste_leads_page(request,id):
@@ -1070,37 +1163,62 @@ def Lead_FollowUp_Updates(request,flID):
         notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
 
 
+        try:
+            data = Leads_assignto_tc.objects.get(id=flID)
+            db_obj = DataBank.objects.get(id=data.dataBank_ID.id)
 
-        data = Leads_assignto_tc.objects.get(id=flID)
+            if data.leadId :
+
+                FD_obj = FollowupDetails.objects.filter(lead_Id=data.leadId).last()
+                FD_objs = FollowupDetails.objects.filter(lead_Id=data.leadId).order_by('-id')
+                FBH_objs = FollowupHistory.objects.filter(hs_lead_Id=data.leadId).order_by('-id')
+
+
+            call_records = Leads_Call_Record.objects.filter(Leads_assignto_tc_id=data)
+            lead_details_objs = lead_Details.objects.filter(leadId=data.leadId)
+
+           
+
+        except Leads_assignto_tc.DoesNotExist:
+
+            print('No data')
+
+        
         flstatus = FollowupStatus.objects.filter(company_Id__id=dash_details.emp_comp_id.id)
-
-        FBH_obj = FollowupHistory.objects.filter(hs_lead_Id=data.leadId)
+        assingObjs = Leads_assignto_tc.objects.filter(TC_Id=dash_details,Status=1).order_by('-Next_update_date')
         
+
+        today_date = date.today() 
        
-
-        t_date = date.today() 
-        
         content = {'emp_dash':emp_dash,
                    'dash_details':dash_details,
                    'data':data,
               
                    'flstatus':flstatus,
                    'notifications':notifications,
-                   't_date':t_date,
-                   'FBH_obj':FBH_obj,
+                   'today_date':today_date,'lead_details_objs':lead_details_objs,
+                   'flID':flID,'call_records':call_records,
+                   'FD_obj':FD_obj,'FD_objs':FD_objs,'assingObjs':assingObjs,
+                   'db_obj':db_obj,'FBH_objs':FBH_objs,
                   }
         return render(request,'TC_lead_followup_UpdatePage.html',content)
 
 
-
-
-
-def TC_complete_lead(request,laID):
+def hr_leadClose(request,laID):
 
     la = Leads_assignto_tc.objects.get(id=laID)
     la.Status = 2
     la.Next_update_date = None
     la.save()
+
+    FH_obj = FollowupHistory()
+    FH_obj.hs_lead_Id = la.leadId
+    FH_obj.hs_comp_Id = la.TC_Id.emp_comp_id
+    FH_obj.hr_telecaller_Id = la.TC_Id
+    FH_obj.allocated_date = date.today()
+    FH_obj.note = 'Lead is closed. '
+    FH_obj.final_status = 'Closed'
+    FH_obj.save()
 
     db_obj = DataBank.objects.get(id=la.dataBank_ID.id)
     db_obj.followup_date = None
@@ -1108,6 +1226,31 @@ def TC_complete_lead(request,laID):
     db_obj.save()
 
     return redirect('Tc_follow_upLeads')
+
+
+def hr_leadJoined(request,ljID):
+    la = Leads_assignto_tc.objects.get(id=ljID)
+    la.Update_Action = 1
+    la.Status = 2
+    la.Next_update_date = None
+    la.save()
+
+    FH_obj = FollowupHistory()
+    FH_obj.hs_lead_Id = la.leadId
+    FH_obj.hs_comp_Id = la.TC_Id.emp_comp_id
+    FH_obj.hr_telecaller_Id = la.TC_Id
+    FH_obj.allocated_date = date.today()
+    FH_obj.note = 'Lead is joined. '
+    FH_obj.final_status = 'Joined'
+    FH_obj.save()
+
+    db_obj = DataBank.objects.get(id=la.dataBank_ID.id)
+    db_obj.followup_date = None
+    db_obj.lead_status = 'Joined'
+    db_obj.save()
+
+    return redirect('Tc_follow_upLeads')
+
 
 
 def Tc_closedlead(request):

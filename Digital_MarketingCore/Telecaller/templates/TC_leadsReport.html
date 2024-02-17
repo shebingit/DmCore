@@ -1,0 +1,159 @@
+{% extends 'TC_base.html' %}
+{% load static %}
+{% block body %}
+
+<style>
+    .h-60
+    {
+      max-height: 72vh;
+      overflow-y: scroll;
+     
+    }
+    .h-50
+    {
+      max-height: 50vh;
+      overflow-y: scroll;
+     
+    }
+    hr{
+     
+      border: 2px solid #353434;
+    }
+    .border-none
+    {
+      border: none !important;
+      box-shadow: rgba(63, 63, 63, 0.2) 0px 8px 24px;
+    }
+    /* For WebKit-based browsers (Chrome, Safari) */
+  #leftBox::-webkit-scrollbar,
+  #historyBox::-webkit-scrollbar,
+  #detailBox::-webkit-scrollbar {
+    width: 4px; /* Set the width of the scrollbar */
+  }
+  
+  /* For Firefox */
+  #leftBox::-moz-scrollbar,
+  #historyBox::-moz-scrollbar,
+  #detailBox::-moz-scrollbar{
+    width: 4px; /* Set the width of the scrollbar */
+  }
+</style>
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'TC_newleads' %}">Leads</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Report</li>
+        </ol>
+      </nav>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-4 col-md-4 col-sm-12 grid-margin">
+        <div class="card">
+          <div class="card-body">
+            <h6 class="card-title text-offwhite">
+               Leads Allocated By Date 
+            </h6>
+            <hr>
+
+            <div class="h-60"  id="leftBox">
+               
+                {% for date, count in result.items %}
+                    <div class="col-sm-12 grid-margin mb-0 pb-2">
+                        <a href="{% url 'hr_leadReport' date %}" class="text-white text-decoration-none">
+                        <div class="card border-none p-2">
+                            <div class="p-1 d-flex">
+                            <i class="icon-md mdi mdi-calendar text-secondary pr-1"></i>
+                            <div>
+                                <p class="text-secondary  ml-2 mt-1 mb-0"> {{date}}</p>
+                                <span class="text-muted small  ml-1 pt-0">
+                                <span class="mdi mdi-account mr-1"></span>Leads - {{count}} </span><br>
+                               
+                            </div>
+                            
+                            
+                            </div>
+                        </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            
+            </div>
+          </div>
+        </div>
+    </div>
+    <div class="col-lg-8 col-md-8 col-sm-12 grid-margin">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+                <h6 class="card-title text-offwhite">
+                    Allocated Leads  - ( {{ data_count }} ) 
+                </h6>
+                <div>
+                    <span class="mdi mdi-printer text-primary mdi-18px"></span>
+                    <span class="mdi mdi-file-pdf text-danger ml-2 mdi-18px"></span>
+                    <span class="mdi mdi-file-excel text-secondary ml-2 mdi-18px"></span>
+                </div>
+                
+              </div>
+            
+
+            <div class="table-responsive">
+                <table class="table" id="data-table">
+                  <thead>
+                    <tr>
+                      <th>No</th>
+                      
+                      <th> Assinged Date</th>
+                      <th> Lead Name | Email | Phone No </th>
+                     
+                    
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for d in TodayassingObjs %}
+            
+                    <tr>
+                      <td>  {{forloop.counter}}</td>
+                      
+                      <td>{{d.Assign_Date|date:'d-m-y'}}</td>
+                      <td>
+                        <p style="font-size: 13px;"><span class="mdi mdi-account mr-1"></span>{{d.leadId.lead_name}}</p>
+                        <p class="mt-1"><span class="mdi mdi-email mr-1"> {{d.leadId.lead_email}}</p>
+                        <p><span class="mdi mdi-phone mr-1"> {{d.leadId.lead_contact}}</p>
+                      </td>
+                     
+                    </tr>
+                  
+                    {% endfor %}
+            
+                  </tbody>
+                </table>
+              </div>
+    
+          </div>
+        </div>
+    </div>
+  </div>
+
+  
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+  <script>
+  $(document).ready(function() {
+    new DataTable('#data-table',{
+     
+      paging: false,
+      scrollCollapse: false,
+      scrollX: true,
+      scrollY: 400,
+    });
+      
+  });
+</script>
+
+{% endblock %}

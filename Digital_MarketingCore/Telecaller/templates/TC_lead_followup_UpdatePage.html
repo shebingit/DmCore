@@ -2,6 +2,79 @@
 {% load static %}
 {% block body %}
 
+<style>
+  .h-60
+  {
+    max-height: 60vh;
+    overflow-y: scroll;
+   
+  }
+  .text-end
+  {
+     text-align: end;
+  }
+  .mdi-12px
+  {
+    font-size: 12px;
+
+  }
+  .h-50
+  {
+    max-height: 50vh;
+    overflow-y: scroll;
+    overflow-x: hidden;
+   
+  }
+  hr{
+   
+    border: 2px solid #353434;
+  }
+  .border-none
+  {
+    border: none !important;
+    box-shadow: rgba(63, 63, 63, 0.2) 0px 8px 24px;
+  }
+  .box-shadow
+  {
+    box-shadow: rgba(17, 17, 26, 0.05) 0px 4px 16px, rgba(17, 17, 26, 0.05) 0px 8px 32px;
+  }
+  /* For WebKit-based browsers (Chrome, Safari) */
+  #FollowupDetailBox::-webkit-scrollbar {
+    width: 5px; /* Set the width of the scrollbar */
+}
+
+/* Track */
+#FollowupDetailBox::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Color of the track */
+}
+
+/* Handle */
+#FollowupDetailBox::-webkit-scrollbar-thumb {
+    background: #888; /* Color of the scrollbar handle */
+}
+#leftBox::-webkit-scrollbar,
+#historyBox::-webkit-scrollbar,
+#detailBox::-webkit-scrollbar {
+  width: 5px; /* Set the width of the scrollbar */
+}
+#leftBox::-webkit-scrollbar-track,
+#detailBox::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Color of the track */
+}
+
+/* Handle */
+#leftBox::-webkit-scrollbar-thumb,
+#detailBox::-webkit-scrollbar-thumb {
+  background: #888; /* Color of the scrollbar handle */
+}
+
+/* For Firefox */
+#leftBox::-moz-scrollbar,
+#historyBox::-moz-scrollbar,
+#detailBox::-moz-scrollbar{
+  width: 5px; /* Set the width of the scrollbar */
+}
+</style>
 
 <div>
     <nav aria-label="breadcrumb">
@@ -13,10 +86,321 @@
   </div>
 
 
-  {% for f in FBH_obj %}
-  <p>{{f.hr_telecaller_Id.emp_name}}</p>
-  {% endfor %}
+  <div class="row ">
+    <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 grid-margin">
+      <div class="card ">
+        <div class="card-body">
 
+          <div class="d-flex justify-content-between">
+            <h6 class="card-title text-offwhite">
+              Leads 
+            </h6>
+            <span class="mdi mdi-filter"></span>
+          </div>
+          <hr>
+
+          <div class="h-60"  id="leftBox">
+            {% for assingObj in assingObjs %}
+            <div class="col-sm-12 grid-margin mb-0 pb-2">
+                <a href="{% url 'Lead_FollowUp_Updates' assingObj.id %}" class="text-white text-decoration-none">
+                  <div class="card border-none p-2">
+                    <div class="p-1 d-flex">
+                      <i class="icon-md mdi mdi-account-card-details text-success pr-1"></i>
+                      <div>
+                        <p class="text-secondary text-sm  ml-2 mt-1 mb-0"> {{assingObj.leadId.lead_name}}</p>
+                        <span class="text-muted small  ml-1 pt-0">
+                          <span class="mdi mdi-email mr-1"></span>{{assingObj.leadId.lead_email}}</span><br>
+                        <span class="text-muted small  ml-1 mt-0"><span class="mdi mdi-phone mr-1"></span> {{assingObj.leadId.lead_contact}}</span>
+                      </div>
+                    
+                    </div>
+                    {% if today_date == assingObj.Next_update_date %}
+                    <p class="text-end m-0 p-0">
+                      <span class="text-muted small"> Followup : {{assingObj.Next_update_date}} </span> 
+                      <span class="mdi mdi-star mdi-spin mdi-12px text-warning mr-1 ml-1 "></span></p>
+                    {% endif %}
+                  </div>
+                </a>
+            </div>
+            {% endfor %}
+          
+          </div>
+         
+
+        </div>
+      </div>
+
+      <div class="card mt-2 ">
+        <div class="card-body">
+
+          <div class="d-flex justify-content-between">
+            <h6 class="card-title text-offwhite">
+              {{data.leadId.lead_name}} - Collected  Details
+            </h6>
+           
+          </div>
+          <hr>
+
+          <div class="h-50" id="detailBox">
+           
+            <div class="row">
+              {% for details in lead_details_objs %}
+              <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 grid-margin">
+                <p class="text-muted small" ><span class="mr-3">{{ details.lead_field_name }}</span></p>
+              </div>
+              <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 grid-margin">
+                 <p  class="text-muted small" ><span class="">{{ details.lead_field_data|default:'Not Available' }}</span></p>
+              </div>
+              {% endfor %}
+            </div>
+          
+          
+          </div>
+         
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-8 col-lg-8 col-md-8 col-sm-12 grid-margin">
+      <div class="card ">
+        <div class="card-body">
+          <h6 class="card-title text-offwhite">
+            {{data.leadId.lead_name}} - Follow Up  
+          </h6>
+          <div class="row">
+            <div class="col-sm-6 grid-margin mb-3 pb-2">
+              <a href="{% url 'Lead_FollowUp_Updates' flID %}" class="text-white text-decoration-none">
+                <div class="card border-none p-2 ">
+                  <div class=" p-2 d-flex ">
+                    <i class="icon-md mdi mdi-account-card-details mt-2 text-primary pr-1"></i>
+                    <div>
+                      <p class="text-secondary  ml-2 mt-1 mb-0"> {{data.leadId.lead_name}}</p>
+                      <span class="text-muted small  ml-1 pt-0">
+                        <span class="mdi mdi-email mr-1"></span>{{data.leadId.lead_email}}</span><br>
+                      <span class="text-muted small  ml-1 mt-0"><span class="mdi mdi-phone mr-1"></span> {{data.leadId.lead_contact}}</span>
+                    </div>
+                   
+                    
+                  </div>
+                </div>
+              </a>
+              
+              <div class="mt-3 p-1">
+                <p class="text-secondary text-muted"><span class="mdi mdi-account mr-1"></span>Client : {{ data.leadId.lead_work_regId.clientId.client_name}}</p>
+                <p class="text-secondary text-muted"><span class="mdi mdi-file-document"></span> Lead Collected For :  {{ data.leadId.lead_category_id.lead_collection_for}}</p>
+              </div>
+            </div>
+            <div class="col-sm-6 grid-margin mb-3 pb-2">
+              <a href="{% url 'Lead_FollowUp_Updates' flID %}" class="text-white text-decoration-none">
+                <div class="card border-none p-2 ">
+                  <div class=" p-2 d-flex ">
+                    <i class="icon-md mdi mdi-phone mt-2 text-primary pr-1"></i>
+                    <div>
+                      <p class="text-secondary  ml-2 mt-1 mb-2">HR -  {{FD_obj.hr_telecaller_Id.emp_name|default:'Not Available'}}</p>
+                      <span class="text-muted small ml-1 pt-0"><span class="mdi mdi-update mr-1  "></span>{{FD_obj.response_status|default:'Not Available'}}</span>
+                      <span class="text-muted small ml-3 mt-0"><span class="mdi mdi-calendar-today mr-1"></span> {{FD_obj.response_date|date:'d-m-y'|default:'Not Available'}}</span><br>
+                      <span class="text-muted small  ml-1 mt-0"><span class="mdi mdi-file-document mr-1"></span>{{FD_obj.response|default:'Not Available'}}</span>
+                    </div>
+                   
+                    
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+          <div class="d-flex justify-content-between mt-2">
+            <a href="{% url 'hr_leadJoined' flID %}"class="small text-success" ><span class="mdi mdi-account-check text-success mr-1 mdi-18px"></span>Lead Joined </a>
+            <a href="{% url 'hr_leadClose' flID %}"class="small text-danger" ><span class="mdi mdi-account-remove text-danger mr-1 mdi-18px"></span>Close Lead</a>
+            <a href="#" class="small text-warning " data-toggle="modal"
+            data-target="#wastemodal"><span class="mdi mdi-delete-sweep text-warning mr-1 mdi-18px"></span>Mark as Waste</a>
+           
+          </div>
+          
+          <hr>
+
+          <div class="d-flex justify-content-between mt-2">
+            <h6 class="card-title text-offwhite">
+              {{data.leadId.lead_name}} - Follow Up Updates 
+            </h6>
+            <p class="text-muted small"><span class="mdi mdi-calendar-today mr-1"> </span>Next Followup Date :
+              <span class="text-secondary">{{db_obj.followup_date |default:'Not Available'}}</span>  </p>
+          </div>
+
+          <div class="row">
+            <div class="col-xl-7 col-lg-7 col-md-7 col-sm-12 grid-margin">
+              <div class="card box-shadow">
+                <div class="card-body mt-0">
+                <form action="{% url 'TC_update_Clients_Response' flID %}" method="post"  enctype="multipart/form-data">
+                  {% csrf_token %} 
+                  <label class="text-muted small" > Response*</label>
+                  <select name="Response" id="response" class="form-control text-white p-2" 
+                    required>
+                    <option value="">choose Response</option>
+                    {% for response in flstatus %}
+                    <option value="{{ response.status_name }}" class="text-white">{{ response.status_name }}</option>
+                    {% endfor %}
+                   
+                  </select>
+                  <label class="text-muted small mt-2 pt-1" > Next Update Date*</label>
+                  <input type="date"  id="nud" name="nud" class="form-control  text-white">
+                  <!-- <input type="text" placeholder="Enter Response" class="form-control mt-3"> -->
+                  <textarea type="text" placeholder="enter Reason" name="Reason" class="form-control mt-3 text-white" style="height: 150px;" required></textarea>
+      
+                  <label class="text-muted small mt-2 pt-1" >If call record is available ?</label>
+                  <input type="file" class="form-control text-offwhite" name="record" accept="audio/*">
+                  <div class="d-flex justify-content-center mt-3 mb-2">
+                    <button type="submit" class="btn btn-outline-success   mr-2"><span class="text-small">Update</span></button>
+                   
+                    <button type="button" class="btn btn-outline-danger text-small" data-dismiss="modal"><span class="text-small">Close</span></button>
+                  </div>
+                 
+                </form>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-5 col-lg-5 col-md-5 col-sm-12 grid-margin">
+              <div class="card box-shadow">
+                <div class="card-body mt-0">
+                  <h6 class="card-title text-offwhite">
+                   Follow Up Details 
+                  </h6>
+                  <hr>
+
+                  <div class="h-60" id="FollowupDetailBox">
+                    {% for FD in FD_objs %}
+                    <div class=" p-2 d-flex ">
+                      <i class="icon-md mdi mdi-phone mt-2 text-primary pr-1"></i>
+                      <div>
+                        <p class="text-secondary  ml-2 mt-1 mb-2">HR -  {{FD.hr_telecaller_Id.emp_name|default:'Not Available'}}</p>
+                        <span class="text-muted small ml-1 pt-0"><span class="mdi mdi-update mr-1  "></span>{{FD.response_status|default:'Not Available'}}</span><br>
+                        <span class="text-muted small ml-1 mt-0"><span class="mdi mdi-calendar-today mr-1"></span> {{FD.response_date|date:'d-m-y'|default:'Not Available'}}</span><br>
+                        <span class="text-muted small  ml-1 mt-0"><span class="mdi mdi-file-document mr-1"></span> {{FD.response|default:'Not Available'}}</span>
+                      </div>
+                     
+                      
+                    </div>
+                 
+                    {% endfor %}
+                  </div>
+                 
+
+                </div>
+              </div>
+              <div class="card mt-2 box-shadow">
+                <div class="card-body mt-0">
+                  <h6 class="card-title text-offwhite">
+                    Call Recordings
+                  </h6>
+                  <hr>
+
+                  <div class="h-70" >
+                    {% for record in call_records %}
+                  
+                      
+                      <p class=" mb-1 text-muted small" >
+                        <span class="mdi mdi-calendar-today mr-1"></span> {{ record.record_Date|date:'d-m-y' }}
+                        <span class="mdi mdi-clock ml-3"></span> {{  record.record_time }} 
+                      </p>
+                      {% if record.Record %}
+                      <div class="row mt-2">
+                        <audio controls>
+                          <source src="{{record.Record.url}}">
+                        </audio>
+                      </div>
+        
+                      {% endif %}
+                
+                {% endfor %}
+                  </div>
+                 
+
+                </div>
+              </div>
+              <div class="card mt-2 box-shadow">
+                <div class="card-body mt-0">
+                  <h6 class="card-title text-offwhite">
+                   Follow Up History 
+                  </h6>
+                  <hr>
+
+                  <div class="h-60 " id="historyBox">
+                    {% for FBH in FBH_objs %}
+                    <div class=" p-2 d-flex ">
+                      <i class="icon-md mdi mdi-phone mt-2 text-primary pr-1"></i>
+                      <div>
+                        <p class="text-secondary  ml-2 mt-1 mb-2">HR -  {{FBH.hr_telecaller_Id.emp_name}}</p>
+                        <span class="text-muted small ml-1 pt-0"><span class="mdi mdi-update mr-1  "></span>{{FBH.final_status|default:'Not Available'}}</span><br>
+                        <span class="text-muted small ml-1 mt-0"><span class="mdi mdi-calendar-today mr-1"></span> {{FBH.allocated_date|date:'d-m-y'}}</span><br>
+                        <span class="text-muted small  ml-1 mt-0"><span class="mdi mdi-file-document mr-1"></span> {{FBH.note|default:'Not Available'}}</span>
+                      </div>
+                     
+                      
+                    </div>
+                 
+                    {% endfor %}
+                  </div>
+                 
+
+                </div>
+              </div>
+            </div>
+          </div>
+         
+          
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <div class="modal fade" id="wastemodal" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="card">
+          <div class="card-body mt-0" style="padding: 0.875rem 0.5625rem">
+            <div class="modal-header">
+              <h6 class="modal-title text-center" >Please clarify the reason for marking waste lead !</h6>
+              <button type="button" class="close text-danger" data-dismiss="modal" style="justify-content: end;">&times;</button>
+              
+             
+            </div>
+            <div class="modal-body">
+              
+              <form action="{% url 'TC_waste_leads_action' flID %}" method="post">
+                {% csrf_token %}
+
+                <div class="row">
+                  <div class="col-lg-12">
+                    <label style="font-size: 13px;margin-top: 10px;">Enter your reason </label>
+                    <textarea class="form-control text-offwhite" name="reason_for" style="height: 120px;" required></textarea>
+                  </div>
+                 
+                </div>
+                <div class="d-flex justify-content-center mt-3 mb-2">
+                  <button type="submit" class="btn btn-outline-success   mr-2"><span class="text-small">Update</span></button>
+                 
+                  <button type="button" class="btn btn-outline-danger text-small" data-dismiss="modal"><span class="text-small">Close</span></button>
+                </div>
+              </form>
+            </div>
+        
+            <div class="modal-footer">
+              
+              
+              <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
 
 
 {% endblock %}

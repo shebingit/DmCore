@@ -413,6 +413,8 @@ def DMA_allocate_lead(request):
                 fh_obj.hs_lead_Id = db.lead_Id
                 fh_obj.hr_telecaller_Id =  EmployeeRegister_Details.objects.get(id=selected_emp)
                 fh_obj.allocated_date = date.today()
+                fh_obj.note ='Lead allocated'
+                fh_obj.final_status='Allocated'
                 fh_obj.hs_comp_Id = db.lead_Id.lead_work_regId.clientId.compId
                 fh_obj.save()
 
@@ -2214,7 +2216,12 @@ def DAM_waste_dateApprove(request,waID):
         db.current_status = 'Marked as Waste'
         db.save 
 
-        fh = FollowupHistory.objects.filter(hs_lead_Id__id=waste.leadId.id).last()
+        fh = FollowupHistory()
+        fh.hs_lead_Id=waste.leadId
+        fh.note = 'Lead marked as waste'
+        fh.allocated_date = date.today()
+        fh.hr_telecaller_Id = waste.assignto_tc_id
+        fh.hs_comp_Id=dash_details.emp_comp_id
         fh.final_status = 'Marked as Waste'
         fh.save()
 
@@ -2261,9 +2268,34 @@ def DAM_waste_dateApprove(request,waID):
 
 
 def DAM_waste_dateCancel(request,waID):
-    waste = Waste_Leads.objects.get(id=waID)
-    waste.delete()
-    return redirect('DAM_waste_data_confirm')
+    if 'emp_id' in request.session:
+        if request.session.has_key('emp_id'):
+            emp_id = request.session['emp_id']
+           
+        else:
+            return redirect('/')
+        
+        emp_dash = LogRegister_Details.objects.get(id=emp_id)
+        dash_details = EmployeeRegister_Details.objects.get(logreg_id=emp_dash)
+
+        waste = Waste_Leads.objects.get(id=waID)
+        data=Leads_assignto_tc.objects.get(id=waste.assignto_tc_id.id)
+        data.Response='Not Waste'
+        data.save()
+
+        FBH = FollowupHistory()
+        FBH.hs_lead_Id= waste.leadId
+        FBH.hs_comp_Id= dash_details.emp_comp_id
+        FBH.hr_telecaller_Id= waste.TC_Id
+
+        FBH.allocated_date = date.today()
+        FBH.note = 'Changed the status Marked as waste to Not a waste '
+        FBH.final_status = 'Not Waste'
+        FBH.save()
+
+        waste.delete()
+
+        return redirect('DAM_waste_data_confirm')
 
 
 
