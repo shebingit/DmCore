@@ -74,6 +74,17 @@
 #detailBox::-moz-scrollbar{
   width: 5px; /* Set the width of the scrollbar */
 }
+.alert-fill-success {
+  color: white;
+  background: #00d25b;
+}
+.alert-fill-danger {
+color: white;
+background: #fc424a;
+}
+.alert {
+  font-size: 0.795rem;
+}
 </style>
 
 <div>
@@ -93,31 +104,44 @@
 
           <div class="d-flex justify-content-between">
             <h6 class="card-title text-offwhite">
-              Leads 
+              Leads List ( {{assingObjs_count}} )
             </h6>
             <span class="mdi mdi-filter"></span>
           </div>
+          
           <hr>
 
+          <div class="form-group">
+            <input type="text" class="form-control text-secondary" name="" id="searchbox" value="">
+          </div>
           <div class="h-60"  id="leftBox">
+            
+
             {% for assingObj in assingObjs %}
-            <div class="col-sm-12 grid-margin mb-0 pb-2">
+            <div class="grid-margin mb-0 pb-2 item">
                 <a href="{% url 'Lead_FollowUp_Updates' assingObj.id %}" class="text-white text-decoration-none">
                   <div class="card border-none p-2">
                     <div class="p-1 d-flex">
                       <i class="icon-md mdi mdi-account-card-details text-success pr-1"></i>
+                     
                       <div>
-                        <p class="text-secondary text-sm  ml-2 mt-1 mb-0"> {{assingObj.leadId.lead_name}}</p>
-                        <span class="text-muted small  ml-1 pt-0">
+                        
+                        <p class="text-secondary text-sm  ml-2 mt-1 mb-0 leadName"> {{assingObj.leadId.lead_name}}</p>
+                        <span class="text-muted small  ml-1 pt-0 leadEmail">
                           <span class="mdi mdi-email mr-1"></span>{{assingObj.leadId.lead_email}}</span><br>
-                        <span class="text-muted small  ml-1 mt-0"><span class="mdi mdi-phone mr-1"></span> {{assingObj.leadId.lead_contact}}</span>
+                        <span class="text-muted small  ml-1 mt-0 leadPhone"><span class="mdi mdi-phone mr-1"></span> {{assingObj.leadId.lead_contact}}</span>
+                        <p class=" m-0 pt-1 ">
+                          <span class="text-muted small leadAllocate "> Allocated on : {{assingObj.Assign_Date|date:'d-m-Y'}} </span>
+                       </p>
                       </div>
                     
                     </div>
+                   
                     {% if today_date == assingObj.Next_update_date %}
-                    <p class="text-end m-0 p-0">
-                      <span class="text-muted small"> Followup : {{assingObj.Next_update_date}} </span> 
-                      <span class="mdi mdi-star mdi-spin mdi-12px text-warning mr-1 ml-1 "></span></p>
+                    <p class="text-end m-0 p-0 ">
+                      <span class="text-muted small leadFollowup "> Followup : {{assingObj.Next_update_date|date:'d-m-Y'}} </span> 
+                      <span class="mdi mdi-star mdi-spin mdi-12px text-warning mr-1 ml-1 "></span>
+                    </p>
                     {% endif %}
                   </div>
                 </a>
@@ -231,6 +255,19 @@
             <div class="col-xl-7 col-lg-7 col-md-7 col-sm-12 grid-margin">
               <div class="card box-shadow">
                 <div class="card-body mt-0">
+
+                  {% if messages %}
+                
+                      {% for message in messages %}
+                      <div class="alert alert-fill-success" role="alert">
+                        <i class="mdi mdi-check-circle"></i> {{ message }}
+                      </div>
+                      
+                      {% endfor %}
+                 
+                  {% endif %}
+
+
                 <form action="{% url 'TC_update_Clients_Response' flID %}" method="post"  enctype="multipart/form-data">
                   {% csrf_token %} 
                   <label class="text-muted small" > Response*</label>
@@ -346,12 +383,11 @@
               </div>
             </div>
           </div>
-         
-          
 
         </div>
       </div>
     </div>
+
   </div>
 
 
@@ -402,5 +438,51 @@
     </div>
   </div>
 
+  
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    new DataTable('#lead-details');
+    
+});
+$(document).ready(function() {
+  // Hide the alert after 3 seconds
+  setTimeout(function() {
+      $(".alert").fadeOut("slow");
+  }, 3000); // 3000 milliseconds = 3 seconds
+});
+
+
+</script>
+
+
+
+<script>
+  // JavaScript code
+  document.getElementById('searchbox').addEventListener('input', function() {
+    var searchText = this.value.trim().toLowerCase();
+    var items = document.querySelectorAll('.item');
+
+    items.forEach(function(item) {
+      var leadName = item.querySelector('.leadName').textContent.trim().toLowerCase();
+      var leadEmail = item.querySelector('.leadEmail:nth-child(2)').textContent.trim().toLowerCase();
+      var leadContact = item.querySelector('.leadPhone:nth-child(4)').textContent.trim().toLowerCase();
+      var allocatedOn = item.querySelector('.leadAllocate').textContent.trim().toLowerCase();
+      var followupElement = item.querySelector('.leadFollowup');
+      var followup = followupElement ? followupElement.textContent.trim().toLowerCase() : '';
+     
+
+      if (leadName.includes(searchText) || leadEmail.includes(searchText) || leadContact.includes(searchText) || allocatedOn.includes(searchText) || followup.includes(searchText) ) {
+        item.style.display = 'block';
+      } else {
+        item.style.display = 'none';
+      }
+    });
+  });
+</script>
 
 {% endblock %}

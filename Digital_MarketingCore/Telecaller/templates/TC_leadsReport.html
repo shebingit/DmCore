@@ -107,6 +107,9 @@
                       
                       <th> Assinged Date</th>
                       <th> Lead Name | Email | Phone No </th>
+                      <th> Status </th>
+                      <th> Details </th>
+
                      
                     
                     </tr>
@@ -122,6 +125,10 @@
                         <p style="font-size: 13px;"><span class="mdi mdi-account mr-1"></span>{{d.leadId.lead_name}}</p>
                         <p class="mt-1"><span class="mdi mdi-email mr-1"> {{d.leadId.lead_email}}</p>
                         <p><span class="mdi mdi-phone mr-1"> {{d.leadId.lead_contact}}</p>
+                      </td>
+                      <td> {{ d.dataBank_ID.current_status }}</td>
+                      <td class="text-center"> <a href="{% url 'Tc_followupDetails' d.id %}" class="btn btn-secondary p-2">
+                        <span class="mdi mdi-file-document"></span> </a>
                       </td>
                      
                     </tr>

@@ -23,7 +23,7 @@ urlpatterns = [
     path('TC_complaint_add',views.TC_complaint_add,name='TC_complaint_add'),
     path('TC_leads/<id>',views.TC_leads,name='TC_leads'),
     path('TC_newleads/',views.TC_newleads,name='TC_newleads'),
-    path('TC_ongoing_leads/<id>',views.TC_ongoing_leads,name='TC_ongoing_leads'),
+
     path('TC_waiting_leads/<id>',views.TC_waiting_leads,name='TC_waiting_leads'),
     path('TC_rejected_leads/<id>',views.TC_rejected_leads,name='TC_rejected_leads'),
     path('TC_completed_leads/<id>',views.TC_completed_leads,name='TC_completed_leads'),
@@ -54,6 +54,8 @@ urlpatterns = [
     path('HR-leadClose/<int:laID>',views.hr_leadClose,name='hr_leadClose'),
     path('HR-leadJoined/<int:ljID>',views.hr_leadJoined,name='hr_leadJoined'),
     path('HR-leadReport/<str:date_str>',views.hr_leadReport,name='hr_leadReport'),
+    path('HR-leadRecall/<int:assID>',views.hr_recallUpdate,name='hr_recallUpdate'),
+    
      
     
     
