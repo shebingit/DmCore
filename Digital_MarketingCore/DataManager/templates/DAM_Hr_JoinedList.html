@@ -1,0 +1,101 @@
+{% extends 'DAM_base.html' %}
+{% load static %}
+{% block body %}
+
+<style>
+    .messages{
+        padding: 0.80rem;
+
+    }
+    .messages li
+    {
+        list-style: none;
+        font-size: 13px;
+    }
+    .text-decoration-none
+    {
+        text-decoration:none
+    }
+</style>
+
+<!-- Top Section -->
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'dataManager_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Joined Leads</li>
+        </ol>
+      </nav>
+</div>
+
+{% if messages %}
+<ul class="messages bg-success" id="MessageBox">
+    {% for message in messages %}
+    <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>
+        <span class="mdi mdi-check-circle"></span> {{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+<div class="row">
+    <div class="col-xl-12 col-sm-12 col-lg-12 col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                <h6 class="text-offwhite">Joined Leads by -  {{ Hr_obj.emp_name }} </h6>
+                <a href="{% url 'Dm_hrReport_dateFetch' Hr_obj.id %}" class="text-decoration-none">
+                    <span class="mdi mdi-undo-variant"></span>
+                    <span class="text-danger small " > Back</span> 
+                </a>
+                </div>
+                <div class="table-responsive mt-2" id="tableBox">
+                    <table class="table" id="data-table">
+                      <thead>
+                        <tr>
+                          <th>No</th>
+                          <th> Assinged Date</th>
+                          <th> Joined Marked Date</th>
+                          <th> Lead Name | Email |  Phone No </th>
+                          <th class="text-center"> Call Details | Change Status</th>
+                         
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for d in assign_objs %}
+                
+                        <tr>
+                          <td>  {{forloop.counter}}</td>
+                          <td> {{ d.Assign_Date }}</td>
+                          <td> <p >{{d.Update_Date|default:'No data available !' }}</p></td>
+                          <td> {{ d.leadId.lead_name }}
+                            <p class="mt-2">{{ d.leadId.lead_email }}</p>
+                            <p>{{ d.leadId.lead_contact  }}</p>
+                          </td>
+                          <td class="d-flex justify-content-around align-items-center">
+                            <a href="{% url 'DAM_dataBnak_followup' d.dataBank_ID.id %}" class="text-success"><span class="mdi mdi-phone mdi-18px"></span></a>
+                            <a href="{% url 'DAM_Hr_LeadStatusChange' d.id %}" class="text-danger"><span class="mdi mdi-undo-variant mdi-18px"></span></a>
+                          </td>
+                          
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+  $(document).ready(function() {
+    // Function to hide the div
+    function hideDiv() {
+      $('#MessageBox').hide();
+    }
+
+    setTimeout(hideDiv, 3000); // 3000 milliseconds = 3 seconds
+  })
+</script>
+{% endblock %}

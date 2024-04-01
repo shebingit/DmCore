@@ -11,6 +11,7 @@ class Leads_assignto_tc(models.Model):
     Response = models.CharField(max_length=255,default='',null=True,blank=True)
     Reason = models.CharField(max_length=255,default='',null=True,blank=True)
     Assign_Date = models.DateField(auto_now_add=True,null=True)
+    Allocate_time = models.TimeField(default='00:00:00')
     Update_Date = models.DateField(auto_now_add=False,null=True,)
     Next_update_date = models.DateField(auto_now_add=False,null=True)
     Update_Action = models.IntegerField(default=0)

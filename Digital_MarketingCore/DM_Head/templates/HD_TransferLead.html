@@ -95,31 +95,27 @@
             <div class="card-body">
             
             {% if leads_obj %}
-
-           
-           
-                <div class="row">
-                    <div class="col-sm-12 col-lg-5 col-md-4 col-xl-6  grid-margin">
-                    <h5 class="card-title custom-letter-spacing"> Pending Leads List</h5>
-                    </div>
-                    <div class="col-sm-12 col-lg-3 col-md-4 col-xl-3 d-flex justify-content-end  grid-margin">
-                        <button class="btn btn-outline-primary p-1" type="submit">
-                            <span class="mdi mdi-file-send  mr-1 small"> Transfer Leads To Data Manager</span>
-                            <div class="badge badge-pill badge-danger">
-                                <span id="check-count">0</span>
-                            </div>
-                        </button>
-                    </div>
-                    
-                    
-                </div>
-               
-    
-            
         
                 <div class="table-responsive">
                     <form action="{% url 'head_all_leadTransfer' %}" method="post">
                         {% csrf_token %}
+                        <div class="row">
+                            <div class="col-sm-12 col-lg-9 col-md-8 col-xl-9  grid-margin">
+                            <h5 class="card-title custom-letter-spacing"> Pending Leads List</h5>
+                            </div>
+                            <div class="col-sm-12 col-lg-3 col-md-4 col-xl-3 d-flex justify-content-end  grid-margin">
+                                <button class="btn btn-outline-primary p-1" type="submit">
+                                    <span class="mdi mdi-file-send  mr-1 small"> Transfer Leads To Data Manager</span>
+                                    <div class="badge badge-pill badge-danger">
+                                        <span id="check-count">0</span>
+                                    </div>
+                                </button>
+                            </div>
+                            
+                            
+                        </div>
+                        
+                        
 
                         <table class="table table-striped table-bordered mb-3" id="leads-data" style="width:100%">
                         <thead>
@@ -270,6 +266,8 @@ $(document).ready(function() {
                         var option = '<option value="' + category.id + '">' + category.name + '</option>';
                         leadCategorySelect.append(option);
                     });
+
+                    
                     updateTable(data.leads_data);
                     
                 } else {

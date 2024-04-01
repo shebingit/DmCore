@@ -1194,6 +1194,7 @@ def hr_leadClose(request,laID):
     la = Leads_assignto_tc.objects.get(id=laID)
     la.Status = 2
     la.Next_update_date = None
+    la.Update_Date = date.today()
     la.save()
 
     FH_obj = FollowupHistory()
@@ -1220,6 +1221,7 @@ def hr_recallUpdate(request,assID):
     la.Update_Action=0
     la.Response = 'Recalled'
     la.Next_update_date = date.today()
+    la.Update_Date=None
     la.save()
 
     FH_obj = FollowupHistory.objects.filter(hs_lead_Id=la.leadId,hr_telecaller_Id=la.TC_Id).last()
@@ -1246,6 +1248,7 @@ def hr_leadJoined(request,ljID):
     la.Update_Action = 1
     la.Status = 2
     la.Next_update_date = None
+    la.Update_Date = date.today()
     la.save()
 
     FH_obj = FollowupHistory()

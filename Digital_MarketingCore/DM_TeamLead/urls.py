@@ -98,6 +98,7 @@ urlpatterns = [
     path('TL-Edit-Task-Assign\<int:taskAsId>',views.tl_edit_taskAssign,name='tl_edit_taskAssign'),
 
     path('TL-Pending-Works',views.tl_pending_works,name='tl_pending_works'),
+    path('TL-Assign-Work-Remove-Works\<int:pk>',views.tl_assignTask_delete,name='tl_assignTask_delete'),
     path('TL-Verify-Works\<int:tdId>',views.tl_verify_workDone,name='tl_verify_workDone'),
     path('TL-Verify-Works-No-Target\<int:tdId>',views.tl_verify_workDone_notarget,name='tl_verify_workDone_notarget'),
 

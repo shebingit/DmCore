@@ -1721,14 +1721,12 @@ def tl_allocateWorkView(request):
 
         work_assign = WorkAssign.objects.filter(wa_work_allocate=dash_details,wa_type=0).order_by('-id')
         lc_team = LeadCateogry_TeamAllocate.objects.filter(wa_id__in=work_assign)
-        team = Allocation_Details.objects.filter(allocat_to=dash_details)
+        team = Allocation_Details.objects.filter(allocat_to=dash_details).exclude(allocatEmp_id__emp_active_status=2)
         team_ids = [t.allocatEmp_id_id for t in team]
 
         task_assign = TaskAssign.objects.filter(ta_workerId_id__in=team_ids).order_by('-id') 
         lc_assign = LeadCateogry_Assign.objects.filter(executive_id_id__in=team_ids).order_by('-id') 
-        print('hello')
-        print(lc_assign)
-       
+        
 
         success = True
         success_text= 'Task add successful.'            
@@ -1956,6 +1954,18 @@ def tl_pending_works(request):
 
     else:
             return redirect('/')
+    
+def tl_assignTask_delete(request,pk):
+
+    try:
+        task_assign_delete = TaskAssign.objects.get(id=pk)
+        allocated_emp = task_assign_delete.ta_workerId.emp_name
+        #task_assign_delete.delete()
+        messages.error(request, f'Task allocated to {allocated_emp} is Deleted.')
+    except TaskAssign.DoesNotExist:
+        messages.error(request,'Sorry! The selected task not found.')
+    
+    return redirect('tl_pending_works')
 
 def tl_verify_workDone(request,tdId):
     if 'emp_id' in request.session:

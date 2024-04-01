@@ -147,7 +147,20 @@ urlpatterns = [
     path('Data-Remove/<int:dBID>',views.DAM_dataBnak_remove,name='DAM_dataBnak_remove'),
     
     path('Change-Executive/', views.fetch_leads_executive_change, name='fetch_leads_executive_change'),
+
+
+
+    # 19/02/24 Report section -----
+    path('Dm_dataReports/',views.Dm_dataReports,name='Dm_dataReports'),
+    path('Dm_HReport_DateFetch/<int:pk>',views.Dm_hrReport_dateFetch,name='Dm_hrReport_dateFetch'),
+    path('Dm_SingleDateFetch/<str:strDate>/<int:pk>',views.Dm_SingleDateFetch,name='Dm_SingleDateFetch'),
     
+    path('DAM_Hr_JoinedLead/<int:pk>',views.DAM_Hr_JoinedLead,name='DAM_Hr_JoinedLead'),
+    path('DAM_Hr_LeadStatusChange/<int:pk>',views.DAM_Hr_LeadStatusChange,name='DAM_Hr_LeadStatusChange'),
+    
+
+
+    #---------------------------------------------------------------------------
     path('DataManager-Logout/',views.DAM_logout,name='DAM_logout'),
 
     ]

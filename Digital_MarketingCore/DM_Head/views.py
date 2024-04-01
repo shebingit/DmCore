@@ -1496,7 +1496,7 @@ def head_lead_verify_unverify(request,pk):
         
         wId = lead_obj.lead_work_regId.id
         lcId = lead_obj.lead_category_id.id
-        lead_obj.save()
+        #lead_obj.save()
         return redirect('head_lead_collected_data',wId,lcId)
 
     except Leads.DoesNotExist:
@@ -1764,9 +1764,9 @@ def head_all_leadTransfer(request):
             if request.POST.getlist('lead_check'):
                 leadChecked = request.POST.getlist('lead_check')
                 leads_obj = Leads.objects.filter(id__in=leadChecked,lead_status=1,waste_data=0,lead_transfer_status=0)
-                
 
                 for l in leads_obj:
+                 
                     l.lead_transfer_status = 1
                     l.lead_transfer_date = date.today()
                     l.save()
@@ -1827,7 +1827,7 @@ def head_all_leadTransfer(request):
                 except EmptyPage:
                     items = paginator.page(paginator.num_pages)
                 
-
+                clients_objs = ClientTask_Register.objects.filter(task_name='Lead Collection',cTcompId__id=dash_details.emp_comp_id.id)
                 content = {'emp_dash':emp_dash,
                             'dash_details':dash_details,
                             'notifications':notifications,
@@ -1835,6 +1835,7 @@ def head_all_leadTransfer(request):
                             'success_text':success_text,
                             'works_obj':works_obj,
                             'leads_obj':items,
+                            'clients_objs':clients_objs,
                             'lead_Details_obj':lead_Details_obj,
                             }
 
@@ -4703,7 +4704,7 @@ def head_lead_verify_unverify_all(request,all_wkid,all_lcid):
         
         leads_ids = request.POST.getlist('lead_check')
 
-
+        print(leads_ids)
         for lid in leads_ids:
             
             try:

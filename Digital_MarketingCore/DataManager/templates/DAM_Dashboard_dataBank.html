@@ -7,6 +7,13 @@
   {
     list-style: none;
   }
+  .alert-fill-danger {
+    color: white;
+    background: #fc424a;
+    }
+    .alert {
+      font-size: 0.795rem;
+    }
 </style>
 
 <div>
@@ -139,10 +146,21 @@
                       
                             <input  class="form-control text-offwhite" name="#" id="search-data" placeholder="search here..">
                             <button class="btn btn-outline-danger mdi mdi-close" id="closeBtn" type="button"></button> 
-                          </div>
+                        </div>
                         
                     </div>
-          
+                    
+                    {% if messages %}
+                
+                      {% for message in messages %}
+                      <div class="alert alert-fill-danger" role="alert">
+                        <i class="mdi mdi-check-circle"></i> {{ message }}
+                      </div>
+                      
+                      {% endfor %}
+                 
+                  {% endif %}
+                    
                    
                     
                   {% if dataBank_objs %}
@@ -153,6 +171,7 @@
                       <thead>
                         <tr>
                           <th> No </th>
+                       
                           <th> Action </th>
                           <th>Allocation  Status </th>
                           <th> Added Date </th>
@@ -497,7 +516,6 @@
 
    
 
-
     function updateTable(dataList) {
       // Clear existing table data
       $("#lead-data").empty();
@@ -506,47 +524,57 @@
       $.each(dataList, function(index, data) {
         var followupUrl = "{% url 'DAM_dataBnak_followup' 0 %}".replace("0", data.id);
         var removeUrl = "{% url 'DAM_dataBnak_remove' 0 %}".replace("0", data.id);
-          var newRow = "<tr class='clickable-row' data-href='#'>" +
-              "<td>" + (index + 1) + "</td>" +
-              "<td>" +
+    
+        var newRow = "<tr class='clickable-row' data-href='#'>" +
+            "<td>" + (index + 1) + "</td>" +
+           
+            "<td>" +
                 "<span class='mdi mdi-dots-vertical close-action text-secondary' onclick='showActions(this)'></span>" +
                 "<div class='actions-dropdown card' style='display: none; position: absolute;'>" +
                     "<ul class='list-group p-3'>" +
-                      "<li class='mb-3 li-none'>" +
-                        "<span class='mdi mdi-phone text-secondary'></span>" +
-                        "<a href='" + followupUrl + "' class='small ml-2 text-offwhite'>FollowUp</a>" +
-                      "</li>" +
+                        "<li class='mb-3 li-none'>" +
+                            "<span class='mdi mdi-phone text-secondary'></span>" +
+                            "<a href='" + followupUrl + "' class='small ml-2 text-offwhite'>FollowUp</a>" +
+                        "</li>" +
                         "<li class='mb-3 li-none'>" +
                             "<span class='mdi mdi-file-account text-secondary'></span>" +
                             "<a href='" + followupUrl + "' class='small ml-2 text-offwhite'>Details</a>" +
                         "</li>" +
                         "<li class='li-none'>" +
                             "<span class='mdi mdi-delete text-secondary'></span>" +
-                            "<a href='" + removeUrl + "' class=' ml-2 small text-offwhite'>Delete</a>" +
+                            "<a href='" + removeUrl + "' class='ml-2 small text-offwhite'>Delete</a>" +
                         "</li>" +
                     "</ul>" +
                 "</div>" +
-              "</td>" +
-              "<td>" + (data.lead_status === 'Not Attended' ? "<p><span class='mdi mdi-information-outline text-warning mr-1'></span>" + data.lead_status + "</p>" :
-                       data.lead_status === 'Allocated' ? "<p><span class='mdi mdi-check text-success mr-1'></span>" + data.lead_status + "</p>" :
-                       data.lead_status === 'Opend' ? "<p><span class='mdi mdi-check-all text-success mr-1'></span>" + data.lead_status + "</p>" :
-                       "<p><span class='mdi mdi-check-circle text-success mr-1'></span>" + data.lead_status + "</p>") +
-              "</td>" +
-              "<td>" + data.Genarated_date + "</td>" +
-              "<td><span class='pl-2'>" + data.lead_name + "</span></td>" +
-              "<td>" + data.lead_email + "</td>" +
-              "<td>" + data.lead_contact + "</td>" +
-              "<td>" + data.c_status + "</td>" +
-              "<td>" + data.lead_source + "</td>" +
-              "<td>" + data.client_name + "</td>" +
-              "<td>" + data.lead_collection_for + "</td>" +
-          "</tr>";
-  
-          $("#lead-data").append(newRow);
-      });
+            "</td>" +
+            "<td>" + 
+                (data.lead_status === 'Not Attended' ? "<p><span class='mdi mdi-information-outline text-warning mr-1'></span>" + data.lead_status + "</p>" :
+                data.lead_status === 'Allocated' ? "<p><span class='mdi mdi-check text-success mr-1'></span>" + data.lead_status + "</p>" :
+                data.lead_status === 'Opend' ? "<p><span class='mdi mdi-check-all text-success mr-1'></span>" + data.lead_status + "</p>" :
+                "<p><span class='mdi mdi-check-circle text-success mr-1'></span>" + data.lead_status + "</p>") +
+            "</td>" +
+            "<td>" + data.Genarated_date + "</td>" +
+            "<td><span class='pl-2'>" + data.lead_name + "</span></td>" +
+            "<td>" + data.lead_email + "</td>" +
+            "<td>" + data.lead_contact + "</td>" +
+            "<td>" + data.c_status + "</td>" +
+            "<td>" + data.lead_source + "</td>" +
+            "<td>" + data.client_name + "</td>" +
+            "<td>" + data.lead_collection_for + "</td>" +
+        "</tr>";
+    
+        $("#lead-data").append(newRow);
+    });
+    
   }
 
-
+  $(document).ready(function() {
+    // Hide the alert after 3 seconds
+    setTimeout(function() {
+        $(".alert").fadeOut("slow");
+    }, 3000); // 3000 milliseconds = 3 seconds
+  });
+  
   
   </script>
 

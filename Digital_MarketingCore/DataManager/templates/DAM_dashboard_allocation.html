@@ -6,6 +6,50 @@
     .li-none{
     list-style: none;
     }
+    .EmployeeLeadsCountBox
+    {
+        overflow-x: scroll;
+        display: flex;
+        max-width: 70vw;
+        flex-direction: row;
+        margin-bottom: 1rem;
+        gap: 0.30rem;
+    }
+    .CoutDiv
+    {
+        height: 40px;
+        min-width:200px;
+        background: #1c1f28e3;
+        border: 1px solid #2322225e;
+        display: flex;
+        color: rgb(171, 173, 173);
+        font-size: 13px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 16px;
+        margin-bottom: 0.50rem;
+
+    }
+    #EmployeeLeadsCountBox::-webkit-scrollbar {
+        width: 2px; /* width of the scrollbar */
+    }
+
+    #EmployeeLeadsCountBox::-webkit-scrollbar-track {
+        background-color: #191c24; /* color of the track */
+    }
+
+    #EmployeeLeadsCountBox::-webkit-scrollbar-thumb {
+        background-color: #191c24; /* color of the scrollbar */
+        border-radius: 6px; /* roundness of the scrollbar thumb */
+        width: 1px;
+        height: 5px;
+    }
+
+    #EmployeeLeadsCountBox::-webkit-scrollbar-thumb:hover {
+        background-color: #0b1216; /* color of the scrollbar thumb on hover */
+    }
+    
+    
 </style>
 
 <div>
@@ -27,203 +71,220 @@
             
             <div class="row ">
                 <div class="col-12 grid-margin">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between">
-                        <h6 class="card-title text-offwhite">
-                            All Leads We Have - ( {{ dataBank_count }} ) 
-                            <span id="dotsElement" class="mdi mdi-dots-vertical text-secondary" onclick="exicutionActions(this)"></span>
-                        </h6>
-                        <div id="fileActionDropdown" class="file-dactiondropdown card" style="display: none;z-index:99; position: absolute; top:10%;">
-                            <ul class="list-group p-3">
-                            <li class="mb-3 li-none">
-                                    <span class="mdi  mdi-account-network text-success "></span>
-                                    <a href="{% url 'DAM_allAllocationList' %}" class="ml-2 text-offwhite"><span class="small">Allocation </span></a>
-                            </li>
-                            <li class="mb-3 li-none">
-                                <span class="mdi  mdi-printer text-primary "></span>
-                                <a href="" class="ml-2 text-offwhite"><span class="small">Print</span></a>
-                            </li>
-                            <li class="mb-3 li-none">
-                                <span class="mdi mdi-file-pdf text-danger"></span>
-                                <a href="" class=" ml-2 text-offwhite"><span class="small">Pdf</span></a>
-                            </li>
-                            <li class="mb-3 li-none">
-                                <span class="mdi mdi-file-excel text-secondary"></span>
-                                <a href="" class=" ml-2 text-offwhite"><span class="small">Excel</span></a>
-                            </li>
-                            </ul>
-                        </div>
-                        
-                        
-                                    
-                            <div class="add-items d-flex ">
-                        
-                                <input  class="form-control text-offwhite" name="#" id="search-data" placeholder="search here..">
-                                <button class="btn btn-outline-danger mdi mdi-close" id="closeBtn" type="button"></button> 
+                    <div class="card">
+                        <div class="card-body">
+
+                           
+                            <div class="d-flex justify-content-between">
+                            <h6 class="card-title text-offwhite">
+                                {% if selected_employee %}
+                                {{ selected_employee.emp_name }} collected lead
+                                {% else %}
+                                All Leads We Have 
+                                {% endif %}
+                            - ( {{ dataBank_count }} ) 
+                                <span id="dotsElement" class="mdi mdi-dots-vertical text-secondary" onclick="exicutionActions(this)"></span>
+                            </h6>
+                            <div id="fileActionDropdown" class="file-dactiondropdown card" style="display: none;z-index:99; position: absolute; top:10%;">
+                                <ul class="list-group p-3">
+                                <li class="mb-3 li-none">
+                                        <span class="mdi  mdi-account-network text-success "></span>
+                                        <a href="{% url 'DAM_allAllocationList' %}" class="ml-2 text-offwhite"><span class="small">Allocation </span></a>
+                                </li>
+                                <li class="mb-3 li-none">
+                                    <span class="mdi  mdi-printer text-primary "></span>
+                                    <a href="" class="ml-2 text-offwhite"><span class="small">Print</span></a>
+                                </li>
+                                <li class="mb-3 li-none">
+                                    <span class="mdi mdi-file-pdf text-danger"></span>
+                                    <a href="" class=" ml-2 text-offwhite"><span class="small">Pdf</span></a>
+                                </li>
+                                <li class="mb-3 li-none">
+                                    <span class="mdi mdi-file-excel text-secondary"></span>
+                                    <a href="" class=" ml-2 text-offwhite"><span class="small">Excel</span></a>
+                                </li>
+                                </ul>
                             </div>
                             
-                        </div>
-            
-                    
-                        
-                  
+                            
+                                        
+                                <div class="add-items d-flex ">
+                            
+                                    <input  class="form-control text-offwhite" name="#" id="search-data" placeholder="search here..">
+                                    <button class="btn btn-outline-danger mdi mdi-close" id="closeBtn" type="button"></button> 
+                                </div>
+                                
+                            </div>
+                
 
-                    <div class="row">
-                        <div class="col-xl-3  col-lg-4  col-md-4  col-sm-12 grid-margin ">
-                            <div class="form-group">
-                                <label class="text-offwhite">Allocation Status </label>
-                                <select class="form-control text-offwhite" id="Status-change" >
-                                  <option value="">Change status</option>
-                                  <option value="Not Attended" >Not Attended</option>
-                                  <option value="Allocated ">Allocated </option>
-                                  <option value="Closed">Closed </option>
-                                </select>
-                    
-                              </div>
-                        </div>
-                        <div class="col-xl-3  col-lg-4  col-md-4  col-sm-12 grid-margin ">
-                            <div class="form-group">
-                                <label class="text-offwhite">Executives </label>
-                                <select class="form-control text-offwhite" id="executive-change" >
-                                  <option value="">Change Executives</option>
-                                  {% for e in executives %}
-                                  <option value="{{e.id}}" >{{e.emp_name}}</option>
-                                  {% endfor %}
-                                 
-                                </select>
-                    
-                              </div>
-                        </div>
-                        <div class="col-xl-5 col-sm-12 grid-margin ">
-                            <div class="form-group">
-                                <label class="text-offwhite">Select HR\Telecaller *</label>
-                                <select class="form-control text-offwhite"  name="selected_emp" required>
-                                  <option value="">Select Employee</option>
-                                  {% for emp in employees %}
-                                  <option value="{{emp.id}}">{{ emp.emp_name }}</option>
-                                  {% endfor %}
-                                </select>
-                    
-                              </div>
-                        </div>
-                       
-                        <div class="col-xl-1 col-sm-12 grid-margin d-flex  align-items-center ">
-                         
-                            <button type="submit" class="btn btn-outline-primary"> <span class="small">Allocate</span></button>
-                         
-                        </div> 
-                      </div>
-                    {% if dataBank_objs %} 
-                    <div class="table-responsive">
-                        
-                        <table class="table" id="table-details">
-                        <thead>
-                            <tr>
+                            <div class="row">
+                                <div class="col-xl-3  col-lg-4  col-md-4  col-sm-12 grid-margin ">
+                                    <div class="form-group">
+                                        <label class="text-offwhite">Allocation Status </label>
+                                        <select class="form-control text-offwhite" id="Status-change" >
+                                        <option value="">Change status</option>
+                                        <option value="Not Attended" >Not Attended</option>
+                                        <option value="Allocated ">Allocated </option>
+                                        <option value="Closed">Closed </option>
+                                        </select>
                             
-                                <th>
-                                    <div class="d-flex">
-                                        <div class="form-check form-check-primary m-0">
-                                        <label class="form-check-label">
-                                            <input type="checkbox" class="form-check-input check-all">
-                                            
-                                        </label>
-                                        </div>
-                                        
                                     </div>
-                                </th>
-                                <th> No </th>
-                                <th> Action </th>
-                                <th> Status </th>
-                                <th> Added Date </th>
-                                
-                                <th> Lead Name </th>
-                                <th> Email </th>
-                                <th> Phone Number </th>
-                                <th> Data Sourse </th>
-                                <th> Client name </th>
-                                <th> Lead Category </th>
+                                </div>
+                                <div class="col-xl-3  col-lg-4  col-md-4  col-sm-12 grid-margin ">
+                                    <div class="form-group">
+                                        <label class="text-offwhite">Executives </label>
+                                        <select class="form-control text-offwhite" id="executive-change" >
+                                        <option value="">Change Executives</option>
+                                        {% for e in executives %}
+                                        <option value="{{e.id}}" >{{e.emp_name}}</option>
+                                        {% endfor %}
+                                        
+                                        </select>
                             
-                            </tr>
-                        </thead>
-                        <tbody  id="lead-data">
-                        {% for d in dataBank_objs %}
-                            <tr >
-            
-                                <td>
-                                
-                                    <div class="form-check form-check-primary">
-                                        <label class="form-check-label">
-                                        <input class="checkbox check-single" name="lead_check" value="{{ d.id }}" id="" type="checkbox">
-                                        </label>
                                     </div>
-                                </td>
-                                
-                                <td>{{ forloop.counter }}</td> 
-                                <td>
-                                        
-                                        <span class="mdi mdi-dots-vertical close-action text-secondary" onclick="showActions(this)"></span>
-                                        <div class="actions-dropdown card" style="display: none; position: absolute;">
-                                        
-                                        <ul class="list-group p-3">
-                                            
-                                            <li class="mb-3 li-none">
-                                                <span class="mdi mdi-phone text-secondary"></span>
-                                                <a href="{% url 'DAM_dataBnak_followup' d.id %}" class="small ml-2 text-offwhite">FollowUp</a>
-                                            </li>
-                                            <li class="mb-3 li-none">
-                                            <span class="mdi mdi-file-account text-secondary"></span>
-                                            <a href="{% url 'DAM_dataBnak_followup' d.id %}" class="small ml-2 text-offwhite">Details</a>
-                                            </li>
-                                        
-                                            <li class=" li-none">
-                                            <span class="mdi mdi-delete text-secondary"></span>
-                                            <a href="{% url 'DAM_dataBnak_remove' d.id %}" class=" ml-2 small text-offwhite">Delete</a>
-                                            </li>
-                                        </ul>
-                                        </div>
-                                        
-                                </td> 
-                                <td>
-                                    {% if d.lead_status == 'Not Attended' %}
-                                    <p>
-                                        <span class="mdi mdi-information-outline text-warning mr-1"></span>
-                                        {{ d.lead_status }}</p>
-                                    {% elif  d.lead_status == 'Allocated' %}
-                                    <p><span class="mdi mdi-check text-success mr-1"></span>  {{ d.lead_status }}</p> 
-                                    {% elif  d.lead_status == 'Opend' %}
-                                    <p><span class="mdi mdi-check-all text-success mr-1"></span>  {{ d.lead_status }}</p> 
-                                    {% else %}
-                                    <p><span class="mdi mdi-check-circle text-success mr-1"></span>  {{ d.lead_status }} </p> 
-                                
-                                    {% endif %}
-                                </td>       
+                                </div>
+                                <div class="col-xl-5 col-sm-12 grid-margin ">
+                                    <div class="form-group">
+                                        <label class="text-offwhite">Select HR\Telecaller *</label>
+                                        <select class="form-control text-offwhite"  name="selected_emp" required>
+                                        <option value="">Select Employee</option>
+                                        {% for emp in employees %}
+                                        <option value="{{emp.id}}">{{ emp.emp_name }}</option>
+                                        {% endfor %}
+                                        </select>
                             
+                                    </div>
+                                </div>
+                            
+                                <div class="col-xl-1 col-sm-12 grid-margin d-flex  align-items-center ">
                                 
-                                <td> {{ d.Genarated_date}} </td>  
+                                    <button type="submit" class="btn btn-outline-primary"> <span class="small">Allocate</span></button>
+                                
+                                </div> 
+                            </div>
+
+                            <div class="EmployeeLeadsCountBox" id="EmployeeLeadsCountBox">
+                                {% for item in countList %}
+                                    {% for key, value in item.items %}
+                                        <div class="CoutDiv">{{ key }} : {{ value }}</div>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for i in leadList %}
+                               
+                                {% endfor %}
+                            </div>
+
+
+                            {% if dataBank_objs %} 
+                            <div class="table-responsive">
+                                
+                                <table class="table" id="table-details">
+                                <thead>
+                                    <tr>
                                     
-                                <td><span class="pl-2">{{ d.lead_Id.lead_name }}</span> </td>
-                                <td>{{ d.lead_Id.lead_email }} </td>
-                                <td>{{ d.lead_Id.lead_contact }}</td>
-                                <td>{{ d.lead_Id.lead_source }}</td>
-                                <td>{{ d.lead_Id.lead_work_regId.clientId.client_name }}</td>
-                                <td>{{ d.lead_Id.lead_category_id.lead_collection_for }}</td>
-                            
-                            </tr>
-            
-                            {% endfor %}
-                        
-                        </tbody>
-                        </table>
-                    </div>
-                    {% else %}
-                        <div class="d-flex justify-content-center">
-                        <img src="{% static 'images\file-icons\no-data-file.png' %}">
-                        </div>
-                    {% endif %}
+                                        <th>
+                                            <div class="d-flex">
+                                                <div class="form-check form-check-primary m-0">
+                                                <label class="form-check-label">
+                                                    <input type="checkbox" class="form-check-input check-all">
+                                                    
+                                                </label>
+                                                </div>
+                                                
+                                            </div>
+                                        </th>
+                                        <th> No </th>
+                                        <th> Action </th>
+                                        <th> Status </th>
+                                        <th> Added Date </th>
+                                        
+                                        <th> Lead Name </th>
+                                        <th> Email </th>
+                                        <th> Phone Number </th>
+                                        <th> Data Sourse </th>
+                                        <th> Client name </th>
+                                        <th> Lead Category </th>
+                                    
+                                    </tr>
+                                </thead>
+                                <tbody  id="lead-data">
+                                {% for d in dataBank_objs %}
+                                    <tr >
+                    
+                                        <td>
+                                        
+                                            <div class="form-check form-check-primary">
+                                                <label class="form-check-label">
+                                                <input class="checkbox check-single" name="lead_check" value="{{ d.id }}" id="" type="checkbox">
+                                                </label>
+                                            </div>
+                                        </td>
+                                        
+                                        <td>{{ forloop.counter }}</td> 
+                                        <td>
+                                                
+                                                <span class="mdi mdi-dots-vertical close-action text-secondary" onclick="showActions(this)"></span>
+                                                <div class="actions-dropdown card" style="display: none; position: absolute;">
+                                                
+                                                <ul class="list-group p-3">
+                                                    
+                                                    <li class="mb-3 li-none">
+                                                        <span class="mdi mdi-phone text-secondary"></span>
+                                                        <a href="{% url 'DAM_dataBnak_followup' d.id %}" class="small ml-2 text-offwhite">FollowUp</a>
+                                                    </li>
+                                                    <li class="mb-3 li-none">
+                                                    <span class="mdi mdi-file-account text-secondary"></span>
+                                                    <a href="{% url 'DAM_dataBnak_followup' d.id %}" class="small ml-2 text-offwhite">Details</a>
+                                                    </li>
+                                                
+                                                    <li class=" li-none">
+                                                    <span class="mdi mdi-delete text-secondary"></span>
+                                                    <a href="{% url 'DAM_dataBnak_remove' d.id %}" class=" ml-2 small text-offwhite">Delete</a>
+                                                    </li>
+                                                </ul>
+                                                </div>
+                                                
+                                        </td> 
+                                        <td>
+                                            {% if d.lead_status == 'Not Attended' %}
+                                            <p>
+                                                <span class="mdi mdi-information-outline text-warning mr-1"></span>
+                                                {{ d.lead_status }}</p>
+                                            {% elif  d.lead_status == 'Allocated' %}
+                                            <p><span class="mdi mdi-check text-success mr-1"></span>  {{ d.lead_status }}</p> 
+                                            {% elif  d.lead_status == 'Opend' %}
+                                            <p><span class="mdi mdi-check-all text-success mr-1"></span>  {{ d.lead_status }}</p> 
+                                            {% else %}
+                                            <p><span class="mdi mdi-check-circle text-success mr-1"></span>  {{ d.lead_status }} </p> 
+                                        
+                                            {% endif %}
+                                        </td>       
+                                    
+                                        
+                                        <td> {{ d.Genarated_date}} </td>  
+                                            
+                                        <td><span class="pl-2">{{ d.lead_Id.lead_name }}</span> </td>
+                                        <td>{{ d.lead_Id.lead_email }} </td>
+                                        <td>{{ d.lead_Id.lead_contact }}</td>
+                                        <td>{{ d.lead_Id.lead_source }}</td>
+                                        <td>{{ d.lead_Id.lead_work_regId.clientId.client_name }}</td>
+                                        <td>{{ d.lead_Id.lead_category_id.lead_collection_for }}</td>
+                                    
+                                    </tr>
+                    
+                                    {% endfor %}
+                                
+                                </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                                <div class="d-flex justify-content-center">
+                                <img src="{% static 'images\file-icons\no-data-file.png' %}">
+                                </div>
+                            {% endif %}
 
+                        </div>
                     </div>
-                </div>
                 </div>
             </div>
 

@@ -7,6 +7,89 @@
   max-width: 60%; 
   margin: auto; 
 }
+h4
+{
+  color: #c7c7c7 !important;
+  letter-spacing: 1px;
+  font-size: 15px;
+  font-weight: 500;
+}
+.card-headingBox
+{
+  justify-content: space-between;
+  margin-bottom: 0.654rem;
+}
+.actionBox
+{
+  position: absolute;
+}
+.links-div
+{
+  padding: 0.80rem 1rem;
+  display: flex;
+  flex-direction: column;
+  box-shadow: rgba(17, 17, 26, 0.1) 0px 0px 16px;
+  background: rgba(17, 17, 26);
+  gap: 0.90rem;
+  margin-top: 0.30rem;
+  margin-left: 2rem;
+  font-size: 12px;
+  position: relative;
+  color: #e0e0e0;
+}
+.closeBtn 
+{
+color: #e02e2ef9;
+}
+.closeBtn:hover
+{
+  color: #d32626f9; 
+}
+
+.links-div a{
+  color: #e0e0e0;
+  margin-top: 0.30rem;
+  text-decoration: none;
+}
+.messages
+{
+  font-size: 12px;
+  list-style: none;
+  color: #fff;
+  padding: 0;
+ 
+}
+.delete-icon
+{
+  height: 40px;
+  width: 40px;
+}
+.error
+{
+  background: #c320209c;
+  padding: 0.965rem;
+}
+.mdi-delete-empty
+{
+  font-size: 16px;
+  color: #f12d2d;
+}
+.delete-icon:hover .mdi-delete-empty
+{
+  border-radius: 150px;
+  background: linear-gradient(145deg, #101010, #131313);
+  box-shadow:  30px 30px 47px #0e0e0e,
+               -30px -30px 47px #161616;
+            
+}
+@media (max-width:632px) {
+.card-headingBox
+{
+  justify-content: start;
+  flex-direction: column;
+}
+
+}
 </style>
 
 <div>
@@ -24,40 +107,61 @@
     <div class="card">
       <div class="card-body">
         
-        <div class="d-flex justify-content-between mb-3">
+        <div class="d-flex  card-headingBox">
           <h4 class="card-title">Daily Work Updates</h4>
-         
-        </div>
-       
+          {% if messages %}
+          <ul class="messages">
+              {% for message in messages %}
+              <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+              {% endfor %}
+          </ul>
+        {% endif %}
+
         <div class="add-items d-flex ">
               
           <input  class="form-control text-offwhite" name="#" id="search-data" placeholder="search here..">
           <button class="btn btn-outline-danger mdi mdi-close" id="closeBtn" type="button"></button> 
         </div>
-        
+         
+        </div>
+
+
         <div class="table-responsive">
           <table class="table" id="work-allocate">
             <thead>
               <tr>
+                <th colspan="1">  </th>
                 <th> Employee </th>
                 <th> Client Name </th>
                 <th> Task </th>
                 <th> Start Date </th>
                 <th> Due Date </th>
-                <th> Task Details </th>
                 <th> Progress </th>
-                <th> Work Done </th>
                
               </tr>
             </thead>
             <tbody>
               {% for ta in task_assign %}
               <tr >
+                <td class="actionBox">
+                  <span class="delete-icon" >
+                    <span class="mdi mdi-dots-vertical mdi-18px "></span>
+                  </span>
+                  <div class="links-div" style="display: none;" >
+                    
+                    <a href="{% url 'tl_assignTask_delete' ta.id %} " title="Remove the assign task">Remove Task</a>
+                    <div data-toggle="modal" data-target="#taskDetails{{ta.id}}">Task Details</div>
+                    <div data-toggle="modal" data-target="#workDone{{ta.id}}">Work Details</div>
+                    <div class="closeBtn">
+                       Close Window
+                    </div>
+                  </div>
+                 </td>
                 <td>
                   {% if ta.ta_workerId.emp_profile %}
                   <img src="{{ ta.ta_workerId.emp_profile.url}}" alt="Profile" />
                   {% else %}
-                  <img src="{% static 'images/faces/profile-icon.png' %}" alt="image" />
+                  <span class="mdi mdi-account  mdi-24px" ></span>
                   {% endif %}
                   <span class="pl-2">{{ta.ta_workerId.emp_name}}</span>
                 </td>
@@ -65,16 +169,14 @@
                   {% if ta.ta_workAssignId.wa_clientId.client_profile %}
                   <img src="{{ta.ta_workAssignId.wa_clientId.client_profile.url}}" alt="Profile" />
                   {% else %}
-                  <img src="{% static 'images/faces/profile-icon.png' %}" alt="image" />
+                  <span class="mdi mdi-account-card-details mdi-22px"></span>
                   {% endif %}
                   <span class="pl-2">{{ta.ta_workAssignId.wa_clientId.client_name}}</span>
                 </td>
-                <td> {{ ta.ta_taskId.task_name }}</td>
-                <td> {{ ta.ta_start_date }} </td>
-                <td> {{ ta.ta_due_date }} </td>
-                <td> 
-                  <div class="btn btn-outline-primary" data-toggle="modal" data-target="#taskDetails{{ta.id}}">View</div>
-                </td>
+                <td><span class="mdi mdi-file-document"></span> {{ ta.ta_taskId.task_name }}</td>
+                <td>  <span class="mdi mdi-calendar "></span> {{ ta.ta_start_date |date:'d-M-y' }} </td>
+                <td> <span class="mdi mdi-calendar "></span> {{ ta.ta_due_date |date:'d-M-y'}} </td>
+               
                 <td> 
                   {% if ta.ta_progress <= 10 %}
                       <div class="progress progress-sm">
@@ -95,29 +197,9 @@
                           </div>
                       </div>
                   {% endif %}
-                  <!-- {% if ta.ta_progress <= 10 %}
-                  <div class="progress progress-lg mt-2">
-                    <div class="progress-bar bg-danger" role="progressbar" style="width: {{ ta.ta_progress}} %" aria-valuenow="{{ ta.ta_progress}} " aria-valuemin="0" aria-valuemax="100">
-                        <span class="small ml-1">{{ ta.ta_progress}}%</span>
-                    </div>
-                  </div>
-                  {% elif ta.ta_progress >= 10 and ta.ta_progress <= 80 %}
-                  <div class="progress progress-lg mt-2">
-                    <div class="progress-bar bg-warning" role="progressbar" style="width: {{ ta.ta_progress}} %" aria-valuenow="{{ ta.ta_progress}} " aria-valuemin="0" aria-valuemax="100">
-                        <span class="small ml-1">{{ ta.ta_progress}}%</span>
-                    </div>
-                  </div>
-                  {% else %}
-                  <div class="progress progress-lg mt-2">
-                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ ta.ta_progress}} %" aria-valuenow="{{ ta.ta_progress}} " aria-valuemin="0" aria-valuemax="100">
-                        <span class="small ml-1">{{ ta.ta_progress}}%</span>
-                    </div>
-                  </div>
-                  {% endif %} -->
+                 
                 </td>
-                <td> 
-                  <div class="badge badge-outline-info" data-toggle="modal" data-target="#workDone{{ta.id}}">View</div>
-                </td>
+                
                 
               </tr>
               {% endfor %}
@@ -401,6 +483,9 @@
 
 
 
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
    
   const inputField = document.getElementById('search-data');
@@ -463,7 +548,16 @@
   });
 </script>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+<script>
+$(document).ready(function(){
+    // Hide the div after 3 seconds
+    setTimeout(function(){
+        $(".messages").hide(); // Hide the div with id "myDiv"
+    }, 3000); // 3000 milliseconds = 3 seconds
+});
+</script>
 
 <script>
     $(document).ready(function () {
@@ -505,6 +599,22 @@
         });
     });
 </script>
+
+
+<script>
+  $(document).ready(function(){
+      $(".delete-icon").click(function(){
+        $(".links-div").hide();
+        $(this).siblings(".links-div").toggle();
+      });
+      $(".closeBtn").click(function(){
+        $(".links-div").hide();
+        $(this).siblings(".links-div").toggle();
+      });
+       
+      
+  });
+  </script>
   
 
   
