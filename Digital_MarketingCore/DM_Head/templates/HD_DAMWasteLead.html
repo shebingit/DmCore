@@ -2,6 +2,53 @@
 {% load static %}
 {% load custom_filters %}
 {% block body %}
+<link rel="stylesheet" href="https://cdn.datatables.net/2.0.3/css/dataTables.dataTables.css">
+
+<style>
+    .input-textarea textarea
+    {
+        color: #c8c8c8;
+    }
+    .ml-2
+    {
+        margin-right: 0.40rem;
+    }
+    .dt-search label
+    {
+     display: none;
+
+    }
+    div.dt-container .dt-search input {
+        border: 1px solid #707070;
+        border-radius: 3px;
+        padding: 5px;
+        background-color: transparent;
+        color: #a5a5a5;
+        margin-left: 3px;
+        font-size: 13px;
+    }
+
+    div.dt-container select.dt-input {
+        padding: 4px 10px;
+        border: 1px solid #707070;
+        color: #a5a5a5;
+        font-size: 13px;
+        background-color: transparent;
+        width: 100px;
+    }
+    div.dt-container select option{
+        background-color: #15171f; 
+    }
+    div.dt-container .dt-length label
+    {
+        display: none;
+    }
+    div.dt-container .dt-info
+    {
+        color: #a5a5a5;
+        font-size: 13px 
+    }
+</style>
 
 <div>
     <nav aria-label="breadcrumb">
@@ -23,14 +70,9 @@
     
                 <div class="row">
                     <div class="col-sm-12 col-lg-8 col-md-7 col-xl-9  grid-margin">
-                    <h5 class="card-title custom-letter-spacing"> Waste Leads List - ( {{ leads_obj_count }} )</h5>
+                    <h6 class="card-title custom-letter-spacing"> Waste Leads List - ( {{ leads_obj_count }} )</h6>
                     </div>
-                    <div class="col-sm-12 col-lg-5 col-md-5 col-xl-3 d-flex justify-content-end  grid-margin">
-                    <div class="d-flex ">
-                        <input  class="form-control text-offwhite mr-1" name="#" id="search-data" placeholder="search here..">
-                        <span class="text-danger mdi mdi-close" id="closeBtn" type="button"></span> 
-                    </div>
-                    </div>
+                   
                     
                 </div>
         
@@ -38,91 +80,35 @@
                     <table class="table" id="leads-data">
                     <thead>
                         <tr>
-                        
-                            
-                            <th>No
-                                <!-- <div class="form-check form-check-primary m-0">
-                                  <label class="form-check-label">
-                                    <input type="checkbox" class="form-check-input">
-                                   All</label>
-                                </div>
-                              </th> -->
-                            <th>Waste Marked Date</th>
-                            <th>Lead Full Name</th>
-                            <th>Email id  </th>
-                            <th>Contact No </th>
-                            <th> Details  </th>
-                            <th> Collected By </th>
-                            <th> Verification Status </th>
-                            
-                            
+                            <th>No</th>
+                            <th> History </th>
+                            <th>Lead Name</th>
+                            <th>Contact Details</th>
+                           
                         </tr>
                     </thead>
                     <tbody>
                         {% for lead in leads_obj %}
                         <tr>
-                        
-                       
-                        <td>
-                            <span>{{ forloop.counter }}</span>
-                            <!-- <div class="form-check form-check-primary">
-                                <label class="form-check-label">
-                               <input class="checkbox " id="" type="checkbox">
-                               </label>
-                           </div> -->
-                        </td>
-                        <td>{{ lead.waste_marked_Date }}</td>
-                        <td>{{ lead.leadId.lead_name }}</td>
-                        <td>{{ lead.leadId.lead_email }}</td>
-                        <td>{{ lead.leadId.lead_contact }}</td>
-                        <td>
-                            <p class="mt-1">
-                             {{lead.leadId.lead_work_regId.clientId.client_name}} 
-                            </p>
-                            <p class="mt-2">
-                                ( {{lead.leadId.lead_category_id.lead_collection_for}} )
-                            </p>
-                            <ol>
-                               
-                                {% for Details in lead_Details_obj %}
-                                {% if Details.leadId.id == lead.leadId.id %}
-                                <li>
-                                    <p>
-                                        <span class="mr-1"> {{ Details.lead_field_name }} :</span>
-                                        <span> {{ Details.lead_field_data }} </span>
-                                    </p>
-                                </li>
-                                {% endif %}
-                                {% endfor %}
-                            </ol>
-                           
-                        </td>
-                        <td> {{ lead.leadId.lead_collect_Emp_id.emp_name }}
-                           
-                            <p class="mt-2">Reason : {{lead.reason }}</p>
-                        </td>
-                        <td>
-                           {% if lead.confirmation == 0 %}
-                            <a href="{% url 'hd_wastelead_confirm' lead.id %}">
-                                <button class=" btn btn-outline-danger "><span class="mdi mdi-check mr-0 "> </span>
-                                <span class="small">Confirm as Waste</span></button>
-                            </a>
-                            {% else %}
+                            <td><span>{{ forloop.counter }}</span> </td>
+                            <td>
 
-                            <button class=" btn btn-outline-success "><span class="mdi mdi-check mr-0 "> </span>
-                                <span class="small">Confirmed</span></button>
-
-                            {% endif %}
-                            
-                        </td>
-                        <!-- <td>
+                                <a class="small ml-2 btn btn-sm btn-outline-info fetch-lead-details"  data-lead-id="{{ lead.id }}" title="More Details of Lead">
+                                    <span class="mdi mdi-file-document mdi-18px text-secondary">  </span> 
+                                </a>
+                                
+                            </td>
+                            <td>
+                                <p><span class="mdi mdi-account ml-2"></span> {{ lead.leadId.lead_name }}</p>
+                                <p> <span class="mdi mdi-file-document  ml-2"></span>
+                                    {{ lead.client_id.client_name }} - 
+                                     {{ lead.leadId.lead_category_id.lead_collection_for }}</p>
+                            </td>
+                            <td>
+                                <p><span class="mdi mdi-email ml-2"></span>{{ lead.leadId.lead_email }}</p>
+                                <p><span class="mdi mdi-phone ml-2"></span>{{ lead.leadId.lead_contact }}</p>
+                            </td>
                            
-                            <a href="" class=" btn btn-outline-primary "><span class="mdi mdi-redo-variant mr-1 small"> Transfer</span></a>
-                            
-                        </td> -->
-                        
-                        
-                        
                         </tr>
                         {% endfor %}
                     
@@ -144,75 +130,200 @@
     </div>
 </div>
 
-<script>
-   
-    const inputField = document.getElementById('search-data');
-    const closeBtn = document.getElementById('closeBtn');
-    const empTable = document.getElementById('leads-data');
-    closeBtn.style.display = 'none';
-  
-    inputField.addEventListener('input', function() {
-        filterTable();
-    });
-  
-    function filterTable() {
-        const filterValue = inputField.value.toLowerCase();
-        const rows = empTable.getElementsByTagName('tr');
-  
-        for (let i = 1; i < rows.length; i++) {
-            const Cell1 = rows[i].getElementsByTagName('td')[1];
-            const Cell2 = rows[i].getElementsByTagName('td')[2];
-            const Cell3 = rows[i].getElementsByTagName('td')[3];
-            const Cell4 = rows[i].getElementsByTagName('td')[4];
-            const Cell5 = rows[i].getElementsByTagName('td')[5];
-            const Cell6 = rows[i].getElementsByTagName('td')[6];
-            const Cell7 = rows[i].getElementsByTagName('td')[7];
-            
-  
-            if (Cell1 || Cell2 || Cell3 || Cell4|| Cell5 || Cell6 || Cell7) {
-  
-                const datacell1 = Cell1.textContent || Cell1.innerText;
-                const datacell2 = Cell2.textContent || Cell2.innerText;
-                const datacell3 = Cell3.textContent || Cell3.innerText;
-                const datacell4 = Cell4.textContent || Cell4.innerText;
-                const datacell5 = Cell5.textContent || Cell5.innerText;
-                const datacell6 = Cell6.textContent || Cell6.innerText;
-                const datacell7 = Cell7.textContent || Cell7.innerText;
-                
-                
-  
-                if (datacell1.toLowerCase().includes(filterValue) ||
-                 datacell2.toLowerCase().includes(filterValue) || 
-                 datacell3.toLowerCase().includes(filterValue) ||
-                 datacell4.toLowerCase().includes(filterValue) || 
-                 datacell5.toLowerCase().includes(filterValue) ||
-                 datacell6.toLowerCase().includes(filterValue) ||
-                 datacell7.toLowerCase().includes(filterValue)) 
-                {
-                    rows[i].style.display = '';
-                } else {
-                    rows[i].style.display = 'none';
-                }
-            }
+
+
+<style>
+    .activityBox
+    {
+        background-color: #21272dfb;
+    }
+    .activityBox .modal-title
+    {
+        font-size: 14px;
+        letter-spacing: 1px;
+        font-weight: 400;
+        color: #c0c0c0;
+    }
+    .activity-MainBox
+    {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 0.50rem;
+    }
+    .activity-MainBox .basic-details
+    {
+        border-bottom: 1px solid rgb(201, 201, 201); 
+        margin-bottom: 1rem;
+    }
+    .activity-leftBox h6,
+    .activity-rightBox h6
+   {
+        font-size: 13.8px;
+        letter-spacing: 1px;
+        color: #c0c0c0;
+    }
+    .activity-leftBox p{
+        color: #979797;
+    }
+    .activity-panel
+    {
+        border-top: 1px solid rgb(201, 201, 201); 
+        display: grid;
+        grid-template-columns: 2.5fr 1fr;
+    }
+    .collect-history
+    {
+        padding-left: 0.80rem;
+    }
+    .activity-history h5,
+    .collect-history h5{
+        font-size: 12.7px;
+        letter-spacing: 1px;
+        color: #d1d1d1;
+        margin-top: 1rem;
+    }
+    .lead-more-details
+    {
+        height: 200px;
+        overflow-y: scroll;
+    }
+    .Collected-details p{
+        font-size: 12px;
+        color: #b3b3b3;
+    }
+    .history-track
+    {
+        height: 320px;
+        overflow-y: scroll;
+    }
+    .waste-reason p{
+        font-size: 12.5px;
+        color: #bdbdbd;
+    }
+    .lead-more-details::-webkit-scrollbar,
+    .history-track::-webkit-scrollbar
+     {
+        width: 1px; /* Set the width of the scrollbar */
+    }
+    
+    /* For webkit browsers */
+    .lead-more-details::-webkit-scrollbar-track,
+    .history-track::-webkit-scrollbar-track {
+        background: transparent; /* Set the background color of the track */
+    }
+    
+    /* For webkit browsers */
+    .lead-more-details::-webkit-scrollbar-thumb,
+    .history-track::-webkit-scrollbar-thumb {
+        background: #888; /* Set the color of the scrollbar thumb */
+        border-radius: 10px; /* Set the border radius of the scrollbar thumb */
+    }
+    .lead-more-details .more-details
+    {
+        display: grid;
+        grid-template-columns: 1fr 10px 1fr;
+    }
+    .followup-details
+    {
+        border-bottom: 1px solid rgb(165, 165, 165); 
+       
+        margin-top: 0.40rem;
+       
+    }
+    .followup-details p,
+    .followup-history p{
+        font-size: 12.5px;
+        color: #d5d5d5;
+    }
+    .followup-details .top-details,
+    .followup-history .top-details
+    {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+    .waste-reason-ststus
+    {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+    .history-div
+    {
+        border-bottom: 1px solid rgb(150, 150, 150);
+        padding: 10px 5px; 
+    }
+    @media (max-width:1032px)
+    {
+        .activity-MainBox
+        {
+            grid-template-columns: 1fr;
+           
         }
     }
-  
-     // To display the close button and hide the close button based on the search input 
-    inputField.addEventListener('input', function() {
-    if (inputField.value == '') {
-        closeBtn.style.display = 'none';
-       
-    } else {
-        closeBtn.style.display = 'block';
+    @media (max-width:632px)
+    {
+    .activity-panel {
         
+        grid-template-columns:1fr;
     }
+    .waste-reason-ststus
+    {
+        grid-template-columns:1fr;
+    }
+    .modal-footer {
+        flex-wrap: nowrap
+    }
+}
+</style>
+
+<!-- Modal -->
+<div class="modal fade" id="activityPanel" tabindex="-1" aria-labelledby="activityPanelLable" aria-hidden="true">
+    <div class="modal-dialog modal-xl" id="activityBox" >
+      
+    </div>
+  </div>
+
+
+
+<!-------------------------------------------------->
+
+
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>  
+<script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
+
+<script>
+    new DataTable('#leads-data', {
+        pagingType: 'simple_numbers'
     });
-  
-    closeBtn.addEventListener('click', function() {
-    inputField.value = '';
-    closeBtn.style.display = 'none';
-    filterTable(); // Display the full table data
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $(document).on("click", ".fetch-lead-details", function(e) {
+       
+            e.preventDefault();
+            var leadId = $(this).data('lead-id');
+            console.log(leadId)
+            fetchLeadDetails(leadId);
+        });
+
+        function fetchLeadDetails(leadId) {
+            $.ajax({
+                url: '/leadActivity_data/' + leadId + '/',  // URL to fetch lead data
+                type: 'GET',
+                success: function(response) {
+                    $('#activityBox').html(response);  // Place the result in activityBox
+                    $('#activityPanel').modal('show');  // Show the modal
+                },
+                error: function(xhr, errmsg, err) {
+                    console.log(xhr.status + ": " + xhr.responseText);
+                }
+            });
+        }
     });
-  </script>
+
+</script>
+
+
 
 {% endblock %}

@@ -3,6 +3,135 @@
 {% load custom_filters %}
 {% block body %}
 
+<style>
+    ul li{
+        list-style: none;
+    }
+    
+    .fieldsBox
+    {   
+        padding: .60rem .40rem;
+        background: #14171eee;
+        box-shadow: rgba(17, 17, 26, 0.05) 0px 1px 0px, rgba(17, 17, 26, 0.1) 0px 0px 8px;
+    }
+    .closeBtn 
+    {
+    color: #e02e2ef9;
+    font-size: 12px;
+    cursor: pointer;
+    }
+    .closeBtn:hover
+    {
+    color: #d32626f9; 
+    }
+
+    .leadDetails
+    {
+        display: none;
+        position: fixed;
+        z-index: 100;
+        top: 4.5rem;
+        right: 0;
+        height: 70%;
+        width: 300px; /* Adjust width as needed */
+        background-color: #15171f; /* Adjust background color as needed */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Adjust box-shadow as needed */
+    
+    }
+    
+    .leadDetails.show {
+        display: block;
+    }
+    .leadDetails-Top
+    {
+        display: grid;
+        grid-template-columns: 1fr 32px;
+       
+    }
+    .leadDetails-Top h6{
+        padding: 1.3rem;
+        letter-spacing: 1.4px;
+        font-weight:400 ;
+        color: #bebebe;
+        font-size: 14px;
+    }
+    .close-x
+    {
+        text-align: end;
+        height: 30px;
+        width: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #dc1a1a;
+        color: #fbfbfb;
+        padding: 5px;
+    }
+    .fields-Details
+    {
+        margin-bottom: 0.10rem;
+        padding-bottom: 0.50rem;
+
+    }
+    #resultContainer 
+    {
+        height: 80%;
+        overflow-y: scroll;
+        background-color: #191f27da;
+    }
+    #resultContainer  p{
+        color: #d0d0d0;
+        letter-spacing: 1px;
+        padding-top: 0.80rem;
+        font-size: 12px;
+        padding-left: 1rem;
+    }
+   
+    #resultContainer ul
+    {
+        padding-top: 0.30rem;
+    }
+    #resultContainer ul li{
+        font-size: 12.3px;
+        padding-bottom: 0.80rem;
+        color: #d0d0d0;
+        letter-spacing: 1px;
+    }
+   
+    #resultContainer::-webkit-scrollbar {
+        width: 2px;
+    }
+    
+    /* For WebKit browsers (Chrome, Safari) */
+    #resultContainer::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    
+    /* For WebKit browsers (Chrome, Safari) */
+    #resultContainer::-webkit-scrollbar-thumb {
+        background: #888; /* Adjust scrollbar thumb color as needed */
+    }
+    @media (max-width:672px)
+    {
+        .leadDetails
+        {
+            width:100%; /* Adjust width as needed */
+            top: 4.4rem;
+            height:90%;
+        }
+        .close-x
+        {
+            padding: 5px;
+        }
+       
+    }
+    
+</style>
+
+
+
+
+
 <div>
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -13,13 +142,26 @@
 </div>
 
 
+
+<div class=" leadDetails">
+    <div class="leadDetails-Top">
+        <h6>Category Fields </h6>
+        <div class="close-x"><span class="mdi mdi-close"></span> </div>
+    </div>
+
+    <div class="fields-Details" id="resultContainer">
+
+    </div>
+   
+       
+</div>
+
+
 <div class="row mt-1">
     <div class="col-12 grid-margin">
         <div class="card">
             <div class="card-body">
-            
-            {% if client_tasks %}
-    
+                {% if client_tasks %}
                 <div class="row">
                     <div class="col-sm-12 col-lg-8 col-md-7 col-xl-9  grid-margin">
                     <h5 class="card-title custom-letter-spacing"> Clients For Lead Collection</h5>
@@ -30,24 +172,21 @@
                         <span class="text-danger mdi mdi-close" id="closeBtn" type="button"></span> 
                     </div>
                     </div>
-                    
                 </div>
         
                 <div class="table-responsive">
                     <table class="table" id="leads-data-client">
-                    <thead>
-                        <tr>
-                        
-                        <th> No</th>
-                        <th> Client Name</th>
-                        <th> Start Date  </th>
-                        <th> End Date </th>
-                        
-                        <th> Progress </th>
-                        <th> Lead Category </th>
-
-                        </tr>
-                    </thead>
+                        <thead>
+                            <tr>
+                            
+                            <th> No</th>
+                            <th> Client Name</th>
+                            <th> Start Date  </th>
+                            <th> End Date </th>
+                            <th > Lead Category </th>
+                            <th> Fileds </th>
+                            </tr>
+                        </thead>
                     <tbody>
                         {% for cl_task in client_tasks %}
                         <tr>
@@ -56,27 +195,7 @@
                         <td>{{ cl_task.client_Id.client_name }}</td>
                         <td>{{ cl_task.work_Id.work_create_date }}</td>
                         <td>{{ cl_task.work_Id.work_end_date }}</td>
-                        <td>
-                            {% if cl_task.task_total_progress <= 10 %}
-                            <div class="progress progress-lg mt-2">
-                              <div class="progress-bar bg-danger" role="progressbar" style="width: {{ cl_task.task_total_progress}} %" aria-valuenow="{{ work_reg.work_progress}} " aria-valuemin="0" aria-valuemax="100">
-                                 <span class="small ml-1">{{ cl_task.task_total_progress}}%</span>
-                              </div>
-                            </div>
-                            {% elif cl_task.task_total_progress >= 10 and cl_task.task_total_progress <= 80 %}
-                            <div class="progress progress-lg mt-2">
-                              <div class="progress-bar bg-warning" role="progressbar" style="width: {{ cl_task.task_total_progress}} %" aria-valuenow="{{ work_reg.work_progress}} " aria-valuemin="0" aria-valuemax="100">
-                                 <span class="small ml-1">{{ cl_task.task_total_progress}}%</span>
-                              </div>
-                            </div>
-                            {% else %}
-                            <div class="progress progress-lg mt-2">
-                              <div class="progress-bar bg-success" role="progressbar" style="width: {{ cl_task.task_total_progress}} %" aria-valuenow="{{ work_reg.work_progress}} " aria-valuemin="0" aria-valuemax="100">
-                                 <span class="small ml-1">{{ cl_task.task_total_progress}}%</span>
-                              </div>
-                            </div>
-                            {% endif %}
-                        </td>
+                        
                         <td>
                            
                             <ul>
@@ -84,35 +203,34 @@
                                 {% if lc.cTaskId.id == cl_task.id %}
                                 <li>
                                     <p>
-                                        <a href="{% url 'head_lead_collected_data' cl_task.work_Id.id lc.id %}">
+                                        <a href="{% url 'head_lead_collected_data' cl_task.work_Id.id lc.id %}" >
                                             <button class="btn btn-outline-warning">
                                                 <span class="small">{{ lc.lead_collection_for }} Collected Data</span>
                                             </button>
                                         </a>
                                     </p>
-                                    <ul>
-                                        <li><p> FullName  </p></li>
-                                        <li><p> Email   </p></li>
-                                        <li><p> Contact  </p></li>
-                                        <li><p> Source  </p></li>
-                                    {% for fields in leadfield_obj %}
-                                    {% if fields.field_lead_category.id == lc.id %}
-                                    <li><p>{{ fields.field_name }} </p></li>
-                                    {% endif %}
-                                    {% endfor %}
-                                    </ul>
+                                   
                                 </li>
                                 
                                 {% endif %}
                                 {% endfor %}
                             </ul>
                         </td>
-                       
+                       <td >
+                        {% for lc in lc_obj %}
+                        {% if lc.cTaskId.id == cl_task.id %}
+                        <button class="btn filed-icon" title="Data Collection Fields"  data-category-id="{{ lc.id }}">
+                            <span class="mdi mdi-file-document mdi-18px"></span>
+                        </button> 
+                        {% endif %}
+                        {% endfor %}
+                            
+                        </td>
                        
                         </tr>
                         {% endfor %}
                     
-                    </tbody>
+                        </tbody>
                     </table>
                 </div>
 
@@ -194,4 +312,55 @@
     filterTable(); // Display the full table data
     });
   </script>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+
+
+<script>
+    $(document).ready(function() {
+        $(document).on("click", ".filed-icon", function() {
+            $(".leadDetails").toggleClass("show");
+        });
+        $(".close-x").click(function() {
+            $(".leadDetails").toggleClass("show");
+        });
+    });
+    
+
+    $(document).ready(function() {
+        $(document).on("click", ".filed-icon", function() {
+            var cId = $(this).data('category-id');
+            console.log(cId)
+            $.ajax({
+                url: "{% url 'HD_featchLeadFields' %}",
+                type: 'GET', 
+                data: {
+                    category_Id: cId
+                },
+                success: function(response) {
+                    console.log('Success')
+                    var categoryFields = response.category_fields;
+        
+                    // Clear any existing content
+                    $('#resultContainer').empty();
+
+                    // Build HTML for list
+                    var html = ' <p  >Fileds : </p> <ul >';
+                    $.each(categoryFields, function(index, field) {
+                        html += '<li>' + field + '</li>';
+                    });
+                    html += '</ul>';
+
+                    // Append HTML to result container
+                    $('#resultContainer').html(html);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching lead details:', error);
+                }
+            });
+        });
+    });
+</script>
+    
 {% endblock %}

@@ -43,28 +43,28 @@ urlpatterns = [
 
     #Lead Section ---------------
     path('Work/Lead-Data/',views.Head_lead_data,name='Head_lead_data'),
+    path('HD_featchLeadFields/',views.HD_featchLeadFields,name='HD_featchLeadFields'),
+    
     path('Work/Lead-Collection/Field-AddForm/',views.head_lead_fieldForm,name='head_lead_fieldForm'),
 
     path('Client/Lead-Data-List/<int:pk>/<int:lcID>',views.head_lead_collected_data,name='head_lead_collected_data'),
-    path('Client/Lead-Data-Verify-Unverify/<int:pk>/',views.head_lead_verify_unverify,name='head_lead_verify_unverify'),
-    path('Client/Lead-Data-Waste-List/<int:pk>/',views.head_lead_mark_waste,name='head_lead_mark_waste'),
+   
+ 
     
 
     path('Lead-add/<int:pk>',views.Head_lead_add,name='Head_lead_add'),
     #Excel Create and download 
     path('download_excel/<int:pk>/<int:lID>',views.download_excel,name='download_excel'),
     path('Upload-Data/<int:pk>/<int:lcID>',views.Head_lead_file_upload,name='Head_lead_file_upload'),
-    path('Duplicate-Data/<int:pk>/<int:lID>',views.duplicate_data,name='duplicate_data'),
     
 
     path('Lead/Transfer-Data',views.head_transfer_lead,name='head_transfer_lead'),
     path('Client/Lead-Transfer-DataManager/',views.head_all_leadTransfer,name='head_all_leadTransfer'),
-    path('Client/SingleLead-Transfer/<int:pk>/',views.head_single_leadTransfer,name='head_single_leadTransfer'),
 
     path('Lead/Transferred-Data',views.head_transferred_lead,name='head_transferred_lead'),
     path('Lead/Waste-Data',views.head_waste_lead,name='head_waste_lead'),
     path('DataManager_WasteLead/',views.datamanager_wasteLead,name='datamanager_wasteLead'),
-    path('Confirm_WasteLead/<int:wasteid>',views.hd_wastelead_confirm,name='hd_wastelead_confirm'),
+    path('Confirm-Reject-Lead/<int:wasteid>/',views.hd_wastelead_confirm_reject,name='hd_wastelead_confirm_reject'),
     
 
     path('Work/Allocate-View-works/',views.head_allocateWorkView,name='head_allocateWorkView'),
@@ -200,6 +200,11 @@ urlpatterns = [
 
     path('Work_allocate/<int:pk>',views.allocate_page,name='allocate_page'),
     path('Fetch_Task_Categories',views.fetch_task_categories,name='fetch_task_categories'),
+    path('Featch-Lead-Details',views.HD_featchLeadDetails,name='HD_featchLeadDetails'),
+
+
+    path('leadActivity_data/<int:lead_id>/', views.leadActivity_data, name='leadActivity_data'),
+    path('Status-Chabge',views.lead_status_change,name='lead_status_change'),
     
 
 ]

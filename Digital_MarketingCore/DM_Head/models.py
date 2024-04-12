@@ -284,7 +284,9 @@ class Leads(models.Model):
     lead_status = models.IntegerField(default=0)
     lead_transfer_date = models.DateField(auto_now=False,null=True)
     lead_transfer_status = models.IntegerField(default=0)
+    lead_incomplete_status = models.IntegerField(default=0)
     target_update_status = models.IntegerField(default=0)
+    repeated_status = models.IntegerField(default=0)
 
 
 class lead_Details(models.Model):

@@ -13,7 +13,8 @@ urlpatterns = [
     path('Admin-Login-Approve\<int:pk>',views.admin_login_approve,name='admin_login_approve'),
     path('Admin-Login-Reject\<int:pk>',views.admin_login_reject,name='admin_login_reject'),
     path('Admin-Logout',views.admin_logout,name='admin_logout'),
-
+ 
+    path('Admin-Checker',views.admin_checker_section,name='admin_checker_section'),
     # Profile ------------------------------
 
     path('Admin-Profile',views.admin_profile,name='admin_profile'),

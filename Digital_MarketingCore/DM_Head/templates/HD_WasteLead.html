@@ -2,6 +2,166 @@
 {% load static %}
 {% load custom_filters %}
 {% block body %}
+<link href="https://cdn.datatables.net/2.0.3/css/dataTables.dataTables.css"  rel="stylesheet" >
+
+<style>
+    .dt-search label
+    {
+     display: none;
+
+    }
+    div.dt-container .dt-search input {
+        border: 1px solid #707070;
+        border-radius: 3px;
+        padding: 5px;
+        background-color: transparent;
+        color: #a5a5a5;
+        margin-left: 3px;
+        font-size: 13px;
+    }
+
+    div.dt-container select.dt-input {
+        padding: 4px 10px;
+        border: 1px solid #707070;
+        color: #a5a5a5;
+        font-size: 13px;
+        background-color: transparent;
+        width: 100px;
+    }
+    div.dt-container select option{
+        background-color: #15171f; 
+    }
+    div.dt-container .dt-length label
+    {
+        display: none;
+    }
+    div.dt-container .dt-info
+    {
+        color: #a5a5a5;
+        font-size: 13px 
+    }
+    .leadDetails
+    {
+        display: none;
+        position: fixed;
+        z-index: 100;
+        top: 4.5rem;
+        right: 0;
+        width: 400px; /* Adjust width as needed */
+        background-color: #15171f; /* Adjust background color as needed */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Adjust box-shadow as needed */
+        height:600px
+    
+    }
+    
+    .leadDetails.show {
+        display: block;
+    }
+    .leadDetails-Top
+    {
+        display: grid;
+        grid-template-columns: 1fr 32px;
+       
+    }
+    .leadDetails-Top h6{
+        padding: 1.3rem;
+        letter-spacing: 1px;
+        font-weight:500 ;
+        color: #dedede;
+    }
+    .close-x
+    {
+        text-align: end;
+        height: 30px;
+        width: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #dc1a1a;
+        color: #fbfbfb;
+        padding: 1px;
+    }
+    .Basic-Details
+    {
+        margin-bottom: 1rem;
+        border-bottom: 1px solid #e9e9e9;
+        padding-bottom: 0.50rem;
+    }
+    .Basic-Details .h6,
+    .More-Deails .h6{
+        padding-left: 1.3rem;
+        color: #dedede;
+        font-size: 14px;
+        margin-top: 0.30rem;
+    }
+    .bd-innerBox
+    {
+        padding-left: 1.3rem;
+        color: #c9c9c9;
+        display: grid;
+        grid-template-columns:1fr 1fr;
+        gap: 0.90rem;
+    
+    }
+    .statusBox
+    {
+        padding-left: 1.3rem;
+        color: #c9c9c9;
+        display: grid;
+        margin-top: 0.875rem;
+        font-size: 14px;
+        grid-template-columns:1fr 1fr 1fr;
+    }
+    .md-innerBox
+    {
+        padding-left: 1.3rem;
+        color: #c9c9c9;
+        font-size: 13px;
+        height: 300px;
+        overflow-y: scroll;
+        padding-bottom: 1rem;
+     
+    }
+    .md-subinner
+    {
+    margin-top: .875rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    }
+    .md-innerBox::-webkit-scrollbar {
+        width: 2px;
+    }
+    
+    /* For WebKit browsers (Chrome, Safari) */
+    .md-innerBox::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    
+    /* For WebKit browsers (Chrome, Safari) */
+    .md-innerBox::-webkit-scrollbar-thumb {
+        background: #888; /* Adjust scrollbar thumb color as needed */
+    }
+    @media (max-width:672px)
+    {
+        .leadDetails
+        {
+            width:100%; /* Adjust width as needed */
+            top: 4.4rem;
+            height:90%;
+        }
+        .close-x
+        {
+            padding: 5px;
+        }
+        .md-innerBox
+        {
+            padding-bottom: 25px;
+            height: 300px;
+        
+        }
+    }
+    
+</style>
 
 
 
@@ -34,60 +194,73 @@
 
 
 
+<div class=" leadDetails">
+    <div class="leadDetails-Top">
+        <h6>Lead Details </h6>
+        <div class="close-x"><span class="mdi mdi-close"></span> </div>
+    </div>
+
+    <div class="Basic-Details">
+        <div class="h6">Basic Details</div>
+        <div class="bd-innerBox">
+            <span class="mdi mdi-account small"><span class="ml-1" id="leadName"></span></span> 
+            <span class="mdi mdi-phone small"><span class="ml-1"  id="leadPhone"></span></span>
+            <span class="mdi mdi-email small"><span class="ml-1"  id="leadEmail"></span></span>
+            
+        </div>
+
+        <div class="statusBox">
+            <span class="mdi small" id="un-verify-icon"><span class="ml-1" id="verify"></span></span> 
+            <span class="mdi mdi-delete-sweep small"><span class="ml-1" id="waste"></span></span> 
+            <span class="mdi mdi-alert small"><span class="ml-1" id="incomplete"></span></span> 
+        </div>
+    </div>
+    <div class="More-Deails">
+        <div class="h6">More Details</div>
+        <div class="md-innerBox">
+            
+        </div>
+    </div>
+       
+</div>
+
+
 <div class="row mt-1">
     <div class="col-12 grid-margin">
         <div class="card">
             <div class="card-body">
 
-            <a href="{% url 'datamanager_wasteLead' %}">
-                <button class="btn btn-outline-secondary">
-                    <span class="mdi mdi-file"></span> 
-                    <span class="text-small">Data Manager</span>
-                    {% if leads_obj_count > 0 %}
-                    <span class=" ml-2 mdi mdi-bell mdi-18px notification-bell"></span>
-                    <span class=" text-small"> {{ leads_obj_count }}</span>
-                    {% endif %}
-            
-                </button>
-            </a>
-            
-            {% if leads_obj %}
-    
                 <div class="row">
                     <div class="col-sm-12 col-lg-8 col-md-7 col-xl-9  grid-margin">
-                    <h5 class="card-title custom-letter-spacing"> Waste Leads List</h5>
+                    <h5 class="card-title custom-letter-spacing"> Waste Leads List ( {{ leads_obj_count }} )</h5>
                     </div>
                     <div class="col-sm-12 col-lg-5 col-md-5 col-xl-3 d-flex justify-content-end  grid-margin">
-                    <div class="d-flex ">
-                        <input  class="form-control text-offwhite mr-1" name="#" id="search-data" placeholder="search here..">
-                        <span class="text-danger mdi mdi-close" id="closeBtn" type="button"></span> 
-                    </div>
+                        <a href="{% url 'datamanager_wasteLead' %}">
+                            <button class="btn btn-outline-secondary">
+                                <span class="mdi mdi-file"></span> 
+                                <span class="text-small">Data Manager</span>
+                                {% if waste_obj_count > 0 %}
+                                <span class=" ml-2 mdi mdi-bell mdi-18px notification-bell"></span>
+                                <span class=" text-small"> {{ waste_obj_count }}</span>
+                                {% endif %}
+                        
+                            </button>
+                        </a>
+                        
                     </div>
                     
                 </div>
-        
+                {% if leads_obj %}
                 <div class="table-responsive">
                     <table class="table" id="leads-data">
                     <thead>
                         <tr>
-                        
-                            
                             <th>No
-                                <!-- <div class="form-check form-check-primary m-0">
-                                  <label class="form-check-label">
-                                    <input type="checkbox" class="form-check-input">
-                                   All</label>
-                                </div>
-                              </th> -->
                             <th>Collected Date</th>
-                            <th>Lead Full Name</th>
-                            <th>Email id  </th>
-                            <th>Contact No </th>
-                            <th> Details  </th>
-                            <th> Collected By </th>
-                            <th> Verification Status </th>
-                            
-                            
+                            <th>Lead Details</th>
+                            <th> Status </th>   
+                            <th> Details  </th>  
+                                  
                         </tr>
                     </thead>
                     <tbody>
@@ -95,49 +268,40 @@
                         <tr>
                         
                        
-                        <td>
-                            <span>{{ forloop.counter }}</span>
-                            <!-- <div class="form-check form-check-primary">
-                                <label class="form-check-label">
-                               <input class="checkbox " id="" type="checkbox">
-                               </label>
-                           </div> -->
-                        </td>
-                        <td>{{ lead.lead_add_date }}</td>
-                        <td>{{ lead.lead_name }}</td>
-                        <td>{{ lead.lead_email }}</td>
-                        <td>{{ lead.lead_contact }}</td>
-                        <td>
-                            
-                            <ol>
-                               
-                                {% for Details in lead_Details_obj %}
-                                {% if Details.leadId.id == lead.id %}
-                                <li>
-                                    <p>
-                                        <span class="mr-1"> {{ Details.lead_field_name }} :</span>
-                                        <span> {{ Details.lead_field_data }} </span>
-                                    </p>
-                                </li>
+                            <td>
+                                <span>{{ forloop.counter }}</span>
+                            </td>
+                            <td>
+                                <p><span class="mdi mdi-account"></span> {{ lead.lead_collect_Emp_id.emp_name }}</p>
+                                <p>{{ lead.lead_add_date }}</p>
+                            </td>
+                            <td>
+                                <p><span class="mdi mdi-account"></span> {{ lead.lead_name }}</p>
+                                <p><span class="mdi mdi-email"></span> {{ lead.lead_email }}</p>
+                                <p><span class="mdi mdi-phone"></span> {{ lead.lead_contact }}</p>
+                            </td>
+                            <td>
+                                {% if lead.lead_status == 1 %}
+                                <span class="text-success small">Verified</span>
                                 {% endif %}
-                                {% endfor %}
-                            </ol>
-                           
-                        </td>
-                        <td> {{ lead.lead_collect_Emp_id.emp_name }}</td>
-                        <td>
-                           
-                            <button class=" btn btn-outline-danger "><span class="mdi mdi-close mr-1 small"> Marked as Waste </span></button>
+                                {% if lead.waste_data == 1 %}
+                                <span class="text-danger small">Waste</span>
+                                {% endif %}
+                                {% if lead.repeated_status == 1 %}
+                                <span class="text-ifo small">Repeated</span>
+                                {% endif %}
+                                
+                            </td>
+                            <td>
+
+                                <a class="small ml-2 text-secondary detailsBox-icon btn btn-sm btn-outline-info" data-lead-id="{{ lead.id }}" title="More Details of Lead">
+                                    <span class="mdi mdi-plus mdi-18px ">  </span> 
+                                </a>
+                                
+                            </td>
                             
-                        </td>
-                        <!-- <td>
-                           
-                            <a href="" class=" btn btn-outline-primary "><span class="mdi mdi-redo-variant mr-1 small"> Transfer</span></a>
-                            
-                        </td> -->
                         
-                        
-                        
+
                         </tr>
                         {% endfor %}
                     
@@ -145,7 +309,7 @@
                     </table>
                 </div>
 
-            {% else %}
+                {% else %}
             
                 <div class="d-flex justify-content-center">
                 <img src="{% static 'images\file-icons\no-data-file.png' %}">
@@ -159,75 +323,101 @@
     </div>
 </div>
 
+
+
+<!------------------------Script Section--------------------------->
+
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
 <script>
-   
-    const inputField = document.getElementById('search-data');
-    const closeBtn = document.getElementById('closeBtn');
-    const empTable = document.getElementById('leads-data');
-    closeBtn.style.display = 'none';
-  
-    inputField.addEventListener('input', function() {
-        filterTable();
+    new DataTable('#leads-data', {
+        pagingType: 'simple_numbers'
     });
-  
-    function filterTable() {
-        const filterValue = inputField.value.toLowerCase();
-        const rows = empTable.getElementsByTagName('tr');
-  
-        for (let i = 1; i < rows.length; i++) {
-            const Cell1 = rows[i].getElementsByTagName('td')[1];
-            const Cell2 = rows[i].getElementsByTagName('td')[2];
-            const Cell3 = rows[i].getElementsByTagName('td')[3];
-            const Cell4 = rows[i].getElementsByTagName('td')[4];
-            const Cell5 = rows[i].getElementsByTagName('td')[5];
-            const Cell6 = rows[i].getElementsByTagName('td')[6];
-            const Cell7 = rows[i].getElementsByTagName('td')[7];
-            
-  
-            if (Cell1 || Cell2 || Cell3 || Cell4|| Cell5 || Cell6 || Cell7) {
-  
-                const datacell1 = Cell1.textContent || Cell1.innerText;
-                const datacell2 = Cell2.textContent || Cell2.innerText;
-                const datacell3 = Cell3.textContent || Cell3.innerText;
-                const datacell4 = Cell4.textContent || Cell4.innerText;
-                const datacell5 = Cell5.textContent || Cell5.innerText;
-                const datacell6 = Cell6.textContent || Cell6.innerText;
-                const datacell7 = Cell7.textContent || Cell7.innerText;
-                
-                
-  
-                if (datacell1.toLowerCase().includes(filterValue) ||
-                 datacell2.toLowerCase().includes(filterValue) || 
-                 datacell3.toLowerCase().includes(filterValue) ||
-                 datacell4.toLowerCase().includes(filterValue) || 
-                 datacell5.toLowerCase().includes(filterValue) ||
-                 datacell6.toLowerCase().includes(filterValue) ||
-                 datacell7.toLowerCase().includes(filterValue)) 
-                {
-                    rows[i].style.display = '';
-                } else {
-                    rows[i].style.display = 'none';
+</script>
+
+<script>
+    $(document).ready(function() {
+        $(document).on("click", ".detailsBox-icon", function() {
+            $(".leadDetails").toggleClass("show");
+        });
+        $(".close-x").click(function() {
+            $(".leadDetails").toggleClass("show");
+        });
+    });
+    
+</script>
+
+<script>
+    $(document).ready(function() {
+        $(document).on("click", ".detailsBox-icon", function() {
+            var leadId = $(this).data('lead-id');
+         
+            $.ajax({
+                url: "{% url 'HD_featchLeadDetails' %}",
+                type: 'GET', 
+                data: {
+                    lead_id: leadId
+                },
+                success: function(response) {
+                    if (response.hasOwnProperty('lead_basic')) {
+                        console.log('success')
+                        var leadBasic = response.lead_basic;
+                        
+                        // Update basic lead details
+                        $("#leadName").text(leadBasic.name);
+                        $("#leadEmail").text(leadBasic.email);
+                        $("#leadPhone").text(leadBasic.phone);
+                      
+                        $("#verify").text(leadBasic.verify);
+                        if ($("#verify").text().trim() == "Verified") {
+                            $("#un-verify-icon").removeClass("mdi-close-circle-outline text-danger");
+                            $("#un-verify-icon").addClass("mdi-check-circle text-success");
+                        }
+                        else{
+                            $("#un-verify-icon").removeClass("mdi-check-circle text-success");
+                            $("#un-verify-icon").addClass("mdi-close-circle-outline text-danger");
+                            
+                            }
+                        
+                        $("#waste").text(leadBasic.waste);
+                        $("#incomplete").text(leadBasic.incomplete);
+    
+                        // Update additional lead details
+                        var leadDetails = response.lead_details;
+                        var mdInnerBox = $(".md-innerBox");
+                        mdInnerBox.empty(); // Clear existing content
+
+                        var subInner = $("<div>").addClass("md-subinner");
+                            var span1 = $("<span>").text('Source' );
+                            var span2 = $("<span>").text( ":  " + leadBasic.source);
+                            subInner.append(span1, span2);
+                            mdInnerBox.append(subInner);
+                        
+                        $.each(leadDetails, function(lead_field_name, lead_field_data) {
+                            var subInner = $("<div>").addClass("md-subinner");
+                            var span1 = $("<span>").text(lead_field_name );
+                            var span2 = $("<span>").text( ":  " + lead_field_data);
+                            subInner.append(span1, span2);
+                            mdInnerBox.append(subInner);
+                        });
+                    } else {
+                        console.error('Error: Lead basic details not found in response');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching lead details:', error);
                 }
-            }
-        }
-    }
-  
-     // To display the close button and hide the close button based on the search input 
-    inputField.addEventListener('input', function() {
-    if (inputField.value == '') {
-        closeBtn.style.display = 'none';
-       
-    } else {
-        closeBtn.style.display = 'block';
-        
-    }
+            });
+        });
     });
-  
-    closeBtn.addEventListener('click', function() {
-    inputField.value = '';
-    closeBtn.style.display = 'none';
-    filterTable(); // Display the full table data
-    });
-  </script>
+</script>
+
+
+
+
+    
 
 {% endblock %}

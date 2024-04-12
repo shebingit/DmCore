@@ -1,0 +1,48 @@
+{% extends 'AD_base.html' %}
+{% load static %}
+{% block body %}
+
+<style>
+    .card-title
+    {
+        color: #d7d7d7 !important;
+        letter-spacing: 1px;
+        font-weight: 600;
+        font-size: 15px;
+    }
+</style>
+<div class="card">
+    <div class="card-body">
+        <h6 class="card-title mb-3">Task Delay Desk  </h6>
+        <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  
+                  <th> No </th>
+                  <th> Name </th>
+                  <th> Email | Phone  </th>
+                  <th> Tasks </th>
+                  <th> Delay </th>
+                  <th> Actions </th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for department in departments %}
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+{% endblock%}

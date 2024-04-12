@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from Telecaller.models import Waste_Leads
 from Registration_Login.models import *
-from DataManager.models import  DataBank
+from DataManager.models import  DataBank,FollowupDetails,FollowupHistory
 from .models import *
 from DataManager.models import PlatForms,PlatFormsData
 from django.core import serializers
@@ -1062,35 +1062,64 @@ def head_transfer_lead(request):
         notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
 
         works_obj = WorkRegister.objects.filter(wcompId=dash_details.emp_comp_id)
-        
+        executive_data = EmployeeRegister_Details.objects.filter(Q(emp_designation_id__dashboard_id=1) | Q(emp_designation_id__dashboard_id=2) | Q(emp_designation_id__dashboard_id=3),emp_comp_id=dash_details.emp_comp_id,emp_active_status=1)
+        clients_ids = ClientTask_Register.objects.filter(task_name='Lead Collection',
+                                                         cTcompId__id=dash_details.emp_comp_id.id).values('client_Id')
+        # Extracting values from queryset
+        client_ids_list = [item['client_Id'] for item in clients_ids]
+        leads_obj = Leads.objects.filter(lead_work_regId__clientId__id__in=client_ids_list,lead_status=1,waste_data=0,lead_transfer_status=0)
+
+        Cl_ID = None
+        Ct_ID = None
+        d1 = None
+        d2 = None
+        emp = None
+
         if request.POST:
             Cl_ID = request.POST['client_change']
             Ct_ID = request.POST['category_name']
-            leads_obj = Leads.objects.filter(lead_work_regId__clientId__id=Cl_ID,lead_category_id__id=Ct_ID,lead_status=1,waste_data=0,lead_transfer_status=0)
-            
-        else:
-           
-            leads_obj = Leads.objects.filter(lead_work_regId__in=works_obj,lead_status=1,waste_data=0,lead_transfer_status=0)
-            
+            emp = request.POST['select_emp']
+            d1 = request.POST['sdate']
+            d2 = request.POST['edate']
 
+        else :
+            Cl_ID = request.GET.get('Cl_ID')
+            Ct_ID = request.GET.get('Ct_ID')
+            emp = request.GET.get('employee')
+            d1 = request.GET.get('start_date')
+            d2 = request.GET.get('end_date')
+
+
+        if Cl_ID and Ct_ID:
+                leads_obj = leads_obj.filter(lead_work_regId__clientId__id=Cl_ID,lead_category_id__id=Ct_ID)
+            
+        if d1:
+                leads_obj = leads_obj.filter(lead_add_date__gte=d1)
+        if d2:
+                leads_obj = leads_obj.filter(lead_add_date__lte=d2)
+        if emp:
+            leads_obj = leads_obj.filter(lead_collect_Emp_id__id=emp)
+
+
+            
         clients_objs = ClientTask_Register.objects.filter(task_name='Lead Collection',cTcompId__id=dash_details.emp_comp_id.id)
         
-        page = request.GET.get('page', 1)
-        paginator = Paginator(leads_obj,50)  
-        try:
-            items = paginator.page(page)
-        
-        except PageNotAnInteger:
-            items = paginator.page(1)
-        except EmptyPage:
-            items = paginator.page(paginator.num_pages)
+        paginator = Paginator(leads_obj, 20)  # Show 10 leads per page
+        page_number = request.GET.get('page')
+       
+        leads = paginator.get_page(page_number)
+
+        leads_obj_count = leads_obj.count()
         
         content = {'emp_dash':emp_dash,
                     'dash_details':dash_details,
                     'notifications':notifications,
+                    'executive_data':executive_data,
                     'works_obj':works_obj,
                     'clients_objs':clients_objs,
-                    'leads_obj':leads_obj,
+                    'leads':leads,
+                    'leads_obj_count':leads_obj_count,
+                    'Cl_ID':Cl_ID,'Ct_ID':Ct_ID,'employee':emp,'start_date':d1,'end_date':d2
                     
                     }
 
@@ -1126,13 +1155,13 @@ def head_transferred_lead(request):
                 leads_obj_count = Leads.objects.filter(lead_work_regId__in=works_obj,lead_status=1,waste_data=0,lead_transfer_status=1,lead_transfer_date__gte=date1,lead_transfer_date__lte=date2).count()
             else:
 
-                leads_obj = Leads.objects.filter(lead_work_regId__in=works_obj,lead_status=1,waste_data=0,lead_transfer_status=1)
-                leads_obj_count = Leads.objects.filter(lead_work_regId__in=works_obj,lead_status=1,waste_data=0,lead_transfer_status=1).count()
+                leads_obj = Leads.objects.filter(lead_work_regId__in=works_obj,lead_status=1,waste_data=0,lead_transfer_status=1,lead_transfer_date=date.today())
+                leads_obj_count = Leads.objects.filter(lead_work_regId__in=works_obj,lead_status=1,waste_data=0,lead_transfer_status=1,lead_transfer_date=date.today()).count()
 
         else:
 
-            leads_obj = Leads.objects.filter(lead_work_regId__in=works_obj,lead_status=1,waste_data=0,lead_transfer_status=1)
-            leads_obj_count = Leads.objects.filter(lead_work_regId__in=works_obj,lead_status=1,waste_data=0,lead_transfer_status=1).count()
+            leads_obj = Leads.objects.filter(lead_work_regId__in=works_obj,lead_status=1,waste_data=0,lead_transfer_status=1,lead_transfer_date=date.today())
+            leads_obj_count = Leads.objects.filter(lead_work_regId__in=works_obj,lead_status=1,waste_data=0,lead_transfer_status=1,lead_transfer_date=date.today()).count()
         
         lead_Details_obj = lead_Details.objects.filter(leadId__in=leads_obj)
         
@@ -1169,8 +1198,8 @@ def head_waste_lead(request):
 
         works_obj = WorkRegister.objects.filter(wcompId=dash_details.emp_comp_id)
         leads_obj = Leads.objects.filter(lead_work_regId__in=works_obj,waste_data=1)
-        lead_Details_obj = lead_Details.objects.filter(leadId__in=leads_obj)
-        leads_obj_count = Waste_Leads.objects.filter(Status=1,confirmation=0,leadId__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id).count()
+        leads_obj_count = leads_obj.count()
+        waste_obj_count = Waste_Leads.objects.filter(confirmation=0,leadId__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id).count()
         
         
 
@@ -1179,7 +1208,7 @@ def head_waste_lead(request):
                     'notifications':notifications,
                     'works_obj':works_obj,
                     'leads_obj':leads_obj,
-                     'lead_Details_obj':lead_Details_obj,
+                    'waste_obj_count':waste_obj_count,
                      'leads_obj_count':leads_obj_count,
                     }
 
@@ -1205,7 +1234,6 @@ def datamanager_wasteLead(request):
 
         leads_obj = Waste_Leads.objects.filter(leadId__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id).order_by('Status')
         leads_ids = Waste_Leads.objects.filter(leadId__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id).values_list('leadId')
-        lead_Details_obj = lead_Details.objects.filter(leadId__in=leads_ids)
         leads_obj_count = Waste_Leads.objects.filter(leadId__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id).order_by('Status').count()
         
         content = {'emp_dash':emp_dash,
@@ -1213,7 +1241,7 @@ def datamanager_wasteLead(request):
                     'notifications':notifications,
                     'leads_obj_count':leads_obj_count,
                     'leads_obj':leads_obj,
-                     'lead_Details_obj':lead_Details_obj,
+                    
                     }
 
 
@@ -1223,7 +1251,7 @@ def datamanager_wasteLead(request):
             return redirect('/')  
 
 
-def hd_wastelead_confirm(request,wasteid):
+def hd_wastelead_confirm_reject(request,wasteid):
 
     if 'emp_id' in request.session:
         if request.session.has_key('emp_id'):
@@ -1238,42 +1266,50 @@ def hd_wastelead_confirm(request,wasteid):
         # Notification-----------
         notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
 
-        confirm_obj = Waste_Leads.objects.get(id=wasteid)
-        confirm_obj.confirmation=1
-        confirm_obj.save()
+        if request.POST:
+            status_v = request.POST['status_val']
+            status_reason = request.POST['head_reason']
+            confirm_obj = Waste_Leads.objects.get(id=wasteid)
+            confirm_obj.confirmation=status_v
+            confirm_obj.head_reason = status_reason
+            confirm_obj.save()
+           
+            if status_v == '2':
+                success_text='Data rejected successfully.'
+            else:
+                success_text='Data confirmed as waste successfully.'
+                
 
-        success_text='Data confirmed as waste successfully.'
-        success = True
+                # Waste Data notification----
 
-        # Waste Data notification----
+                emp_obj = EmployeeRegister_Details.objects.filter(emp_designation_id__dashboard_id=5)
 
-        emp_obj = EmployeeRegister_Details.objects.filter(emp_designation_id__dashboard_id=5)
+                for emp in emp_obj:
 
-        for emp in emp_obj:
+                    notific_obj = Notification()
+                    notific_obj.emp_id = emp
+                    notific_obj.notific_head =' Waste Lead Confirmation.'
+                    notific_obj.notific_content = (
+                        dash_details.emp_name +
+                        ' ( ' +
+                        dash_details.emp_designation_id.desig_name +
+                        ' ) ' +
+                        ' has confirmed the lead ' +
+                        confirm_obj.leadId.lead_name +
+                        ' ( ' +
+                        confirm_obj.leadId.lead_category_id.lead_collection_for +
+                    ' ) as a waste lead.'
+                    )
 
-            notific_obj = Notification()
-            notific_obj.emp_id = emp
-            notific_obj.notific_head =' Waste Lead Confirmation.'
-            notific_obj.notific_content = (
-                dash_details.emp_name +
-                ' ( ' +
-                dash_details.emp_designation_id.desig_name +
-                ' ) ' +
-                ' has confirmed the lead ' +
-                confirm_obj.leadId.lead_name +
-                ' ( ' +
-                confirm_obj.leadId.lead_category_id.lead_collection_for +
-            ' ) as a waste lead.'
-            )
+                    notific_obj.notific_time = timezone
 
-            notific_obj.notific_time = timezone
+                    notific_obj.save()
 
-            notific_obj.save()
+            success = True
 
         leads_obj = Waste_Leads.objects.filter(leadId__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id).order_by('Status')
         leads_obj_count = Waste_Leads.objects.filter(leadId__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id).order_by('Status').count()
-        leads_ids = Waste_Leads.objects.filter(leadId__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id).values_list('leadId')
-        lead_Details_obj = lead_Details.objects.filter(leadId__in=leads_ids)
+      
         
         content = {'emp_dash':emp_dash,
                     'dash_details':dash_details,
@@ -1282,7 +1318,7 @@ def hd_wastelead_confirm(request,wasteid):
                     'success':success,
                     'leads_obj':leads_obj,
                     'leads_obj_count':leads_obj_count,
-                     'lead_Details_obj':lead_Details_obj,
+                    
                     }
 
 
@@ -1290,6 +1326,7 @@ def hd_wastelead_confirm(request,wasteid):
 
     else:
             return redirect('/')  
+
 
 def Head_lead_data(request):
     if 'emp_id' in request.session:
@@ -1324,7 +1361,28 @@ def Head_lead_data(request):
         return render(request,'HD_Leaddata.html',content)
 
     else:
-            return redirect('/')         
+            return redirect('/')    
+
+def HD_featchLeadFields(request):
+    if request.method == 'GET':
+        category_Id = request.GET.get('category_Id')
+
+        try:
+           
+            lc_obj = LeadCategory_Register.objects.get(id=category_Id)
+          
+            lead_fields = LeadField_Register.objects.filter(field_lead_category=lc_obj)
+            lead_fields_list = []  
+
+            for fields in lead_fields:
+                lead_fields_list.append(fields.field_name)
+
+            return JsonResponse({'category_fields': lead_fields_list})
+        
+        except LeadCategory_Register.DoesNotExist:
+            return JsonResponse({'error': ' Categoryr not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request'}, status=400)     
 
 
      
@@ -1343,87 +1401,200 @@ def head_lead_collected_data(request,pk,lcID):
         notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
 
         works_obj = WorkRegister.objects.get(id=pk)
-        lf_obj = LeadField_Register.objects.filter(field_lead_category__id=lcID)
+        lc_obj=LeadCategory_Register.objects.get(id=lcID)
+        executive_data = EmployeeRegister_Details.objects.filter(Q(emp_designation_id__dashboard_id=1) | Q(emp_designation_id__dashboard_id=2) | Q(emp_designation_id__dashboard_id=3),emp_comp_id=dash_details.emp_comp_id,emp_active_status=1)
+        leads_obj = Leads.objects.filter(lead_work_regId=works_obj,lead_category_id__id=lcID,lead_transfer_status=0).order_by('-lead_add_date')
+        leads_obj_count = leads_obj.count()
+        
+        d1= None
+        d2= None
+        emp_id = None
+        status_change = None
 
         if request.POST:
 
             d1 = request.POST['sdate']
             d2 = request.POST['edate']
-            emp_id = request.POST['empID']
+            emp_id = request.POST['select_emp']
+            status_change = request.POST['select_status']
 
-            if d1 and d2 and (emp_id == '0') :
+        else: 
+            d1 = request.GET.get('start_date')
+            d2 = request.GET.get('end_date')
+            emp_id = request.GET.get('employee')
+            status_change = request.GET.get('status')
 
-               
-                leads_obj = Leads.objects.filter(lead_work_regId=works_obj,lead_category_id__id=lcID,lead_add_date__gte=d1,lead_add_date__lte=d2,lead_transfer_status=0).order_by('-lead_add_date')
-                leads_obj =leads_obj.order_by('waste_data')
+
+        if d1:
+
+                leads_obj = leads_obj.filter(lead_add_date__gte=d1)
                 leads_obj_count = leads_obj.count()
 
-            elif d1 and d2 and (emp_id != '0'):
-
-              
-                leads_obj = Leads.objects.filter(lead_work_regId=works_obj,lead_category_id__id=lcID,lead_add_date__gte=d1,lead_add_date__lte=d2,lead_collect_Emp_id__id=emp_id,lead_transfer_status=0).order_by('lead_add_date')
-                leads_obj =leads_obj.order_by('waste_data')
-                leads_obj_count = leads_obj.count()
-            
-            elif (emp_id != '0'):
-
-                leads_obj = Leads.objects.filter(lead_work_regId=works_obj,lead_category_id__id=lcID,lead_collect_Emp_id__id=emp_id,lead_transfer_status=0).order_by('-lead_add_date')
-                leads_obj =leads_obj.order_by('waste_data')
+        if d2:
+                leads_obj = leads_obj.filter(lead_add_date__lte=d2)
                 leads_obj_count = leads_obj.count()
             
-            else:
+        if emp_id :
 
+                leads_obj = leads_obj.filter(lead_collect_Emp_id__id=emp_id)
+                leads_obj_count = leads_obj.count()
+
+
+        if status_change == 'Exist':
+            lead_ids_list = []
+            count_val = 0
+            for lead in leads_obj:
                 
+                try:
+                    leads_obj_check = Leads.objects.get(id=lead.id)
+                    count_val = count_val + 1
+                    email_exists = DataBank.objects.filter(lead_Id__lead_category_id=leads_obj_check.lead_category_id,lead_Id__lead_email=leads_obj_check.lead_email).exists()
+                    phone_exists = DataBank.objects.filter(lead_Id__lead_category_id=leads_obj_check.lead_category_id,lead_Id__lead_contact=leads_obj_check.lead_contact).exists()
 
-                leads_obj = Leads.objects.filter(lead_work_regId=works_obj,lead_category_id__id=lcID,lead_transfer_status=0).order_by('-lead_add_date')
-                leads_obj =leads_obj.order_by('waste_data')
-                leads_obj_count = leads_obj.count()
-
-        else:
+                    if email_exists or phone_exists:
+                        lead_id = lead.id
+                        lead_ids_list.append(lead_id)
         
-            leads_obj = Leads.objects.filter(lead_work_regId=works_obj,lead_category_id__id=lcID,lead_transfer_status=0).order_by('-lead_add_date')
-            leads_obj =leads_obj.order_by('waste_data')
+                except Leads.DoesNotExist:
+                        continue
+            leads_obj = leads_obj.filter(id__in=lead_ids_list,waste_data=0)
             leads_obj_count = leads_obj.count()
 
-        lead_Details_obj = lead_Details.objects.filter(leadId__in=leads_obj)
-
-        executive_data = EmployeeRegister_Details.objects.filter(Q(emp_designation_id__dashboard_id=1) | Q(emp_designation_id__dashboard_id=2) | Q(emp_designation_id__dashboard_id=3),emp_comp_id=dash_details.emp_comp_id)
             
-        lc_obj=LeadCategory_Register.objects.get(id=lcID)
+        else:
+                if status_change == 'Verified':
+                    status_val=1
+                    leads_obj = leads_obj.filter(lead_status=status_val)
+                if status_change == 'Unverified':
+                    status_val=0
+                    leads_obj = leads_obj.filter(lead_status=status_val)
+                if status_change == 'Waste':
+                    status_val=1
+                    leads_obj = leads_obj.filter(waste_data=status_val)
+                if status_change == 'Repeated':
+                    status_val=1
+                    leads_obj = leads_obj.filter(repeated_status=status_val)
+                if status_change == 'Incompleted':
+                    status_val=1
+                    leads_obj = leads_obj.filter(lead_incomplete_status=status_val)
+                if status_change == 'Transfer':
+                    leads_obj = Leads.objects.filter(lead_work_regId=works_obj,lead_category_id__id=lcID,lead_transfer_status=1).order_by('-lead_add_date')
+                leads_obj_count = leads_obj.count()
+
+        paginator = Paginator(leads_obj, 10)  # Show 10 leads per page
+        page_number = request.GET.get('page')
+       
+        leads = paginator.get_page(page_number)
 
 
-        page = request.GET.get('page', 1)
-        paginator = Paginator(leads_obj,100)  # Show 10 items per page
-        try:
-            items = paginator.page(page)
-        
-        except PageNotAnInteger:
-            items = paginator.page(1)
-        except EmptyPage:
-            items = paginator.page(paginator.num_pages)
-
-        
+        lf_obj = LeadField_Register.objects.filter(field_lead_category__id=lcID)
 
         content = {'emp_dash':emp_dash,
                     'dash_details':dash_details,
                     'notifications':notifications,
                     'works_obj':works_obj,
-                    'leads_obj':items,
-                     'lead_Details_obj':lead_Details_obj,
                      'leads_obj_count':leads_obj_count,
-                     'lf_obj':lf_obj,
-                     'lcID':lcID,
                      'lc_obj':lc_obj,
+                     'lf_obj':lf_obj,
                      'executive_data':executive_data,
                      'lcID':lcID,
+                     'leads_obj':leads_obj,
+                     'status_change':status_change,
+                     'leads': leads, 'status': status_change, 'employee': emp_id, 'start_date': d1, 'end_date': d2
                     }
 
         return render(request,'HD_ClientLead_datalist.html',content)
 
     else:
             return redirect('/')
+    
 
 
+# april 02 2024 ----------------------
+
+def lead_status_change(request):
+    selected_value = request.POST.get('selected_value')
+    checked_values = request.POST.get('checked_values')
+
+    id_list = checked_values.split(',') 
+    works_obj = request.POST.get('wID')
+    lcID = request.POST.get('lID')
+    
+
+    if selected_value:
+        count_val = 0
+        for ids in id_list:
+            count_val = count_val + 1
+
+            try:
+                    leads_obj = Leads.objects.get(id=ids,
+                                                lead_work_regId__id=works_obj,
+                                                lead_category_id__id=lcID,
+                                                lead_transfer_status=0)
+            except Leads.DoesNotExist:
+                    continue
+
+            if selected_value == 'Verified':
+                            status_val=1
+                            leads_obj.lead_status=status_val
+
+            if selected_value == 'Unverified':
+                            status_val=0
+                            leads_obj.lead_status=status_val
+                
+            if selected_value == 'Waste':
+                            status_val=1
+                            leads_obj.waste_data=status_val
+            if selected_value == 'Incompleted':
+                            status_val=1
+                            leads_obj.lead_incomplete_status=status_val
+            leads_obj.save()
+        
+    return JsonResponse({'message': f'Data marked as {count_val} successfully for {selected_value}.','work_id':works_obj,'lcid':lcID})
+
+
+def HD_featchLeadDetails(request):
+    if request.method == 'GET':
+        lead_id = request.GET.get('lead_id')
+        try:
+            lead_more=[]
+
+            lead = Leads.objects.get(id=lead_id)
+            if lead.lead_status == 1:
+                verify='Lead is Verified'
+            else:
+                 verify='Lead is Unverified'
+
+            if lead.waste_data == 1:
+                waste='Lead is marked as waste '
+            else:
+                 waste='Lead is  not a waste'
+
+            if lead.lead_incomplete_status == 1:
+                incomplete='Incompleted Data'
+            else:
+                incomplete='Not Marked as Incompleted '
+            lead_basic = {
+                'name': lead.lead_name,
+                'email': lead.lead_email,
+                'phone': lead.lead_contact,
+                'verify':verify,
+                'waste':waste,
+                'incomplete':incomplete,
+                'source':lead.lead_source
+            }
+
+            lead_details = lead_Details.objects.filter(leadId=lead)
+            lead_details_dict = {}  
+            for detail in lead_details:
+                lead_details_dict[detail.lead_field_name] = detail.lead_field_data
+
+            return JsonResponse({'lead_basic': lead_basic, 'lead_details': lead_details_dict})
+        
+        except Leads.DoesNotExist:
+            return JsonResponse({'error': 'Lead not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
 
      
 def categoryleadt_details(request,catelcid):
@@ -1466,47 +1637,6 @@ def categoryleadt_details(request,catelcid):
 
 
 
-def head_lead_mark_waste(request,pk):
-     
-    lead_obj = Leads.objects.get(id=pk)
-
-    if lead_obj.waste_data == 0:
-        lead_obj.waste_data = 1
-        
-        lead_obj.save()
-    else:
-        lead_obj.waste_data = 0  
-        lead_obj.save()
-
-    wId = lead_obj.lead_work_regId.id
-    lcId = lead_obj.lead_category_id.id
-    
-    return redirect('head_lead_collected_data',wId,lcId)
-
-
-def head_lead_verify_unverify(request,pk):
-
-    try: 
-        lead_obj = Leads.objects.get(id=pk,waste_data=0)
-
-        if lead_obj.lead_status == 0:
-            lead_obj.lead_status = 1
-        else:
-            lead_obj.lead_status = 0 
-        
-        wId = lead_obj.lead_work_regId.id
-        lcId = lead_obj.lead_category_id.id
-        #lead_obj.save()
-        return redirect('head_lead_collected_data',wId,lcId)
-
-    except Leads.DoesNotExist:
-
-        lead_obj = Leads.objects.get(id=pk)
-        wId = lead_obj.lead_work_regId.id
-        lcId = lead_obj.lead_category_id.id
-
-        return redirect('head_lead_collected_data',wId,lcId)
-     
 
 def Head_lead_add(request,pk):
      
@@ -1537,6 +1667,7 @@ def Head_lead_add(request,pk):
             ld_obj.lead_email = request.POST['leadEmail']
             ld_obj.lead_contact =request.POST['leadContact']
             ld_obj.lead_source =request.POST['source']
+            ld_obj.lead_add_time =  timezone.now()
             ld_obj.lead_category_id =LeadCategory_Register.objects.get(id=request.POST['lcid'])
             ld_obj.save()
             lcID = request.POST['lcid']
@@ -1596,7 +1727,7 @@ def download_excel(request,pk,lID):
     wb = Workbook()
     ws = wb.active
 
-    additional_headers = ["Full Name", "Email Id", "Contact Number", "Source of Lead"]
+    additional_headers = ["Full Name", "Email Id", "Contact Number", "Source of Lead", "Lead Add Time"]
 
     headers = list(LeadField_Register.objects.filter(field_work_regId=wId,field_lead_category__id=lID).values_list('field_name', flat=True))
     all_headers = additional_headers + headers
@@ -1657,6 +1788,7 @@ def Head_lead_file_upload(request,pk,lcID):
                     lead.lead_email = lead_data['Email Id']
                     lead.lead_contact = lead_data['Contact Number']
                     lead.lead_source = lead_data['Source of Lead']
+                    lead.lead_add_time = lead_data['Lead Add Time']
                     lead.lead_category_id= LeadCategory_Register.objects.get(id=lcID)
                     lead.save()
 
@@ -1698,52 +1830,7 @@ def Head_lead_file_upload(request,pk,lcID):
             return redirect('/')
     
 
-def duplicate_data(request,pk,lID):
-    if 'emp_id' in request.session:
-        if request.session.has_key('emp_id'):
-            emp_id = request.session['emp_id']
-           
-        else:
-            return redirect('/')
-        
-        emp_dash = LogRegister_Details.objects.get(id=emp_id)
-        dash_details = EmployeeRegister_Details.objects.get(logreg_id=emp_dash)
 
-        # Notification-----------
-        notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
-
-        
-
-        works_obj = WorkRegister.objects.get(id=pk)
-
-        duplicate_data = Leads.objects.filter(lead_work_regId=works_obj,lead_category_id__id=lID).values('lead_email', 'lead_contact').annotate(
-        email_count=Count('lead_email'),
-        contact_count=Count('lead_contact')).filter(email_count__gt=1, contact_count__gt=1)
-
-
-        leads_obj = Leads.objects.filter(Q(lead_email__in=duplicate_data.values('lead_email')) | Q(lead_contact__in=duplicate_data.values('lead_contact'))).filter(lead_category_id__id=lID)            
-        leads_obj_count = Leads.objects.filter(Q(lead_email__in=duplicate_data.values('lead_email')) | Q(lead_contact__in=duplicate_data.values('lead_contact'))).filter(lead_category_id__id=lID).count()
-      
-        lf_obj = LeadField_Register.objects.filter(field_work_regId=works_obj)
-        lead_Details_obj = lead_Details.objects.filter(leadId__in=leads_obj)
-        
-
-        content = {'emp_dash':emp_dash,
-                    'dash_details':dash_details,
-                    'notifications':notifications,
-                    'works_obj':works_obj,
-                    'leads_obj':leads_obj,
-                     'lead_Details_obj':lead_Details_obj,
-                     'leads_obj_count':leads_obj_count,
-                     'lf_obj':lf_obj,
-                     'lcID':lID
-                    }
-
-        return render(request,'HD_ClientLead_datalist.html',content)
-
-    else:
-            return redirect('/')
-     
 
 def head_all_leadTransfer(request):
     if 'emp_id' in request.session:
@@ -1759,6 +1846,10 @@ def head_all_leadTransfer(request):
         # Notification-----------
         notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
 
+        count_val = 0
+        trns_val = 0
+        bal_lead = 0
+
         if request.POST:
             
             if request.POST.getlist('lead_check'):
@@ -1766,77 +1857,94 @@ def head_all_leadTransfer(request):
                 leads_obj = Leads.objects.filter(id__in=leadChecked,lead_status=1,waste_data=0,lead_transfer_status=0)
 
                 for l in leads_obj:
-                 
-                    l.lead_transfer_status = 1
-                    l.lead_transfer_date = date.today()
-                    l.save()
-                    db_obj = DataBank()
-                    db_obj.lead_Id = Leads.objects.get(id=l.id)
-                    db_obj.lead_status ='Not Attended'
-                    db_obj.save()
-                
-                    if l.lead_source:
-                       
-                        try:
-                            pf_obj = PlatForms.objects.get(platform_Name__iexact=l.lead_source,company_Id__id=dash_details.emp_comp_id.id) 
-                            pf_obj.platform_TotalCount = pf_obj.platform_TotalCount +1
-                            pf_obj.save()
+                    lead_ids_list = []
+                   
 
-                        except PlatForms.DoesNotExist:
-                            pf_obj = PlatForms()
-                            pf_obj.company_Id=dash_details.emp_comp_id
-                            pf_obj.platform_Name = l.lead_source
-                            pf_obj.platform_TotalCount = pf_obj.platform_TotalCount +1
-                            pf_obj.save()
+                    try:
+                        leads_obj_check = Leads.objects.get(id=l.id)
+                        count_val = count_val + 1
+                        email_exists = DataBank.objects.filter(lead_Id__lead_category_id=leads_obj_check.lead_category_id,lead_Id__lead_email=leads_obj_check.lead_email).exists()
+                        phone_exists = DataBank.objects.filter(lead_Id__lead_category_id=leads_obj_check.lead_category_id,lead_Id__lead_contact=leads_obj_check.lead_contact).exists()
+
+                        if email_exists or phone_exists:
+                            lead_id = l.id
+                            l.repeated_status = 1
+                            l.save()
+                            lead_ids_list.append(lead_id)
+
+                        else:
+ 
+                            l.lead_transfer_status = 1
+                            l.lead_transfer_date = date.today()
+                            l.save()
+                            db_obj = DataBank()
+                            db_obj.lead_Id = Leads.objects.get(id=l.id)
+                            db_obj.lead_status ='Not Attended'
+                            db_obj.save()
+                            trns_val = trns_val + 1
+
+                            if l.lead_source:
                             
-                        except Exception as e:
-                            print('An error occurred:', e)
+                                try:
+                                    pf_obj = PlatForms.objects.get(platform_Name__iexact=l.lead_source,company_Id__id=dash_details.emp_comp_id.id) 
+                                    pf_obj.platform_TotalCount = pf_obj.platform_TotalCount +1
+                                    pf_obj.save()
+
+                                except PlatForms.DoesNotExist:
+                                    pf_obj = PlatForms()
+                                    pf_obj.company_Id=dash_details.emp_comp_id
+                                    pf_obj.platform_Name = l.lead_source
+                                    pf_obj.platform_TotalCount = pf_obj.platform_TotalCount +1
+                                    pf_obj.save()
+                                    
+                                except Exception as e:
+                                    print('An error occurred:', e)
 
 
-                        try:
-                            pfd = PlatFormsData.objects.get(data_add_date=date.today(),platform_name__iexact=l.lead_source,Pfd_company_Id__id=dash_details.emp_comp_id.id)
-                            pfd.platform_dataCount = pfd.platform_dataCount +1
-                            pfd.save()
+                                try:
+                                    pfd = PlatFormsData.objects.get(data_add_date=date.today(),platform_name__iexact=l.lead_source,Pfd_company_Id__id=dash_details.emp_comp_id.id)
+                                    pfd.platform_dataCount = pfd.platform_dataCount +1
+                                    pfd.save()
 
-                        except PlatFormsData.DoesNotExist:
-                            pfd = PlatFormsData()
-                            pfd.Pfd_company_Id=dash_details.emp_comp_id
-                            pfd.platform_name = l.lead_source
-                            pfd.platform_dataCount = pfd.platform_dataCount +1
-                            pfd.save()
-                           
-                        except Exception as e:
-                            print('An error occurred:', e)
-
-
+                                except PlatFormsData.DoesNotExist:
+                                    pfd = PlatFormsData()
+                                    pfd.Pfd_company_Id=dash_details.emp_comp_id
+                                    pfd.platform_name = l.lead_source
+                                    pfd.platform_dataCount = pfd.platform_dataCount +1
+                                    pfd.save()
+                                
+                                except Exception as e:
+                                    print('An error occurred:', e)
+                    except Leads.DoesNotExist:
+                        continue
 
                 success = True
-                success_text = 'Leads Transfered Successfully.'
+                success_text = f'{trns_val} Leads Transfered Successfully.'
+
+                
 
                 works_obj = WorkRegister.objects.filter(wcompId=dash_details.emp_comp_id)
                 leads_obj = Leads.objects.filter(lead_work_regId__in=works_obj,lead_status=1,waste_data=0,lead_transfer_status=0)
-                lead_Details_obj = lead_Details.objects.filter(leadId__in=leads_obj)
+                leads_obj_count = leads_obj.count()
                 
-                page = request.GET.get('page', 1)
-                paginator = Paginator(leads_obj,50)  
-                try:
-                    items = paginator.page(page)
-                
-                except PageNotAnInteger:
-                    items = paginator.page(1)
-                except EmptyPage:
-                    items = paginator.page(paginator.num_pages)
+                paginator = Paginator(leads_obj, 20)  # Show 10 leads per page
+                page_number = request.GET.get('page')
+            
+                leads = paginator.get_page(page_number)
                 
                 clients_objs = ClientTask_Register.objects.filter(task_name='Lead Collection',cTcompId__id=dash_details.emp_comp_id.id)
+                bal_lead = count_val - trns_val
+
                 content = {'emp_dash':emp_dash,
                             'dash_details':dash_details,
                             'notifications':notifications,
                             'success':success,
                             'success_text':success_text,
                             'works_obj':works_obj,
-                            'leads_obj':items,
+                            'leads':leads,
                             'clients_objs':clients_objs,
-                            'lead_Details_obj':lead_Details_obj,
+                            'bal_lead':bal_lead,
+                            'leads_obj_count':leads_obj_count
                             }
 
                 return render(request,'HD_TransferLead.html',content)
@@ -1852,67 +1960,6 @@ def head_all_leadTransfer(request):
             return redirect('/')     
 
 
-def head_single_leadTransfer(request,pk): 
-    if 'emp_id' in request.session:
-        if request.session.has_key('emp_id'):
-            emp_id = request.session['emp_id']
-           
-        else:
-            return redirect('/')
-        
-        emp_dash = LogRegister_Details.objects.get(id=emp_id)
-        dash_details = EmployeeRegister_Details.objects.get(logreg_id=emp_dash)
-
-        # Notification-----------
-        notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
-
-        
-        try:    
-            lead_obj = Leads.objects.get(id=pk,lead_status=1,waste_data=0,lead_transfer_status=0)
-
-            lead_obj.lead_transfer_status = 1
-            lead_obj.lead_transfer_date = date.today()
-            lead_obj.save()
-            db_obj = DataBank()
-            db_obj.lead_Id = Leads.objects.get(id=lead_obj.id)
-            db_obj.save()
-
-            works_obj = WorkRegister.objects.filter(wcompId=dash_details.emp_comp_id)
-            leads_obj = Leads.objects.filter(lead_work_regId__in=works_obj,lead_status=1,waste_data=0,lead_transfer_status=0)
-            lead_Details_obj = lead_Details.objects.filter(leadId__in=leads_obj)
-            
-            success = True
-            success_text = 'Lead Transfered Successfully.'
-
-            page = request.GET.get('page', 1)
-            paginator = Paginator(leads_obj,50)  
-
-            try:
-                items = paginator.page(page)
-                
-            except PageNotAnInteger:
-                items = paginator.page(1)
-            except EmptyPage:
-                items = paginator.page(paginator.num_pages)
-
-            content = {'emp_dash':emp_dash,
-                        'dash_details':dash_details,
-                        'notifications':notifications,
-                        'success':success,
-                        'success_text':success_text,
-                        'works_obj':works_obj,
-                        'leads_obj':items,
-                        'lead_Details_obj':lead_Details_obj,
-                        }
-
-            return render(request,'HD_TransferLead.html',content)
-        
-        except Leads.DoesNotExist:
-             
-            return redirect('head_transfer_lead')
-
-    else:
-            return redirect('/')  
 
 
 
@@ -4792,3 +4839,21 @@ def fetch_task_categories(request):
     except Exception as e:
         # Handle exceptions and return a JSON response indicating failure
         return JsonResponse({'success': False, 'message': str(e)})
+
+
+def leadActivity_data(request,lead_id):
+    wl_lead = Waste_Leads.objects.get(id=lead_id) 
+    fd_objs = FollowupDetails.objects.filter(lead_Id=wl_lead.leadId).order_by('-id')
+    fl_history = FollowupHistory.objects.filter(hs_lead_Id=wl_lead.leadId).order_by('-id')
+    fields_obj = lead_Details.objects.filter(leadId=wl_lead.leadId)
+
+    context = {
+        'wl_lead': wl_lead,
+        'fd_objs':fd_objs,  
+        'fl_history':fl_history,
+        'fields_obj':fields_obj,
+    }
+    return render(request, 'modal_content.html', context)
+
+
+

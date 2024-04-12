@@ -34,6 +34,7 @@ class Waste_Leads(models.Model):
     waste_marked_Date = models.DateField(auto_now_add=True,null=True)
     reason = models.TextField(default='')
     Status = models.IntegerField(default=0)
+    head_reason = models.TextField(default='')
     confirmation = models.IntegerField(default=0)
     
 

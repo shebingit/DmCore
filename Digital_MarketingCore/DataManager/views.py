@@ -2243,51 +2243,55 @@ def DAM_waste_dateApprove(request,waID):
         notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
 
         waste = Waste_Leads.objects.get(id=waID)
-        waste.Status = 1
-        waste.save()
+        if waste.confirmation == 1:
+            waste.Status = 1
+            waste.save()
 
-        db = DataBank.objects.get(lead_Id__id=waste.leadId.id)
-        db.current_status = 'Marked as Waste'
-        db.save 
+            db = DataBank.objects.get(lead_Id__id=waste.leadId.id)
+            db.current_status = 'Marked as Waste'
+            db.save 
 
-        fh = FollowupHistory()
-        fh.hs_lead_Id=waste.leadId
-        fh.note = 'Lead marked as waste'
-        fh.allocated_date = date.today()
-        fh.hr_telecaller_Id = waste.assignto_tc_id
-        fh.hs_comp_Id=dash_details.emp_comp_id
-        fh.final_status = 'Marked as Waste'
-        fh.save()
+            fh = FollowupHistory()
+            fh.hs_lead_Id=waste.leadId
+            fh.note = 'Lead marked as waste'
+            fh.allocated_date = date.today()
+            fh.hr_telecaller_Id = waste.assignto_tc_id
+            fh.hs_comp_Id=dash_details.emp_comp_id
+            fh.final_status = 'Marked as Waste'
+            fh.save()
 
-        lead_waste = Waste_Leads.objects.filter(client_id__compId__id=dash_details.emp_comp_id.id,Status=0)
+            lead_waste = Waste_Leads.objects.filter(client_id__compId__id=dash_details.emp_comp_id.id,Status=0)
 
-        success_text='Data Marked as waste successfully.'
-        success = True
+            success_text='Data Marked as waste successfully.'
+            success = True
 
-        # Waste Data notification----
+            # Waste Data notification----
 
-        emp_obj = EmployeeRegister_Details.objects.filter(emp_designation_id__dashboard_id=1)
+            emp_obj = EmployeeRegister_Details.objects.filter(emp_designation_id__dashboard_id=1)
 
-        for emp in emp_obj:
+            for emp in emp_obj:
 
-            notific_obj = Notification()
-            notific_obj.emp_id = emp
-            notific_obj.notific_head ='New waste Lead added.'
-            notific_obj.notific_content = (
-                dash_details.emp_name +
-                ' ( ' +
-                dash_details.emp_designation_id.desig_name +
-                ' ) ' +
-                ' has marked the lead ' +
-                waste.leadId.lead_name +
-                ' ( ' +
-                waste.leadId.lead_category_id.lead_collection_for +
-            ' ) as a waste lead.'
-            )
+                notific_obj = Notification()
+                notific_obj.emp_id = emp
+                notific_obj.notific_head ='New waste Lead added.'
+                notific_obj.notific_content = (
+                    dash_details.emp_name +
+                    ' ( ' +
+                    dash_details.emp_designation_id.desig_name +
+                    ' ) ' +
+                    ' has marked the lead ' +
+                    waste.leadId.lead_name +
+                    ' ( ' +
+                    waste.leadId.lead_category_id.lead_collection_for +
+                ' ) as a waste lead.'
+                )
 
-            notific_obj.notific_time = timezone
+                notific_obj.notific_time = timezone
 
-            notific_obj.save()
+                notific_obj.save()
+        else:
+            error_text='Oops! Confirmation Missing.'
+            error = True
 
 
 

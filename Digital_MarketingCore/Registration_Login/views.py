@@ -38,6 +38,7 @@ def login_submitt(request):
             
 
             
+            
             elif log_dashboard.position == 'Admin':
 
                 request.session["admin_id"]=log_dashboard.id

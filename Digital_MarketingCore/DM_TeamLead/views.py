@@ -1960,7 +1960,7 @@ def tl_assignTask_delete(request,pk):
     try:
         task_assign_delete = TaskAssign.objects.get(id=pk)
         allocated_emp = task_assign_delete.ta_workerId.emp_name
-        #task_assign_delete.delete()
+        task_assign_delete.delete()
         messages.error(request, f'Task allocated to {allocated_emp} is Deleted.')
     except TaskAssign.DoesNotExist:
         messages.error(request,'Sorry! The selected task not found.')

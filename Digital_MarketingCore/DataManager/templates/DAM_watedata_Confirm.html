@@ -3,6 +3,46 @@
 {% load custom_filters %}
 {% block body %}
 
+<link href="https://cdn.datatables.net/2.0.3/css/dataTables.dataTables.css"  rel="stylesheet" >
+
+<style>
+    .dt-search label
+    {
+     display: none;
+
+    }
+    div.dt-container .dt-search input {
+        border: 1px solid #707070;
+        border-radius: 3px;
+        padding: 5px;
+        background-color: transparent;
+        color: #a5a5a5;
+        margin-left: 3px;
+        font-size: 13px;
+    }
+
+    div.dt-container select.dt-input {
+        padding: 4px 10px;
+        border: 1px solid #707070;
+        color: #a5a5a5;
+        font-size: 13px;
+        background-color: transparent;
+        width: 100px;
+    }
+    div.dt-container select option{
+        background-color: #15171f; 
+    }
+    div.dt-container .dt-length label
+    {
+        display: none;
+    }
+    div.dt-container .dt-info
+    {
+        color: #a5a5a5;
+        font-size: 13px 
+    }
+  </style>
+
 <div>
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -18,29 +58,18 @@
         <div class="card-body">
             <div class="d-flex justify-content-between">
                 <h6 class="card-title text-offwhite">Wating For Checking</h6>
-                <div class="add-items d-flex ">
               
-                    <input  class="form-control text-offwhite" name="#" id="search-data" placeholder="search here..">
-                    <button class="btn btn-outline-danger mdi mdi-close" id="closeBtn" type="button"></button> 
-                  </div>
-                
             </div>
-  
-           
-            
-    
+
           <div class="table-responsive">
-            <table class="table" id="table-details">
+            <table class="table" id="leads-wastedata">
               <thead>
                 <tr>
                   <th> No </th>
                   <th> Action</th>
-                 
                   <th> Lead Name </th>
-                  <th> Client name </th>
-                  <th> Lead Category </th>
-                  <th> Marked date </th>
-                  <th> Who Marked as Waste </th>
+                  <th> Client name | Lead Category </th>
+                  <th> Telecaller | Marked date </th>
                   <th> Reason for </th>
                 
                   
@@ -70,16 +99,17 @@
                     </li>
                     
                    </ul>
-                        
-                       
-                   
-                   
+
                   </td>              
                   <td><span class="pl-2">{{ wa.leadId.lead_name}}</span> </td>
-                  <td>{{wa.client_id.client_name}} </td>
-                  <td> {{wa.leadId.lead_category_id.lead_collection_for }}</td>
-                  <td> {{wa.waste_marked_Date }} </td>
-                  <td> {{ wa.TC_Id.emp_name}}</td>
+                  <td>
+                    <p>{{wa.client_id.client_name}}</p> 
+                    <p>{{wa.leadId.lead_category_id.lead_collection_for }}</p>
+                  </td>
+                  <td><p>{{ wa.TC_Id.emp_name}}</p>
+                    <p> {{wa.waste_marked_Date }}</p>
+                   </td>
+                 
                   <td> 
                     <p>
                    {{wa.reason}}
@@ -101,72 +131,15 @@
   </div>
   
   
+
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   
   <script>
-   
-    const inputField = document.getElementById('search-data');
-    const closeBtn = document.getElementById('closeBtn');
-    const empTable = document.getElementById('table-details');
-    closeBtn.style.display = 'none';
-  
-    inputField.addEventListener('input', function() {
-        filterTable();
-    });
-  
-    function filterTable() {
-        const filterValue = inputField.value.toLowerCase();
-        const rows = empTable.getElementsByTagName('tr');
-  
-        for (let i = 1; i < rows.length; i++) {
-            const Cell1 = rows[i].getElementsByTagName('td')[1];
-            const Cell2 = rows[i].getElementsByTagName('td')[2];
-            const Cell3 = rows[i].getElementsByTagName('td')[3];
-            const Cell4 = rows[i].getElementsByTagName('td')[4];
-            const Cell5 = rows[i].getElementsByTagName('td')[5];
-            const Cell6 = rows[i].getElementsByTagName('td')[6];
-            const Cell7 = rows[i].getElementsByTagName('td')[7];
-            const Cell8 = rows[i].getElementsByTagName('td')[8];
-  
-            if (Cell1 || Cell2 || Cell3 || Cell4|| Cell5 || Cell6 || Cell7 || Cell8) {
-  
-                const datacell1 = Cell1.textContent || Cell1.innerText;
-                const datacell2 = Cell2.textContent || Cell2.innerText;
-                const datacell3 = Cell3.textContent || Cell3.innerText;
-                const datacell4 = Cell4.textContent || Cell4.innerText;
-                const datacell5 = Cell5.textContent || Cell5.innerText;
-                const datacell6 = Cell6.textContent || Cell6.innerText;
-                const datacell7 = Cell7.textContent || Cell7.innerText;
-                const datacell8 = Cell7.textContent || Cell8.innerText;
-                
-  
-                if (datacell1.toLowerCase().includes(filterValue) || datacell2.toLowerCase().includes(filterValue) || datacell3.toLowerCase().includes(filterValue)
-                || datacell4.toLowerCase().includes(filterValue) || datacell5.toLowerCase().includes(filterValue) || datacell6.toLowerCase().includes(filterValue) 
-                || datacell7.toLowerCase().includes(filterValue) || datacell8.toLowerCase().includes(filterValue) ) 
-                {
-                    rows[i].style.display = '';
-                } else {
-                    rows[i].style.display = 'none';
-                }
-            }
-        }
-    }
-  
-     // To display the close button and hide the close button based on the search input 
-    inputField.addEventListener('input', function() {
-    if (inputField.value == '') {
-        closeBtn.style.display = 'none';
-       
-    } else {
-        closeBtn.style.display = 'block';
-        
-    }
-    });
-  
-    closeBtn.addEventListener('click', function() {
-    inputField.value = '';
-    closeBtn.style.display = 'none';
-    filterTable(); // Display the full table data
-    });
+      new DataTable('#leads-wastedata', {
+          pagingType: 'simple_numbers'
+      });
   </script>
 
 

@@ -15,6 +15,41 @@ from django.shortcuts import render,redirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
+def admin_checker_section(request):
+    if 'admin_id' in request.session:
+        if request.session.has_key('admin_id'):
+            admin_id = request.session['admin_id']
+        else:
+            return redirect('/')
+        
+        Admin_dash = LogRegister_Details.objects.get(id=admin_id)
+        dash_details = BusinessRegister_Details.objects.get(log_id=Admin_dash)
+
+        if request.POST:
+            try:
+                log_dashboard =  LogRegister_Details.objects.get(log_username=request.POST['emailid'],log_password=request.POST['passwordid'] )
+                
+                content = {
+                'Admin_dash':Admin_dash,
+                'dash_details':dash_details,
+                }
+        
+                return render(request,'Checker/AD_checkerDashBoard.html',content)
+            
+            except LogRegister_Details.DoesNotExist:
+
+                return redirect('admin_checker_section')
+
+        content = {
+            'Admin_dash':Admin_dash,
+            'dash_details':dash_details,
+        }
+     
+        return render(request,'Checker/AD_checkerLogin.html',content)
+    else:
+            return redirect('/')
+    return redirect('login_page')
+
 # Dashboard section---------------------------------
 
 def admin_dashboard(request):
@@ -52,7 +87,7 @@ def admin_dashboard(request):
 
     else:
             return redirect('/')
-
+    return redirect('login_page')
 
 # Logout Section ---------------------------------
 
