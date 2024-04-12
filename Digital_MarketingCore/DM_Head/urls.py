@@ -205,6 +205,11 @@ urlpatterns = [
 
     path('leadActivity_data/<int:lead_id>/', views.leadActivity_data, name='leadActivity_data'),
     path('Status-Chabge',views.lead_status_change,name='lead_status_change'),
+
+
+    path('Reports/',views.head_Reports,name='head_Reports'),
+
+    
     
 
 ]

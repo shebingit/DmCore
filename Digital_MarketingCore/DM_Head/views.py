@@ -1065,7 +1065,7 @@ def head_transfer_lead(request):
         executive_data = EmployeeRegister_Details.objects.filter(Q(emp_designation_id__dashboard_id=1) | Q(emp_designation_id__dashboard_id=2) | Q(emp_designation_id__dashboard_id=3),emp_comp_id=dash_details.emp_comp_id,emp_active_status=1)
         clients_ids = ClientTask_Register.objects.filter(task_name='Lead Collection',
                                                          cTcompId__id=dash_details.emp_comp_id.id).values('client_Id')
-        # Extracting values from queryset
+    
         client_ids_list = [item['client_Id'] for item in clients_ids]
         leads_obj = Leads.objects.filter(lead_work_regId__clientId__id__in=client_ids_list,lead_status=1,waste_data=0,lead_transfer_status=0)
 
@@ -1232,9 +1232,9 @@ def datamanager_wasteLead(request):
         # Notification-----------
         notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
 
-        leads_obj = Waste_Leads.objects.filter(leadId__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id).order_by('Status')
-        leads_ids = Waste_Leads.objects.filter(leadId__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id).values_list('leadId')
-        leads_obj_count = Waste_Leads.objects.filter(leadId__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id).order_by('Status').count()
+        leads_obj = Waste_Leads.objects.filter(leadId__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id,confirmation=0).order_by('Status')
+      
+        leads_obj_count = leads_obj.count()
         
         content = {'emp_dash':emp_dash,
                     'dash_details':dash_details,
@@ -1307,8 +1307,8 @@ def hd_wastelead_confirm_reject(request,wasteid):
 
             success = True
 
-        leads_obj = Waste_Leads.objects.filter(leadId__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id).order_by('Status')
-        leads_obj_count = Waste_Leads.objects.filter(leadId__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id).order_by('Status').count()
+        leads_obj = Waste_Leads.objects.filter(leadId__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id,confirmation=0).order_by('Status')
+        leads_obj_count = leads_obj.count()
       
         
         content = {'emp_dash':emp_dash,
@@ -4857,3 +4857,116 @@ def leadActivity_data(request,lead_id):
 
 
 
+
+# Reprort Section --------------------------------12/04/24
+
+def head_Reports(request):
+    if 'emp_id' in request.session:
+        if request.session.has_key('emp_id'):
+            emp_id = request.session['emp_id']
+           
+        else:
+            return redirect('/')
+        
+        emp_dash = LogRegister_Details.objects.get(id=emp_id)
+        dash_details = EmployeeRegister_Details.objects.get(logreg_id=emp_dash)
+
+        # Notification-----------
+        notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
+
+        leads_objs = Leads.objects.filter(lead_work_regId__wcompId=dash_details.emp_comp_id).order_by('-lead_add_date')
+
+        status_val = None
+        lead_count = None
+        emp = None
+        d1 = None
+        d2 = None
+        client = None
+        category = None
+
+        
+        # Total Leads 
+        tol_count = leads_objs.count()
+        trsf_count = leads_objs.filter(lead_transfer_status=1).count()
+        trsf_pending_count = leads_objs.filter(lead_transfer_status=0).count()
+        wsate_count = leads_objs.filter(waste_data=1).count()
+
+        if request.POST:
+            emp_id = request.POST['emplyoee']
+            d1 = request.POST['sdate']
+            d2 =  request.POST['edate']
+            client_val = request.POST['client_val']
+            category_val = request.POST['category_val']
+
+            if client_val:
+                client = ClientRegister.objects.get(id=client_val)
+                leads_objs = leads_objs.filter(lead_category_id__cTaskId__client_Id=client)
+            if category_val:
+                category = LeadCategory_Register.objects.get(id=category_val)
+                leads_objs = leads_objs.filter(lead_category_id=category)
+
+            if emp_id:
+                emp = EmployeeRegister_Details.objects.get(id=emp_id)
+                leads_objs = leads_objs.filter(lead_collect_Emp_id__id=emp_id)
+
+            if d1:
+                leads_objs = leads_objs.filter(lead_add_date__gte=d1)
+
+            if d2:
+                leads_objs = leads_objs.filter(lead_add_date__lte=d2)
+              
+            status_val = request.POST['status_val']
+              
+            if status_val == 'Verified' :
+                leads_objs = leads_objs.filter(lead_status=1)
+                lead_count = leads_objs.count()
+            if status_val == 'Unverified' :
+                leads_objs = leads_objs.filter(lead_status=0)
+                lead_count = leads_objs.count()
+            if status_val == 'Transfered' :
+                leads_objs = leads_objs.filter(lead_transfer_status=1)
+                lead_count = leads_objs.count()
+            if status_val == 'Pending' :
+                leads_objs = leads_objs.filter(lead_transfer_status=0)
+                lead_count = leads_objs.count()
+            if status_val == 'Incompleted' :
+                leads_objs = Leads.objects.filter(lead_incomplete_status=1)
+                lead_count = leads_objs.count()
+            if status_val == 'Repeated' :
+                leads_objs = leads_objs.filter(repeated_status=1)
+                lead_count = leads_objs.count()
+            if status_val == 'Waste' :
+                leads_objs = leads_objs.filter(waste_data=1)
+                lead_count = leads_objs.count()
+            if status_val == 'All' :
+                leads_objs = Leads.objects.filter(lead_work_regId__wcompId=dash_details.emp_comp_id).order_by('-lead_add_date')
+                lead_count = leads_objs.count()
+
+        clients_objs = ClientTask_Register.objects.filter(task_name='Lead Collection',cTcompId__id=dash_details.emp_comp_id.id)
+        executive_data = EmployeeRegister_Details.objects.filter(Q(emp_designation_id__dashboard_id=1) | 
+                                                                 Q(emp_designation_id__dashboard_id=2) | 
+                                                                 Q(emp_designation_id__dashboard_id=3),
+                                                                 emp_comp_id=dash_details.emp_comp_id,
+                                                                 emp_active_status=1)
+        
+        paginator = Paginator(leads_objs, 10)  # Show 10 leads per page
+        page_number = request.GET.get('page')
+       
+        leads = paginator.get_page(page_number)
+        content = {'emp_dash':emp_dash,
+                   'dash_details':dash_details,
+                   'notifications':notifications,
+                   'tol_count':tol_count,
+                   'trsf_count':trsf_count,
+                   'trsf_pending_count':trsf_pending_count,
+                   'wsate_count':wsate_count,
+                   'clients_objs':clients_objs,
+                   'executive_data':executive_data,
+                   'leads':leads,'status_val':status_val,'lead_count':lead_count,'emp':emp,
+                   'd1':d1,'d2':d2,'client':client,'category':category
+                   }
+
+        return render(request,'reports.html',content)
+
+    else:
+            return redirect('/')

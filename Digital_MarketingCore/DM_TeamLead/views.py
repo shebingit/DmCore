@@ -2617,7 +2617,6 @@ def tl_lead_collected_data(request,pk):
         # Notification-----------
         notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
 
-        print(pk)
 
         taskAs = TaskAssign.objects.get(id=pk)
         work_reg = taskAs.ta_workAssignId.wa_work_regId
@@ -2627,16 +2626,15 @@ def tl_lead_collected_data(request,pk):
         lead_category = LeadCategory_Register.objects.get(id=lcTeamAllocate.lc_id_id)
         lf_obj = LeadField_Register.objects.filter(field_work_regId=work_reg,field_lead_category=lead_category.id)
 
-        # lf_obj = LeadField_Register.objects.filter(field_work_regId=work_reg)
+    
         leads_obj = Leads.objects.filter(lead_work_regId=work_reg,lead_collect_Emp_id=dash_details,lead_category_id=lead_category,lead_add_date=date.today())
-        leads_obj_count = Leads.objects.filter(lead_work_regId=work_reg,lead_collect_Emp_id=dash_details,lead_category_id=lead_category,lead_add_date=date.today()).count()
+        leads_obj_count = leads_obj.count()
         lead_Details_obj = lead_Details.objects.filter(leadId__in=leads_obj)
 
         
         content = {'emp_dash':emp_dash,
                     'dash_details':dash_details,
                     'notifications':notifications,
-                    # 'works_obj':works_obj,
                     'leads_obj':leads_obj,
                      'lead_Details_obj':lead_Details_obj,
                      'leads_obj_count':leads_obj_count,

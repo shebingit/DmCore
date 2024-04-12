@@ -1,0 +1,392 @@
+{% extends 'HD_base.html' %}
+{% load static %}
+{% block body %}
+
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'head_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page"> Reports </li>
+        </ol>
+      </nav>
+</div>
+
+ <!-- Pagination -->
+ <style>
+    .paginationBox
+    {
+        display: flex;
+        align-items: center;
+        justify-content: end;
+        margin-top: 1rem;
+    }
+    .pagination li
+    {
+        margin: 0.10rem;
+    }
+    .pagination .active
+    {
+        border:1px solid #e3e2e2 ;
+    }
+    .pagination li a{
+        padding: .70rem;
+    }
+   
+</style>
+
+
+
+<style>
+    .card
+    {
+        border-radius: 0px;
+        background: #06060b;
+    }
+    .card h6{
+        letter-spacing: 1px;
+        font-size: 13px;
+        color: #b3b3b3;
+    }
+    .count
+    {
+        display: grid;
+        grid-template-columns: 2.5fr 0.60fr;
+    }
+    .count p span{
+        padding: 0.50rem;
+        background-color: #040406;
+        font-weight: 500;
+        color: #dce2f5;
+    }
+    .filterBox
+    {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.40rem;
+        margin-bottom: 0.60rem;
+        padding-bottom: 0.50rem;
+        border-bottom: 1px solid #aeaeaf;
+    }
+    .filterBox .search-field select,
+    .filterBox .search-field input
+    {
+        padding: 0.50rem 0.30rem;
+        border: 0.40px solid #b3b3b3;
+        border-radius: 2px;
+        font-size: 13px;
+        color: #dce2f5;
+        background: #040406;
+    }
+    .filterBox .search-field input
+    {
+        padding: 0.40rem 0.30rem;
+    }
+
+    .convertion-Box
+    {
+        display: grid;
+        grid-template-columns:1fr 1fr 1fr 1fr 1fr;
+        gap: 0.30rem;
+
+    }
+    .reportBox
+    {
+        display: grid;
+        grid-template-columns: 2fr 0.90fr;
+        padding-bottom: .80rem;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid #aeaeaf;
+    }
+    .reportBox h6{
+        font-size: 12px;
+        line-height: 1.6rem;
+    }
+</style>
+
+
+
+<div class="row">
+    <div class="col-lg-3 col-md-4 col-sm-12 col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="count">
+                    <h6>Total Leads</h6>
+                    <p><span>{{ tol_count }}</span></p>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-4 col-sm-12 col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="count">
+                    <h6>Transfered Leads</h6>
+                    <p><span>{{ trsf_count }}</span></p>
+                </div>
+              
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-4 col-sm-12 col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="count">
+                    <h6>Pending Leads</h6>
+                    <p><span>{{ trsf_pending_count }}</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-4 col-sm-12 col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="count">
+                    <h6>Waste Leads</h6>
+                    <p><span>{{ wsate_count }}</span></p>
+                </div>
+             
+            </div>
+        </div>
+    </div>
+</div>
+<hr>
+
+<div>
+    <form action="{% url 'head_Reports' %}" method="post">
+        {% csrf_token %}
+        <div class="filterBox">
+            <div class="search-field" >
+                <select id="client" name="client_val">
+                    {% if client %}
+                    <option value="{{ client.id }}" selected>{{client.client_name}}</option>
+                    {% else %}
+                    <option value="">select client</option>
+                    {% endif %}
+                    {% for c in clients_objs %}
+                    <option value="{{ c.client_Id.id }}">{{c.client_Id.client_name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="search-field" >
+                <select id="category" name="category_val">
+                    <option value="">select category</option>
+                </select>
+            </div>
+            <div class="search-field" >
+                <select id="employee" name="emplyoee">
+                    {% if emp %}
+                    <option value="{{ emp.id }}" selected>{{emp.emp_name}}</option>
+                    {% else %}
+                    <option value="">select employee</option>
+                    {% endif %}
+                    {% for emp_val in executive_data %}
+                    <option value="{{ emp_val.id }}">{{emp_val.emp_name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="search-field" >
+                <select id="employee" name="status_val">
+                    {% if status_val %}
+                    <option value="{{status_val}}" selected>{{ status_val}}</option>
+                    
+                    {% endif %}
+                    <option value="All">All status</option>
+                    <option value="Verified">Verified</option>
+                    <option value="Unverified">Unverified</option>
+                    <option value="Transfered">Transfered</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Incompleted">Incompleted</option>
+                    <option value="Waste">Waste</option>
+                    <option value="Repeated">Repeated</option>
+                    <option value="exist">Exist</option>
+                </select>
+            </div>
+            <div class="search-field" >
+                <select id="employee">
+                    <option>select source</option>
+                </select>
+            </div>
+            <div class="search-field" >
+                <input type="date" name="sdate" value="{{ d1}}">
+            </div>
+            <div class="search-field" >
+                <input type="date" name="edate" value="{{ d2}}">
+            </div>
+            <div class="search-fieldBtn" id="search-btn">
+                <button class="btn btn-outline-success" type="submit">
+                    <span class="mdi mdi-check"></span>
+                </button>
+            </div>
+            
+        </div>
+    </form>
+
+</div>
+
+<div class="row mt-1">
+    <div class="col-12 col-lg-8 col-md-12 col-sm-12">
+        <div class="card">
+            <div class="card-body">
+                
+                <div class="reportBox">
+                    <h6>Report 
+                        {% if emp %}- <span style="text-transform: uppercase;">{{emp.emp_name }}   </span> {% endif %}
+                        {% if lead_count or status_val %}- <span style="text-transform: uppercase;">{{status_val }} ( {{lead_count|default:'0'}} ) </span> {% endif %}
+                        {% if d1 %}- <span style="text-transform: uppercase;"> ( {{d1 }}  ) </span> {% endif %}
+                        {% if d2 %}<span style="text-transform: uppercase;"> - ( {{d2 }}  ) </span> {% endif %}
+                        
+                    </h6>
+                    
+                    <div class="convertion-Box">
+                        <button type="button" class="btn  btn-dark" title="Print out the lead data">
+                            <span class="mdi  mdi-content-paste text-secondary"></span>
+                            <span class="small mr-1">Report</span>
+                        </button>
+                        <button type="button" class="btn  btn-dark" title="Print out the lead data">
+                            <span class="mdi  mdi-share text-success"></span>
+                            <span class="small mr-1">Share</span>
+                        </button>
+                        
+                        <button type="button" class="btn  btn-dark" title="Covert leads to PDF">
+                            <span class="mdi mdi-file-pdf text-danger"></span>
+                            <span class="small mr-1">PDF</span>
+                        </button>
+                        <button type="button" class="btn  btn-dark" title="Covert leads to excel">
+                            <span class="mdi mdi-file-excel"></span>
+                            <span class="small mr-1">Excel</span>
+                        </button>
+                        <button type="button" class="btn  btn-dark" title="Print out the lead data">
+                            <span class="mdi mdi-printer text-primary"></span>
+                            <span class="small mr-1">Print</span>
+                        </button>
+                       
+                        
+                    </div>
+                    
+                </div>
+                <p>
+                    {% if client %}
+                    <span>
+                        {{ client.client_name }} 
+                    </span>
+                    {% endif %}
+                    {% if category %}
+                    <span>
+                        - {{ category.lead_collection_for }} 
+                    </span>
+                    {% endif %}
+                   
+                   
+                 
+                </p>
+                <div class="table-responsive">
+                    <table class="table table-bordered mt-2" id="leadsData">
+                        <thead>
+                            <tr class="table-active">
+                                <th>Date On</th>
+                                <th>Name</th> 
+                                <th>Email</th>   
+                                <th>Contact</th> 
+                       
+                                
+                            </tr>
+                        </thead>
+                    
+                        <tbody>
+                        
+                        
+                            {% for lead in leads %}
+                                <tr>
+
+                                    <td><p>{{ lead.lead_add_date|date:'d-m-y' }} </p> </td>
+                                    <td><p> <span class="mdi mdi-account "> </span> {{ lead.lead_name }} </p></td>
+                                    <td> <p><span class="mdi mdi-email"> </span> {{ lead.lead_email }}  </p></td>
+                                    <td> <p> <span class="mdi mdi-phone "> </span> {{ lead.lead_contact }} </p> </td>
+                                    
+                                
+                                </tr>
+                            {% endfor %}
+                    
+                        
+                        </tbody>
+                    </table>
+                    <div class=" paginationBox ">
+                        <ul class="pagination">
+                            {% if leads.has_previous %}
+                            <li><a href="?page=1{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-double-left"></span></a></li>
+                            <li><a href="?page={{ leads.previous_page_number }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-left"></span></a></li>
+                            {% endif %}
+                            {% for num in leads.paginator.page_range %}
+                                {% if num <= 4 or num == leads.paginator.num_pages or leads.number == num %}
+                                    <li {% if leads.number == num %} class="active" {% endif %}>
+                                        <a href="?page={{ num }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}" class="btn btn-dark"><span>{{ num }}</span></a></li>
+                                {% endif %}
+                               
+                            {% endfor %}
+                            {% if leads.has_next %}
+                            <li><a href="?page={{ leads.next_page_number }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-right"></span></a></li>
+                            <li><a href="?page={{ leads.paginator.num_pages }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-double-right"></span></a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-4 col-md-12 col-sm-12">
+        <div class="card">
+            <div class="card-body">
+                <div style="width:100%;">
+                    <canvas id="barChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<!-- Include Chart.js for drawing charts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    $(document).ready(function(){
+        // Data for the chart
+        var data = {
+            labels: ["Total", " Waste "],
+            datasets: [{
+                label: "lead",
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255,99,132,1)',
+                borderWidth: 1,
+                data: [500,20],
+            }]
+        };
+
+        // Configuration options
+        var options = {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true
+                    }
+                }]
+            }
+        };
+
+        // Get the context of the canvas element we want to select
+        var ctx = document.getElementById("barChart").getContext("2d");
+
+        // Instantiate a new chart
+        var myBarChart = new Chart(ctx, {
+            type: 'bar',
+            data: data,
+            options: options
+        });
+    });
+</script>
+
+
+{% endblock %}
