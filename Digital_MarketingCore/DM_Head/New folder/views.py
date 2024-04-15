@@ -1590,7 +1590,7 @@ def lead_status_change(request):
                             status_val=1
                             leads_obj.lead_incomplete_status=status_val
             leads_obj.save()
-
+            
             if selected_value == 'Delete':
                 status_val=1
                 leads_obj.delete()
@@ -1915,8 +1915,6 @@ def head_all_leadTransfer(request):
                         if email_exists or phone_exists:
                             lead_id = l.id
                             l.repeated_status = 1
-                            l.waste_data = 1
-                            l.waste_data_reason = 'The email id or contact number already exist.'
                             l.save()
                             lead_ids_list.append(lead_id)
 
@@ -4928,7 +4926,6 @@ def head_Reports(request):
 
         status_val = None
         lead_count = None
-        today_val= None
         emp = None
         d1 = None
         d2 = None
@@ -4939,7 +4936,7 @@ def head_Reports(request):
         # Total Leads 
         tol_count = leads_objs.count()
         trsf_count = leads_objs.filter(lead_transfer_status=1).count()
-        trsf_pending_count = leads_objs.filter(lead_transfer_status=0,waste_data=0,repeated_status=0).count()
+        trsf_pending_count = leads_objs.filter(lead_transfer_status=0).count()
         wsate_count = leads_objs.filter(waste_data=1).count()
 
         if request.POST:
@@ -4989,7 +4986,9 @@ def head_Reports(request):
             if status_val == 'Waste' :
                 leads_objs = leads_objs.filter(waste_data=1)
                 lead_count = leads_objs.count()
-            
+            if status_val == 'All' :
+                leads_objs = Leads.objects.filter(lead_work_regId__wcompId=dash_details.emp_comp_id).order_by('-lead_add_date')
+                lead_count = leads_objs.count()
 
         clients_objs = ClientTask_Register.objects.filter(task_name='Lead Collection',cTcompId__id=dash_details.emp_comp_id.id)
         executive_data = EmployeeRegister_Details.objects.filter(Q(emp_designation_id__dashboard_id=1) | 
@@ -4997,43 +4996,8 @@ def head_Reports(request):
                                                                  Q(emp_designation_id__dashboard_id=3),
                                                                  emp_comp_id=dash_details.emp_comp_id,
                                                                  emp_active_status=1)
-        if (d1 is None) and (d2 is None):
-           
-            leads_objs = leads_objs.filter(lead_add_date__gte=date.today(),lead_add_date__lte=date.today())
-            toady_trsf_count = Leads.objects.filter(lead_work_regId__wcompId=dash_details.emp_comp_id,
-                                                    lead_transfer_status=1,
-                                                    lead_transfer_date__gte=date.today(),
-                                                    lead_transfer_date__lte=date.today()).count()
-            
-
-            toady_tol_count = leads_objs.filter(lead_add_date__gte=date.today(),
-                                                lead_add_date__lte=date.today()).count()
         
-            toady_trsf_pending_count = leads_objs.filter(lead_add_date__gte=date.today(),
-                                                    lead_add_date__lte=date.today(),
-                                                    lead_transfer_status=0,waste_data=0,repeated_status=0).count()
-        
-            toady_wsate_count = leads_objs.filter(waste_data=1,
-                                              lead_add_date__gte=date.today(),
-                                              lead_add_date__lte=date.today()).count()
-            today_val = 1
-        else:
-            toady_trsf_count = leads_objs.filter(lead_transfer_status=1,
-                                                 lead_transfer_date__gte=d1,
-                                                 lead_transfer_date__lte=d2).count()
-
-            toady_tol_count = leads_objs.filter(lead_add_date__gte=d1,
-                                                    lead_add_date__lte=d2).count()
-            
-            toady_trsf_pending_count = leads_objs.filter(lead_add_date__gte=d1,
-                                                        lead_add_date__lte=d2,
-                                                        lead_transfer_status=0,waste_data=0,repeated_status=0).count()
-            
-            toady_wsate_count = leads_objs.filter(waste_data=1,
-                                                lead_add_date__gte=d1,
-                                                lead_add_date__lte=d2).count()
-        
-        paginator = Paginator(leads_objs, 200)  # Show 10 leads per page
+        paginator = Paginator(leads_objs, 10)  # Show 10 leads per page
         page_number = request.GET.get('page')
        
         leads = paginator.get_page(page_number)
@@ -5047,12 +5011,7 @@ def head_Reports(request):
                    'clients_objs':clients_objs,
                    'executive_data':executive_data,
                    'leads':leads,'status_val':status_val,'lead_count':lead_count,'emp':emp,
-                   'd1':d1,'d2':d2,'client':client,'category':category,
-                   'toady_tol_count':toady_tol_count,
-                   'toady_trsf_count':toady_trsf_count,
-                   'toady_trsf_pending_count':toady_trsf_pending_count,
-                   'toady_wsate_count':toady_wsate_count,
-                   'today_val':today_val
+                   'd1':d1,'d2':d2,'client':client,'category':category
                    }
 
         return render(request,'reports.html',content)

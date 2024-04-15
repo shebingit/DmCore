@@ -41,7 +41,9 @@
     .card
     {
         border-radius: 0px;
-        background: #06060b;
+        background: #020203;
+        border-radius: 5px;
+        box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
     }
     .card h6{
         letter-spacing: 1px;
@@ -63,11 +65,12 @@
     {
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: start;
         gap: 0.40rem;
         margin-bottom: 0.60rem;
-        padding-bottom: 0.50rem;
+        padding-top: 1.50rem;
         border-bottom: 1px solid #aeaeaf;
+        padding-bottom: 1.9rem;
     }
     .filterBox .search-field select,
     .filterBox .search-field input
@@ -154,82 +157,14 @@
 </div>
 <hr>
 
-<div>
-    <form action="{% url 'head_Reports' %}" method="post">
-        {% csrf_token %}
-        <div class="filterBox">
-            <div class="search-field" >
-                <select id="client" name="client_val">
-                    {% if client %}
-                    <option value="{{ client.id }}" selected>{{client.client_name}}</option>
-                    {% else %}
-                    <option value="">select client</option>
-                    {% endif %}
-                    {% for c in clients_objs %}
-                    <option value="{{ c.client_Id.id }}">{{c.client_Id.client_name}}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="search-field" >
-                <select id="category" name="category_val">
-                    <option value="">select category</option>
-                </select>
-            </div>
-            <div class="search-field" >
-                <select id="employee" name="emplyoee">
-                    {% if emp %}
-                    <option value="{{ emp.id }}" selected>{{emp.emp_name}}</option>
-                    {% else %}
-                    <option value="">select employee</option>
-                    {% endif %}
-                    {% for emp_val in executive_data %}
-                    <option value="{{ emp_val.id }}">{{emp_val.emp_name}}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="search-field" >
-                <select id="employee" name="status_val">
-                    {% if status_val %}
-                    <option value="{{status_val}}" selected>{{ status_val}}</option>
-                    
-                    {% endif %}
-                    <option value="All">All status</option>
-                    <option value="Verified">Verified</option>
-                    <option value="Unverified">Unverified</option>
-                    <option value="Transfered">Transfered</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Incompleted">Incompleted</option>
-                    <option value="Waste">Waste</option>
-                    <option value="Repeated">Repeated</option>
-                    <option value="exist">Exist</option>
-                </select>
-            </div>
-            <div class="search-field" >
-                <select id="employee">
-                    <option>select source</option>
-                </select>
-            </div>
-            <div class="search-field" >
-                <input type="date" name="sdate" value="{{ d1}}">
-            </div>
-            <div class="search-field" >
-                <input type="date" name="edate" value="{{ d2}}">
-            </div>
-            <div class="search-fieldBtn" id="search-btn">
-                <button class="btn btn-outline-success" type="submit">
-                    <span class="mdi mdi-check"></span>
-                </button>
-            </div>
-            
-        </div>
-    </form>
 
-</div>
 
 <div class="row mt-1">
-    <div class="col-12 col-lg-8 col-md-12 col-sm-12">
+    <div class="col-12 col-lg-12 col-md-12 col-sm-12">
         <div class="card">
             <div class="card-body">
+
+                
                 
                 <div class="reportBox">
                     <h6>Report 
@@ -282,6 +217,131 @@
                    
                  
                 </p>
+                <div class="row">
+                    <div class="col-lg-3 col-md-4 col-sm-12 col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="count">
+                                    <h6>{% if today_val %}Today {% endif %}Total Leads</h6>
+                                    <p><span>{{ toady_tol_count }}</span></p>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-sm-12 col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="count">
+                                    <h6>{% if today_val %}Today {% endif %} Transfered Leads</h6>
+                                    <p><span>{{ toady_trsf_count }}</span></p>
+                                </div>
+                              
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-sm-12 col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="count">
+                                    <h6>{% if today_val %}Today {% endif %} Pending Leads</h6>
+                                    <p><span>{{ toady_trsf_pending_count }}</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-sm-12 col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="count">
+                                    <h6>{% if today_val %}Today {% endif %} Waste Leads</h6>
+                                    <p><span>{{ toady_wsate_count }}</span></p>
+                                </div>
+                             
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <form action="{% url 'head_Reports' %}" method="post">
+                        {% csrf_token %}
+                        <div class="filterBox">
+                            <div class="search-field" >
+                                <select id="client" name="client_val">
+                                    {% if client %}
+                                    <option value="{{ client.id }}" selected>{{client.client_name}}</option>
+                                    {% else %}
+                                    <option value="">select client</option>
+                                    {% endif %}
+                                    {% for c in clients_objs %}
+                                    <option value="{{ c.client_Id.id }}">{{c.client_Id.client_name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="search-field" >
+                                <select id="category" name="category_val">
+                                    <option value="">select category</option>
+                                </select>
+                            </div>
+                            
+                            <div class="search-field" >
+                                <select id="employee" name="emplyoee">
+                                    {% if emp %}
+                                    <option value="{{ emp.id }}" selected>{{emp.emp_name}}</option>
+                                    {% else %}
+                                    <option value="">select employee</option>
+                                    {% endif %}
+                                    {% for emp_val in executive_data %}
+                                    <option value="{{ emp_val.id }}">{{emp_val.emp_name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="search-field" >
+                                <input type="date" name="sdate" value="{{ d1}}" title="Lead entry date ">
+                            </div>
+                            <div class="search-field" >
+                                <input type="date" name="edate" value="{{ d2}}" title="Lead entry date ">
+                            </div>
+                            <div class="search-field" >
+                                <select id="employee" name="status_val">
+                                    {% if status_val %}
+                                    <option value="{{status_val}}" selected>{{ status_val}}</option>
+                                    
+                                    {% endif %}
+                                    <option value=""> status</option>
+                                    <option value="Verified">Verified</option>
+                                    <option value="Unverified">Unverified</option>
+                                    <option value="Transfered">Transfered</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Incompleted">Incompleted</option>
+                                    <option value="Waste">Waste</option>
+                                    <option value="Repeated">Repeated</option>
+                                    <option value="exist">Exist</option>
+                                </select>
+                            </div>
+                            <div class="search-field" >
+                                <select id="employee">
+                                    <option>select source</option>
+                                </select>
+                            </div>
+                            
+                            <div class="search-fieldBtn" id="search-btn">
+                                <button class="btn btn-outline-success" type="submit">
+                                    <span class="mdi mdi-check"></span>
+                                </button>
+                            </div>
+                            <div class="search-fieldBtn" id="">
+                                <a href="{% url 'head_Reports' %}" class="btn btn-outline-secondary" title="Refresh">
+                                    <span class="mdi mdi-refresh"></span>
+                                </a>
+                            </div>
+                            
+                        </div>
+                    </form>
+                
+                </div>
+                
                 <div class="table-responsive">
                     <table class="table table-bordered mt-2" id="leadsData">
                         <thead>
@@ -290,6 +350,7 @@
                                 <th>Name</th> 
                                 <th>Email</th>   
                                 <th>Contact</th> 
+                                <th>Status </th>
                        
                                 
                             </tr>
@@ -305,6 +366,14 @@
                                     <td><p> <span class="mdi mdi-account "> </span> {{ lead.lead_name }} </p></td>
                                     <td> <p><span class="mdi mdi-email"> </span> {{ lead.lead_email }}  </p></td>
                                     <td> <p> <span class="mdi mdi-phone "> </span> {{ lead.lead_contact }} </p> </td>
+                                    <td> 
+                                        {% if lead.lead_status == 1 %}
+                                        <p> <span class="text-success small "> Verified </span>  </p> 
+                                        {% else %}
+                                        <p> <span class="text-danger small "> Unverified </span>  </p> 
+                                        {% endif %}
+                                    </td>
+
                                     
                                 
                                 </tr>
@@ -336,15 +405,7 @@
             </div>
         </div>
     </div>
-    <div class="col-12 col-lg-4 col-md-12 col-sm-12">
-        <div class="card">
-            <div class="card-body">
-                <div style="width:100%;">
-                    <canvas id="barChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
+    
     
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -390,3 +451,13 @@
 
 
 {% endblock %}
+
+<div class="col-12 col-lg-4 col-md-12 col-sm-12">
+    <div class="card">
+        <div class="card-body">
+            <div style="width:100%;">
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>

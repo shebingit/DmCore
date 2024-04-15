@@ -281,6 +281,7 @@ class Leads(models.Model):
     lead_add_date = models.DateField(auto_now=True,null=True)
     lead_add_time = models.TimeField(auto_now_add=True,null=True,blank=True)
     waste_data = models.IntegerField(default=0)
+    waste_data_reason = models.TextField(default='',null=True,blank=True)
     lead_status = models.IntegerField(default=0)
     lead_transfer_date = models.DateField(auto_now=False,null=True)
     lead_transfer_status = models.IntegerField(default=0)

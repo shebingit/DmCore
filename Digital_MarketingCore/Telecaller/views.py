@@ -754,8 +754,13 @@ def TC_newleads(request):
         WLP = 0
         if TAL > 0:
             WLP = int((TAL/100)*20)
- 
-        PERF = round(((TJL/(TAL-WLP))*100),2)
+        
+        TAL_WLP = TAL- WLP
+        
+        if TAL_WLP:
+            PERF = round(((TJL/(TAL_WLP))*100),2)
+        else:
+            PERF = 1
        
 
         today_date = date.today()
