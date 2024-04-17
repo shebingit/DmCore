@@ -1,6 +1,6 @@
 <div class="modal-content activityBox">
-    <form action="{% url 'hd_wastelead_confirm_reject' wl_lead.id  %}" method="post">
-        {% csrf_token %}
+    <div class="card">
+       
         <div class="modal-header">
             <h5 class="modal-title" id="activityPanelLable">Activity Tracker</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -15,18 +15,18 @@
                         <div class="card-body">
                             <h6>Lead Details </h6>
                             <div class="basic-details">
-                                <p><span class="mdi mdi-account"></span><span> {{ wl_lead.leadId.lead_name }}</span></p>
-                                <p><span class="mdi mdi-email"></span><span> {{  wl_lead.leadId.lead_email }}</span></p>
-                                <p><span class="mdi mdi-phone"></span><span> {{  wl_lead.leadId.lead_contact }}</span></p>
+                                <p><span class="mdi mdi-account"></span><span> {{ lead.lead_name }}</span></p>
+                                <p><span class="mdi mdi-email"></span><span> {{  lead.lead_email }}</span></p>
+                                <p><span class="mdi mdi-phone"></span><span> {{  lead.lead_contact }}</span></p>
                             </div>
                     
                             <h6>Client Details </h6>
                             <div>
                                 <p>
-                                    <span class="mdi mdi-account"></span> <span> {{ wl_lead.client_id.client_name }} </span>
+                                    <span class="mdi mdi-account"></span> <span> {{lead.lead_work_regId.clientId.client_name }} </span>
                                 </p>
                                 <p>
-                                    <span class="mdi mdi-file"></span> <span> {{ wl_lead.leadId.lead_category_id.lead_collection_for }} </span>
+                                    <span class="mdi mdi-file"></span> <span> {{ lead.lead_category_id.lead_collection_for }} </span>
                                 </p>
                                 
                             </div>
@@ -52,23 +52,30 @@
                             <h6>Activity Panel</h6>
                             <div class="activity-panel">
                                 <div class="activity-history">
-                                    <h5>Followup Track</h5>
+                                    
+                                  
                                     <div class="history-track">
-                                        {% for fd in fd_objs %}
-                                        <div>
-                                            <div class="followup-details">
-                                                <p class="top-details">
-                                                    <span>Connected On : {{ fd.response_date }}</span> <span>Contact By :  {{ fd.hr_telecaller_Id.emp_name }}</span> 
-                                                </p>
-                                                <p class="top-details">
-                                                    <span>Response :{{ fd.response }}</span>
-                                                    <span>Status :{{ fd.response_status }}</span>
-                                                </p>
-                                                
+                                        {% if fd_objs %}
+                                            <h5>Followup Track</h5>
+                                            {% for fd in fd_objs %}
+                                            <div>
+                                                <div class="followup-details">
+                                                    <p class="top-details">
+                                                        <span>Connected On : {{ fd.response_date }}</span> <span>Contact By :  {{ fd.hr_telecaller_Id.emp_name }}</span> 
+                                                    </p>
+                                                    <p class="top-details">
+                                                        <span>Response :{{ fd.response }}</span>
+                                                        <span>Status :{{ fd.response_status }}</span>
+                                                    </p>
+                                                    
+                                                </div>
                                             </div>
-                                        </div>
-                                        {% endfor %}
-                                        
+                                            {% endfor %}
+                                        {% else %}
+                                            <p class="mt-2" style="font-size: 11px;">No Data Avilable..</p>
+                                        {% endif %}
+
+                                        {% if fl_history %}
                                         <h5>History Track</h5>
                                         <div class="followup-history">
                                             {% for fh in fl_history %}
@@ -84,34 +91,41 @@
                                             </div>
                                             {% endfor %}
                                         </div>
+                                        {% else %}
+                                        <p class="mt-2 " style="font-size:11px;">No Data Avilable..</p>
+                                        {% endif %}
                                     </div>
                                     
 
                                     <h5>Waste Lead Reason</h5>
                                     <div class="waste-reason">
                                         <p class="waste-reason-ststus" >
-                                            <span class="mdi mdi-calendar-clock"> {{ wl_lead.waste_marked_Date }} </span>
+                                            
                                             {% if wl_lead.Status == 1 %}
-                                            <span><span class="mdi mdi-check text-success"> Verified</span>  ( Data Manager )  </span> 
+                                            <span><span class="mdi mdi-check-circle text-success"> </span> &nbsp;Data Manager   &nbsp; </span> 
                                             {% endif %}
                                             {% if wl_lead.Status == 0 %}
-                                            <span><span class="mdi mdi-close-circle text-danger"> Not Confirmed</span>  ( Head )  </span> 
+                                            <span><span class="mdi mdi-close-circle-outline text-danger"> &nbsp;</span> &nbsp; Head  &nbsp;  </span> 
                                             {% else %}
-                                            <span><span class="mdi mdi-close-check text-success">  Confirmed</span>  ( Head )  </span> 
+                                            <span><span class="mdi mdi-check-circle text-success"> &nbsp; </span> &nbsp; Head   &nbsp; </span> 
                                             {% endif %}
                                             
                                         </p>
-                                        <p>Marked By : {{ wl_lead.assignto_tc_id.TC_Id.emp_name}}</p>
-                                        <p> Reason :  {{ wl_lead.reason }}</p>
+                                        <p> {% if  wl_lead.assignto_tc_id.TC_Id.emp_name %}
+                                            Marked By : {{ wl_lead.assignto_tc_id.TC_Id.emp_name}}
+                                            {% endif %}
+                                        </p>
+                                        <p> Reason :  {{ lead.waste_data_reason }}</p>
                                     </div>
                                 </div>
                                 <div class="collect-history">
                                     <h5> Lead Collected By </h5>
                                     <div class="Collected-details">
-                                        <p><span class="mdi mdi-account"></span><span> {{ wl_lead.leadId.lead_collect_Emp_id.emp_name }}</span></p>
-                                        <p><span class="mdi mdi-calendar"></span><span> {{ wl_lead.leadId.lead_add_date }} </span></p>
-                                        <p><span class="mdi mdi-clock"></span><span> {{ wl_lead.leadId.lead_add_time }}</span></p>
+                                        <p><span class="mdi mdi-account"></span><span> {{ lead.lead_collect_Emp_id.emp_name }}</span></p>
+                                        <p><span class="mdi mdi-calendar"></span><span> {{ lead.lead_add_date }} </span></p>
+                                        <p><span class="mdi mdi-clock"></span><span> {{ lead.lead_add_time }}</span></p>
                                     </div>
+                                    {% if  wl_lead.assignto_tc_id.TC_Id.emp_name %}
                                     <hr>
                                     <h5> Lead Allocated To</h5>
                                     <div class="Collected-details">
@@ -119,45 +133,30 @@
                                         <p><span class="mdi mdi-calendar"></span><span> {{ wl_lead.assignto_tc_id.Assign_Date  }} </span></p>
                                         <p><span class="mdi mdi-clock"></span><span> {{ wl_lead.assignto_tc_id.Allocate_time  }}</span></p>
                                     </div>
+                                    {% endif %}
+                                    
                                 </div>
 
                             </div>
                         </div>
-                        <div class="m-3">
-                            <div class="btn btn-outline-secondary">
-                                <input type="radio" name="status_val" value="2" required> 
-                                <span class="mdi mdi-chevron-double-left text-danger"></span>
-                                <span class="small text-danger">Reject </span> 
-                            </div>
-                            <div class="btn btn-outline-secondary">
-                                <input type="radio" name="status_val" value="1" required> 
-                                <span class="mdi mdi-check text-success"></span>
-                                <span class="small text-success">Confirm </span> 
-                            </div>
-                           
-                        </div>
+                        
                     </div>
                 </div>
 
             </div>
-            <div class="mt-2">
-                <div class="input-textarea">
-                    <textarea name="head_reason" class="form-control" rows="7"></textarea>
-                </div>
-            </div>
+            
         
         </div>
         <div class="modal-footer">
-        <button type="button" class="btn btn-secondary " data-dismiss="modal">
-            <span class="mdi mdi-close"></span>
-            <span class="small">Close</span>
-            
-        </button>
-       
-        <button type="submit"   class="btn btn-success">
-            <span class="mdi mdi-checkbox-marked-circle-outline"></span>
-            <span class="small">Update  </span> 
-        </button>
+            <button type="button"   class="btn btn-primary">
+                <span class="mdi mdi-printer"></span>
+                <span class="small">Print  </span> 
+            </button>
+            <button type="button"   class="btn btn-danger">
+                <span class="mdi mdi-file-pdf"></span>
+                <span class="small">PDF  </span> 
+            </button>
         </div>
-    </form>
+        
+    </div>
   </div>

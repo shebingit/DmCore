@@ -1,23 +1,18 @@
-{% extends 'HD_base.html' %}
+{% extends 'TL_base.html' %}
 {% load static %}
-{% load custom_filters %}
 {% block body %}
+
 <link href="https://cdn.datatables.net/2.0.3/css/dataTables.dataTables.css"  rel="stylesheet" >
 
 <!-- Other Styling -->
 <style>
-    .modal-title
-    {
-        font-size: 14px;
-        letter-spacing: 1px;
-        color: #d0d0d0;
-    }
-    #content_reason p
-    {
-        font-size: 12px;
-        letter-spacing: 1px;
-        color: #d0d0d0;
-    }
+    
+   .filter-values
+   {
+    font-size: 12px;
+    line-height: 1.6rem;
+    color: #d8d8d8;
+   }
    #leadsData p{
     margin-bottom: 0.10rem;
    }
@@ -240,13 +235,13 @@ grid-template-columns: 1fr 1fr;
 
 
 
-    #waste-data .lead-topBox
+    #lead-data .lead-topBox
     {
         display: flex;
         align-items: center;
         justify-content: space-between;
     }
-    #waste-data .heading h6{
+    #lead-data .heading h6{
         font-size: 14px;
         color: #c4c2c2;
         letter-spacing: 0.90px;
@@ -254,7 +249,7 @@ grid-template-columns: 1fr 1fr;
     .convertion-Box
     {
         display: grid;
-        grid-template-columns:0.50fr 0.50fr 1fr ;
+        grid-template-columns:1fr 1fr  ;
         gap: 0.50rem;
     }
     .lead-section2
@@ -431,27 +426,7 @@ grid-template-columns: 1fr 1fr;
         justify-content: center;
     }
 }
-</style>
 
-<style>
-
-    .notification-bell {
-        animation: color-changing 2s infinite;
-    }
-    
-    @keyframes color-changing {
-        0%, 100% {
-            color: rgb(26, 245, 26); /* Initial color */
-        }
-    
-        50% {
-            color: red; /* Color change point */
-        }
-    }
-
-</style>
-
-<style>
     .activityBox
     {
         background-color: #21272dfb;
@@ -592,21 +567,29 @@ grid-template-columns: 1fr 1fr;
     .modal-footer {
         flex-wrap: nowrap
     }
+    #lead-data .lead-topBox
+    {
+        flex-direction: column;
+        justify-content: start;
+    }
+    .card .card-body {
+        padding: 1.75rem .9625rem; 
+        }
 }
 </style>
 
 <div>
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'head_dashboard' %}">Dashboard</a></li>
-          <li class="breadcrumb-item active text-md" aria-current="page">Waste Leads </li>
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'tl_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Leads </li>
         </ol>
       </nav>
 </div>
 
 
 
-<div class="row" id="waste-data">
+<div class="row" id="lead-data">
     <div class="col-12">
         <div class="card">
             <div class="card-body">
@@ -614,7 +597,7 @@ grid-template-columns: 1fr 1fr;
                 <!------- Lead Document Section ----->
                 <div class="lead-topBox">
                     <div class="heading">
-                        <h6>Waste Leads ( {{ leads_obj_count }} ) </h6>
+                        <h6> Leads List ( {{ leads_obj_count }} ) </h6>
                     </div>
                     <div class="convertion-Box">
                         
@@ -626,19 +609,7 @@ grid-template-columns: 1fr 1fr;
                             <span class="mdi mdi-file-pdf text-danger"></span>
                             <span class="small mr-1">PDF</span>
                         </button>
-                        <div >
-                            <a href="{% url 'datamanager_wasteLead' %}">
-                                <button class="btn btn-outline-secondary">
-                                    <span class="mdi mdi-file"></span> 
-                                    <span class="text-small">Data Manager</span>
-                                    {% if waste_obj_count > 0 %}
-                                    <span class=" ml-2 mdi mdi-bell mdi-18px notification-bell"></span>
-                                    <span class=" text-small"> {{ waste_obj_count }}</span>
-                                    {% endif %}
-                            
-                                </button>
-                            </a>
-                        </div>
+                        
 
                     </div>
 
@@ -671,7 +642,7 @@ grid-template-columns: 1fr 1fr;
                                 <select class="select-tag"  id="client-change" name="client_change">
                                     <option value="">Client</option>
                                     {% for client in clients_objs %}
-                                        <option value="{{ client.client_Id.id }}"> {{ client.client_Id.client_name }}</option>
+                                        <option value="{{ client.id }}"> {{ client.client_name }}</option>
                                     {% endfor %}
                                     
                                 </select>
@@ -687,7 +658,7 @@ grid-template-columns: 1fr 1fr;
                             <div class="select-Box">
                                 <select class="select-tag" name="select_emp" id="select-emp">
                                     <option value="">Executive</option>
-                                    {% for exe in executive_data %}
+                                    {% for exe in employees %}
                                         <option value="{{ exe.id }}"> {{ exe.emp_name }} </option>
                                     {% endfor %}
                                     
@@ -701,23 +672,7 @@ grid-template-columns: 1fr 1fr;
                             <div class=" ">
                                 <input type="date" class="input-date"  name="edate" title="Lead collected to ">
                             </div>
-                            <div class="select-Box">
-                                <select class="select-tag" name="select_telecaller_emp" id="select-telecaller-emp">
-                                    <option value="">Telecaller</option>
-                                    {% for tele in telecaller_data %}
-                                        <option value="{{ tele.id }}"> {{ tele.emp_name }} </option>
-                                    {% endfor %}
-                                    
-                                </select>
-
-                            </div>
-                            
-                            <div class="">
-                                <input type="date" class="input-date"  name="waste_sdate" title="Waste makerd from ">
-                            </div>
-                            <div class=" ">
-                                <input type="date" class="input-date"  name="waste_edate" title="Waste makerd to ">
-                            </div>
+                           
                             <div>
                                 <button type="submit" class="btn btn-outline-primary">
                                     <span class="mdi mdi-magnify"></span>
@@ -728,15 +683,13 @@ grid-template-columns: 1fr 1fr;
                     </div>
                 </div>
                 <div>
-                    <p class="small mt-2">
+                    <p class="filter-values mt-2">
                         {% if client_name %}  {{ client_name.client_name }} -  {% endif %}
                         {% if category_name %} ( {{ category_name.lead_collection_for }} )  {% endif %}
                         {% if select_emp %} &nbsp; {{ select_emp.emp_name }}   {% endif %}
                         {% if start_date %} - ( {{ start_date }} ) {% endif %}
-                        {% if end_date %} ( {{ end_date}} ) ,{% endif %}
-                        {% if select_telecaller_emp %} &nbsp;&nbsp; HR - &nbsp; {{ select_telecaller_emp.emp_name }}   {% endif %}
-                        {% if d3 %} - ( {{ d3 }} ) {% endif %}
-                        {% if d4 %} ( {{ d4}} ) {% endif %}
+                        {% if end_date %} ( {{ end_date}} ){% endif %}
+                       
                         
                     </p>
     
@@ -802,7 +755,13 @@ grid-template-columns: 1fr 1fr;
                                         <td><p> <span class="mdi mdi-account "> </span> {{ lead.lead_name }} </p></td>
                                         <td><p><span class="mdi mdi-email"> </span> {{ lead.lead_email }}</p>      </td>
                                         <td><p><span class="mdi mdi-phone "> </span> {{ lead.lead_contact }} </p></td>
-                                        <td><p class="badge badge-pill badge-danger lead_reason" data-lead-id="{{ lead.id }}" title="Click to view reason for waste"><span class="mdi mdi-check-circle small"> Waste</span></p></td>
+                                        <td>
+                                            {% if lead.lead_status == 1 %}
+                                            <p class="badge badge-pill badge-success"><span class="mdi mdi-check-all small"> Verifird</span></p>
+                                            {% else %}
+                                            <p class="badge badge-pill badge-info"><span class="mdi mdi-check-circle small"> New</span></p>
+                                            {% endif %}
+                                        </td>
                                         <td>
                                             <a class="small ml-2 detailsBox-icon btn btn-sm btn-outline-info" data-lead-id="{{ lead.id }}" title="Basic Details of Lead">
                                                 <span class="mdi mdi-plus mdi-18px ">  </span> 
@@ -825,19 +784,19 @@ grid-template-columns: 1fr 1fr;
                     <div class=" paginationBox ">
                         <ul class="pagination">
                             {% if leads.has_previous %}
-                            <li><a href="?page=1{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}{% if telecaller_emp %}&telecaller={{ telecaller_emp }}{% endif %}{% if d3 %}&wsdate={{ d3 }}{% endif %}{% if d4 %}&wedate={{ d4 }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-double-left"></span></a></li>
-                            <li><a href="?page={{ leads.previous_page_number }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}{% if telecaller_emp %}&telecaller={{ telecaller_emp }}{% endif %}{% if d3 %}&wsdate={{ d3 }}{% endif %}{% if d4 %}&wedate={{ d4 }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-left"></span></a></li>
+                            <li><a href="?page=1{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-double-left"></span></a></li>
+                            <li><a href="?page={{ leads.previous_page_number }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-left"></span></a></li>
                             {% endif %}
                             {% for num in leads.paginator.page_range %}
                                 {% if num <= 4 or num == leads.paginator.num_pages or leads.number == num %}
                                     <li {% if leads.number == num %} class="active" {% endif %}>
-                                        <a href="?page={{ num }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}{% if telecaller_emp %}&telecaller={{ telecaller_emp }}{% endif %}{% if d3 %}&wsdate={{ d3 }}{% endif %}{% if d4 %}&wedate={{ d4 }}{% endif %}" class="btn btn-dark"><span>{{ num }}</span></a></li>
+                                        <a href="?page={{ num }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span>{{ num }}</span></a></li>
                                 {% endif %}
                                
                             {% endfor %}
                             {% if leads.has_next %}
-                            <li><a href="?page={{ leads.next_page_number }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}{% if telecaller_emp %}&telecaller={{ telecaller_emp }}{% endif %}{% if d3 %}&wsdate={{ d3 }}{% endif %}{% if d4 %}&wedate={{ d4 }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-right"></span></a></li>
-                            <li><a href="?page={{ leads.paginator.num_pages }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}{% if telecaller_emp %}&telecaller={{ telecaller_emp }}{% endif %}{% if d3 %}&wsdate={{ d3 }}{% endif %}{% if d4 %}&wedate={{ d4 }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-double-right"></span></a></li>
+                            <li><a href="?page={{ leads.next_page_number }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-right"></span></a></li>
+                            <li><a href="?page={{ leads.paginator.num_pages }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-double-right"></span></a></li>
                             {% endif %}
                         </ul>
                     </div>
@@ -892,23 +851,6 @@ grid-template-columns: 1fr 1fr;
 </div>
 
 
-<!-- Modal Reason Tracker -->
-<div class="modal fade" id="reasonPanel" tabindex="-1" aria-labelledby="reasonPanelLable" aria-hidden="true">
-    <div class="modal-dialog " id="reasonBox" >
-        <div class="modal-content">
-            <div class="card">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="reasonPanelLable">Reason Tracker</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span class="mdi mdi-close text-danger"></span>
-                    </button>
-                </div>
-                <div class="modal-body card-body" id="content_reason" >
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- Modal Follow up Details  -->
 <div class="modal fade" id="activityPanel" tabindex="-1" aria-labelledby="activityPanelLable" aria-hidden="true">
@@ -1019,32 +961,6 @@ grid-template-columns: 1fr 1fr;
         });
     });
 </script>
-
-<script>
-    $(document).ready(function() {
-        $(document).on("click", ".lead_reason", function() {
-            var leadId = $(this).data('lead-id');
-         
-            $.ajax({
-                url: "{% url 'HD_featchLeadwasteReason' %}",
-                type: 'GET', 
-                data: {
-                    lead_id: leadId
-                },
-                success: function(response) {
-                    console.log(response.lead_wsate_reason); // Corrected property name
-                    $('#content_reason').empty();
-                    $('#content_reason').html('<div><p>' + response.lead_wsate_reason + '</p></div>');
-                    $('#reasonPanel').modal('show');     
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error fetching lead details:', error);
-                }
-            });
-        });
-    });
-</script>
-
 
 
 <script>

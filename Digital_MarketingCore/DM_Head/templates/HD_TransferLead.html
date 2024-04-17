@@ -665,7 +665,7 @@
     $(document).ready(function() {
        new DataTable('#leadsData', {
            search: {
-               return: true
+            enable: true 
            },
            columnDefs: [
            {
@@ -710,12 +710,12 @@
     });
 
     $("#client-change").on("change", function () {
-        // Get the selected client ID
+        
         var selectedClientId = $(this).val();
       
         
         $.ajax({
-            url: "{% url 'fetch_lead_categories' %}",
+            url: "{% url 'leadCategories' %}",
             type: 'GET',
             dataType: 'json',
             data: {

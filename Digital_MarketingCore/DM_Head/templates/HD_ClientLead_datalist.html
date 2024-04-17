@@ -6,6 +6,21 @@
 
 <!-- Other Styling -->
 <style>
+    #waste-reason {
+        margin-top: 3px;
+    }
+    
+    #waste-reason textarea {
+        width: 100%;
+        height: 100px;
+        resize: none;
+        background: transparent;
+        border-radius: 5px;
+        color: #c9c9c9;
+        font-size: 13px;
+        padding: 0.60rem 1rem;
+
+    }
     .g-1
     {
         gap: 1rem;
@@ -295,16 +310,22 @@ grid-template-columns: 1fr 1fr;
 
 <!-- Pagination -->
 <style>
+    .paginationBox-scroll
+    {
+        width: 100%;
+    }
     .paginationBox
     {
         display: flex;
         align-items: center;
         justify-content: end;
         margin-top: 1rem;
+        gap: 0.30rem;
     }
     .pagination li
     {
         margin: 0.10rem;
+      
     }
     .pagination .active
     {
@@ -331,7 +352,14 @@ grid-template-columns: 1fr 1fr;
     .section2_2::-webkit-scrollbar-thumb:hover {
         background: #555; /* Set the color of the scrollbar handle when hovered */
     }
-
+@media (max-width:732px)
+{
+    .paginationBox-scroll
+    {
+        width:calc(100% - 1%);
+        overflow-y:scroll;
+    }
+}
 </style>
 
 <!--- At Media -->
@@ -530,6 +558,10 @@ grid-template-columns: 1fr 1fr;
                     </div>
                 </div>
 
+                <div id="waste-reason" style="display: none;">
+                    <textarea id="waste-reason-textarea" name="waste_reason"  placeholder="Enter waste reason"></textarea>
+                </div>
+
                 <!-------- Table Section ----->
 
                 {% if leads %}
@@ -641,29 +673,28 @@ grid-template-columns: 1fr 1fr;
                             </tbody>
                         </table>
                     </div>
-
-                   
-
-                    <div class=" paginationBox ">
-                        <ul class="pagination">
-                            {% if leads.has_previous %}
-                            <li><a href="?page=1{% if status %}&status={{ status }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-double-left"></span></a></li>
-                            <li><a href="?page={{ leads.previous_page_number }}{% if status %}&status={{ status }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-left"></span></a></li>
-                            {% endif %}
-                            {% for num in leads.paginator.page_range %}
-                                {% if num <= 4 or num == leads.paginator.num_pages or leads.number == num %}
-                                    <li {% if leads.number == num %} class="active" {% endif %}>
-                                        <a href="?page={{ num }}{% if status %}&status={{ status }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}"  class="btn btn-dark"><span>{{ num }}</span></a></li>
+                    <div class="paginationBox-scroll">
+        
+                        <div class=" paginationBox ">
+                            <ul class="pagination">
+                                {% if leads.has_previous %}
+                                <li><a href="?page=1{% if status %}&status={{ status }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-double-left"></span></a></li>
+                                <li><a href="?page={{ leads.previous_page_number }}{% if status %}&status={{ status }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-left"></span></a></li>
                                 {% endif %}
-                               
-                            {% endfor %}
-                            {% if leads.has_next %}
-                            <li><a href="?page={{ leads.next_page_number }}{% if status %}&status={{ status }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-right"></span></a></li>
-                            <li><a href="?page={{ leads.paginator.num_pages }}{% if status %}&status={{ status }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-double-right"></span></a></li>
-                            {% endif %}
-                        </ul>
+                                {% for num in leads.paginator.page_range %}
+                                    {% if num <= 4 or num == leads.paginator.num_pages or leads.number == num %}
+                                        <li {% if leads.number == num %} class="active" {% endif %}>
+                                            <a href="?page={{ num }}{% if status %}&status={{ status }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}"  class="btn btn-dark"><span>{{ num }}</span></a></li>
+                                    {% endif %}
+                                
+                                {% endfor %}
+                                {% if leads.has_next %}
+                                <li><a href="?page={{ leads.next_page_number }}{% if status %}&status={{ status }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-right"></span></a></li>
+                                <li><a href="?page={{ leads.paginator.num_pages }}{% if status %}&status={{ status }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-double-right"></span></a></li>
+                                {% endif %}
+                            </ul>
+                        </div>
                     </div>
-                    
 
                 {% else %}
         
@@ -818,6 +849,11 @@ grid-template-columns: 1fr 1fr;
 </div>
 
 
+
+
+
+
+
 <!--- Script Section  -->          
                   
 
@@ -825,27 +861,51 @@ grid-template-columns: 1fr 1fr;
 <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 <script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
 <script>
-    // Get the span element
-    var downloadSpan = document.getElementById("downloadFile");
-
-    // Add event listener for window resize
-    window.addEventListener("resize", function() {
-        // Check the window width
-        if (window.innerWidth <= 768) {
-            // Change the text content when window width is less than or equal to 768px
-            downloadSpan.textContent = "Download";
-        } else {
-            // Revert back to original text content for other window widths
-            downloadSpan.textContent = "Download File Format";
-        }
-    });
-
-    // Initial check for window width on page load
-    if (window.innerWidth <= 768) {
-        downloadSpan.textContent = "Download";
-    }
+    $(document).ready(function() {
+       new DataTable('#leadsData', {
+           search: {
+            enable: true 
+           },
+           columnDefs: [
+           {
+               orderable: false,
+               className: 'check-single',
+               targets: 0,
+           }
+       ],
+       paging: false 
+       
+   });
+  
+});
 </script>
+
+
+
+
+    <script>
+        // Get the span element
+        var downloadSpan = document.getElementById("downloadFile");
+
+        // Add event listener for window resize
+        window.addEventListener("resize", function() {
+            // Check the window width
+            if (window.innerWidth <= 768) {
+                // Change the text content when window width is less than or equal to 768px
+                downloadSpan.textContent = "Download";
+            } else {
+                // Revert back to original text content for other window widths
+                downloadSpan.textContent = "Download File Format";
+            }
+        });
+
+        // Initial check for window width on page load
+        if (window.innerWidth <= 768) {
+            downloadSpan.textContent = "Download";
+        }
+    </script>
 
     <script>
         $(document).ready(function(){
@@ -855,6 +915,9 @@ grid-template-columns: 1fr 1fr;
                 var wID = $('#work-ID').val()
                 var lID = $('#lc-ID').val()
                 var pgnum = $('#select-count').val()
+                var wasteReason = $('#waste-reason-textarea').val();
+
+               
 
                 // Iterate through all checkboxes with class "check-single"
                 $('.check-single:checked').each(function(){
@@ -867,6 +930,26 @@ grid-template-columns: 1fr 1fr;
                     alert('Please check at least one lead.');
                     return; // Exit the function without submitting the form
                 }
+
+                // Check if the selected value is "Waste"
+                if (selectedValue == "Waste") {
+                    // Show the textarea
+                    $('#waste-reason').show();
+                    console.log('showed')
+                    // Get the value of the textarea only if it's visible
+                    var wasteReason = $('#waste-reason-textarea').val();
+                   
+                    // Check if the textarea is empty
+                    if ($.trim(wasteReason) == '') {
+                       
+                        $('#waste-reason-textarea').focus(); // Point cursor to textarea
+                        return; // Exit function if textarea is empty
+                    }
+                } else {
+                    // Hide the textarea if the selected value is not "Waste"
+                    $('#waste-reason').hide();
+                }
+
                 var leadIDs = $('#checkbox-values').val()
                 console.log(leadIDs)
                 $.ajax({
@@ -881,6 +964,7 @@ grid-template-columns: 1fr 1fr;
                         wID:wID,
                         lID:lID,
                         pgnum:pgnum,
+                        wasteReason:wasteReason,
                     },
                     success: function(response){
                         console.log(response);
@@ -920,30 +1004,6 @@ grid-template-columns: 1fr 1fr;
     }
     </script>
 
-
-    <script>
-         $(document).ready(function() {
-            new DataTable('#leadsData', {
-                search: {
-                    return: true
-                },
-                columnDefs: [
-                {
-                    orderable: false,
-                    className: 'check-single',
-                    targets: 0,
-                }
-            ],
-            paging: false 
-            
-        });
-      
-    
-       
-    });
-    </script>
-
-    
 
     <script>
         $(document).ready(function () {
@@ -1084,7 +1144,23 @@ grid-template-columns: 1fr 1fr;
                 $("#multiple-entry").toggle();
             });
         });
-        </script>
+    </script>
+
+    <!-- To Input the reason for waste-->
+
+    <script>
+        $(document).ready(function() {
+            $('#select-action').change(function() {
+                var selectedOption = $(this).val();
+                if (selectedOption === 'Waste') {
+                    $('#waste-reason').show();
+                } else {
+                    $('#waste-reason').hide();
+                }
+            });
+        });
+        
+    </script>
 
 {% endblock %}
 

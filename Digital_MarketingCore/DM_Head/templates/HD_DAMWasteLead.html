@@ -4,15 +4,30 @@
 {% block body %}
 <link rel="stylesheet" href="https://cdn.datatables.net/2.0.3/css/dataTables.dataTables.css">
 
+<!-- Other Styling -->
 <style>
-    .input-textarea textarea
-    {
-        color: #c8c8c8;
+    
+   
+  
+   .table th, .jsgrid .jsgrid-table th, .table td, .jsgrid .jsgrid-table td {
+    padding: 0.4375rem;
     }
-    .ml-2
+    .top-h4
     {
-        margin-right: 0.40rem;
+        color: #bababa;
+        font-size: 17px;
+        letter-spacing: 1px;
     }
+    .g-1
+    {
+        gap: 1rem;
+    }
+    #checkbox-values
+    {
+        opacity: 0;
+    }
+    /*   Data Table   */
+
     .dt-search label
     {
      display: none;
@@ -46,90 +61,201 @@
     div.dt-container .dt-info
     {
         color: #a5a5a5;
-        font-size: 13px 
+        font-size: 13px ;
     }
+
+
+
+    #waste-data .lead-topBox
+    {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    #waste-data .heading h6{
+        font-size: 14px;
+        color: #c4c2c2;
+        letter-spacing: 0.90px;
+    }
+    .convertion-Box
+    {
+        display: grid;
+        grid-template-columns:1fr 1fr ;
+        gap: 0.50rem;
+    }
+    .lead-section2
+    {
+        margin-top: 0.897rem;
+        padding: .785rem;
+        border-top: 1px solid #747373cd;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .statusChange
+    {
+        letter-spacing: 1px;
+        color: #c4c2c2;
+    }
+    .search-section2_2,
+    .search-form
+    {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 0.30rem;
+    }
+    .search-section2_2
+    {
+        display: inline-flex;
+        width: calc(100% - 1%);
+        overflow-x: scroll;
+        margin: 0;
+        padding-bottom: 0.30rem;
+    }
+    .select-Box .select-tag,
+    .search-form .input-date
+    {
+        padding: 0.35rem .30rem;
+        background: transparent;
+        border: 1px solid #909090;
+        border-radius: 5px;
+        font-size: 12px;
+        color: #dedede;
+    }
+    .search-form .input-date
+    {
+        padding: 0.25rem .30rem;
+    }
+    
+    .select-Box .select-tag option
+    {
+        background: #0d0f14;
+    }
+    .table-responsive
+    {
+        border: 1px solid rgba(86, 85, 85, 0.827); 
+        padding: 1rem;
+    }
+    #waste-data thead tr th{
+        text-align: center;
+        font-size: 13.75px;
+        font-weight: 500;
+    }
+    #waste-data tbody tr td{
+        font-size: 12px;
+        font-weight: 400;
+
+    }
+
+    #search-section2_2::-webkit-scrollbar {
+        width: 1px;
+        border-radius: 10px;
+    }
+    
+    /* For WebKit browsers (Chrome, Safari) */
+    #search-section2_2::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    
+    /* For WebKit browsers (Chrome, Safari) */
+    #search-section2_2::-webkit-scrollbar-thumb {
+        background: #04050bb5; /* Adjust scrollbar thumb color as needed */
+    }
+    
+        
+    
+   
 </style>
 
-<div>
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'head_waste_lead' %}">Waste Leads</a></li>
-          <li class="breadcrumb-item active text-md" aria-current="page"> Data Manager </li>
-        </ol>
-      </nav>
-</div>
+<!-- Pagination -->
+<style>
+    .paginationBox-scroll
+    {
+        width: 100%;
+    }
+    .paginationBox
+    {
+        display: flex;
+        align-items: center;
+        justify-content: end;
+        margin-top: 1rem;
+        gap: 0.30rem;
+    }
+    .pagination li
+    {
+        margin: 0.10rem;
+      
+    }
+    .pagination .active
+    {
+        border:1px solid #e3e2e2 ;
+    }
+    .pagination li a{
+        padding: .70rem;
+    }
+ 
+@media (max-width:732px)
+{
+    .paginationBox-scroll
+    {
+        width:calc(100% - 1%);
+        overflow-y:scroll;
+    }
+}
+</style>
 
-<div class="row mt-1">
-    <div class="col-12 grid-margin">
-        <div class="card">
-            <div class="card-body">
+<!--- At Media -->
+<style>
+@media (max-width:1280px)
+{
 
-            
-            
-            {% if leads_obj %}
-    
-                <div class="row">
-                    <div class="col-sm-12 col-lg-8 col-md-7 col-xl-9  grid-margin">
-                    <h6 class="card-title custom-letter-spacing"> Waste Leads List - ( {{ leads_obj_count }} )</h6>
-                    </div>
-                   
-                    
-                </div>
-        
-                <div class="table-responsive">
-                    <table class="table" id="leads-data">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th> History </th>
-                            <th>Lead Name</th>
-                            <th>Contact Details</th>
-                           
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for lead in leads_obj %}
-                        <tr>
-                            <td><span>{{ forloop.counter }}</span> </td>
-                            <td>
+    .lead-section2
+{
+    display: grid;
+    grid-template-columns: 1fr;
+    row-gap: 0.90rem;
+}
+.search-section2_1
+{
+    display: flex;
+    justify-content: space-between;
+}
 
-                                <a class="small ml-2 btn btn-sm btn-outline-info fetch-lead-details"  data-lead-id="{{ lead.id }}" title="More Details of Lead">
-                                    <span class="mdi mdi-file-document mdi-18px text-secondary">  </span> 
-                                </a>
-                                
-                            </td>
-                            <td>
-                                <p><span class="mdi mdi-account ml-2"></span> {{ lead.leadId.lead_name }}</p>
-                                <p> <span class="mdi mdi-file-document  ml-2"></span>
-                                    {{ lead.client_id.client_name }} - 
-                                     {{ lead.leadId.lead_category_id.lead_collection_for }}</p>
-                            </td>
-                            <td>
-                                <p><span class="mdi mdi-email ml-2"></span>{{ lead.leadId.lead_email }}</p>
-                                <p><span class="mdi mdi-phone ml-2"></span>{{ lead.leadId.lead_contact }}</p>
-                            </td>
-                           
-                        </tr>
-                        {% endfor %}
-                    
-                    </tbody>
-                    </table>
-                </div>
+#leads-data .col-12
+{
+    padding-right: 0.05rem; 
+    padding-left: 0.05rem; 
+}
+#leads-data .lead-topBox {
+    display: grid;
+    grid-template-columns: 1fr;
+}
+#leads-data .heading h6 {
+    font-size: 13px;
+    margin-bottom: 0.90rem;
+    letter-spacing: 0.80px;
 
-            {% else %}
-            
-                <div class="d-flex justify-content-center">
-                <img src="{% static 'images\file-icons\no-data-file.png' %}">
-                </div>
-            
-            {% endif %}
-                        
-                        
-            </div>
-        </div>
-    </div>
-</div>
+}
+.lead-section2
+{
+    display: grid;
+    grid-template-columns: 1fr;
+    row-gap: 0.70rem;
+}
+.search-section2_1
+{
+    gap: 0.50rem;
+    margin-bottom: 0.875rem;
+}
 
+
+    .paginationBox
+    {
+        justify-content: center;
+    }
+}
+</style>
 
 
 <style>
@@ -275,28 +401,281 @@
 }
 </style>
 
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'head_waste_lead' %}">Waste Leads</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page"> Data Manager </li>
+        </ol>
+      </nav>
+</div>
+
+
+<div class="row" id="waste-data">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+
+                <!------- Lead Document Section ----->
+                <div class="lead-topBox">
+                    <div class="heading">
+                        <h6>Waste Leads ( {{ leads_obj_count }} ) </h6>
+                    </div>
+                    <div class="convertion-Box">
+                        
+                        <button type="button" class="btn  btn-dark" title="Covert leads to excel">
+                            <span class="mdi mdi-file-excel"></span>
+                            <span class="small mr-1">Excel</span>
+                        </button>
+                        <button type="button" class="btn  btn-dark" title="Covert leads to PDF">
+                            <span class="mdi mdi-file-pdf text-danger"></span>
+                            <span class="small mr-1">PDF</span>
+                        </button>
+                       
+
+                    </div>
+
+                </div>
+
+                <!----- Search Section ------>
+                <div class="lead-section2">
+                    
+                    <div class="search-section2_2" id="search-section2_2">
+                        
+                        <form class="search-form" action="#" method="post" >
+                            {% csrf_token %}
+                            <div class="select-Box">
+                                <select class="select-tag" name="pgnum" id="select-count">
+                                    {% if pg_num %}
+                                    <option value="{{ pg_num }}" selected>{{ pg_num }}</option>   
+                                    {% endif %}
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                    <option value="150">150</option>
+                                    <option value="250">250</option>
+                                    <option value="500">500</option>
+                                    <option value="1000">1000</option>
+                                   
+                                </select>
+                            </div>
+                            
+                            <div class="select-Box">
+                                <select class="select-tag"  id="client-change" name="client_change">
+                                    <option value="">Client</option>
+                                    {% for client in clients_objs %}
+                                        <option value="{{ client.client_Id.id }}"> {{ client.client_Id.client_name }}</option>
+                                    {% endfor %}
+                                    
+                                </select>
+                            </div>
+                            <div class="select-Box">
+                                <select class="select-tag" id="lead-category" name="category_name">
+                                    <option value="">Category</option>
+                                    
+                                </select>
+
+                            </div>
+                           
+                            <div class="select-Box">
+                                <select class="select-tag" name="select_emp" id="select-emp">
+                                    <option value="">Executive</option>
+                                    {% for exe in executive_data %}
+                                        <option value="{{ exe.id }}"> {{ exe.emp_name }} </option>
+                                    {% endfor %}
+                                    
+                                </select>
+
+                            </div>
+                            
+                            <div class="">
+                                <input type="date" class="input-date"  name="sdate" title="Lead collected from ">
+                            </div>
+                            <div class=" ">
+                                <input type="date" class="input-date"  name="edate" title="Lead collected to ">
+                            </div>
+
+                            <!-- Telecaller -->
+                            <div class="select-Box">
+                                <select class="select-tag" name="select_telecaller_emp" id="select-telecaller-emp">
+                                    <option value="">Telecaller</option>
+                                    {% for tele in telecaller_data %}
+                                        <option value="{{ tele.id }}"> {{ tele.emp_name }} </option>
+                                    {% endfor %}
+                                    
+                                </select>
+
+                            </div>
+                            
+                            <div class="">
+                                <input type="date" class="input-date"  name="waste_sdate" title="Waste makerd from ">
+                            </div>
+                            <div class=" ">
+                                <input type="date" class="input-date"  name="waste_edate" title="Waste makerd to ">
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-outline-primary">
+                                    <span class="mdi mdi-magnify"></span>
+                                </button>
+                            </div>
+                            
+                        </form>
+                        
+                    </div>
+                </div>
+                <div>
+                    <p class="small mt-2">
+                        {% if client_name %}  {{ client_name.client_name }} -  {% endif %}
+                        {% if category_name %} ( {{ category_name.lead_collection_for }} )  {% endif %}
+                        {% if select_emp %} &nbsp; {{ select_emp.emp_name }}   {% endif %}
+                        {% if start_date %} - ( {{ start_date }} ) {% endif %}
+                        {% if end_date %} ( {{ end_date}} ) , {% endif %}
+                        {% if select_telecaller_emp %} &nbsp;&nbsp; HR - &nbsp; {{ select_telecaller_emp.emp_name }}  {% endif %}
+                        {% if d3 %} - ( {{ d3 }} ) {% endif %}
+                        {% if d4 %} ( {{ d4}} ) {% endif %}
+                        
+                    </p>
+    
+                </div>
+
+                <!-------- Table Section ----->
+
+                {% if leads %}
+
+                <form action="" method="post">
+                    {% csrf_token %}
+                    
+                    <div class="table-responsive">
+                
+                        <table class="table table-bordered" id="waste-leadsData">
+                            <thead>
+                                <tr class="table-active">
+                                   
+                                    <th>No</th>
+                                    <th> History </th>
+                                    <th> Marked Date</th>
+                                    <th>Lead Name</th>
+                                    <th>Contact Details</th>
+
+                                </tr>
+                            </thead>
+                        
+                            <tbody>
+                               
+                               
+                            {% for lead in leads %}
+                            <tr>
+                                <td>{{ forloop.counter }} </td>
+                                <td>
+
+                                    <a class="small ml-2 btn btn-sm btn-outline-info fetch-lead-details"  data-lead-id="{{ lead.id }}" title="More Details of Lead">
+                                        <span class="mdi mdi-file-document mdi-18px text-secondary">  </span> 
+                                    </a>
+                                    
+                                </td>
+                                <td class="text-center">{{ lead.waste_marked_Date  }}
+                                    <p class="mt-1">Collected on : {{  lead.leadId.lead_add_date}}</p>
+                                </td>
+                                <td>
+                                    <p><span class="mdi mdi-account ml-2"></span> {{ lead.leadId.lead_name }}</p>
+                                    <p> <span class="mdi mdi-file-document  ml-2"></span>
+                                        {{ lead.client_id.client_name }} - 
+                                        {{ lead.leadId.lead_category_id.lead_collection_for }}</p>
+                                </td>
+                                <td>
+                                    <p><span class="mdi mdi-email ml-2"></span>{{ lead.leadId.lead_email }}</p>
+                                    <p><span class="mdi mdi-phone ml-2"></span>{{ lead.leadId.lead_contact }}</p>
+                                </td>
+                           
+                            </tr>
+                            {% endfor %}
+                           
+                            
+                            </tbody>
+                        </table>
+                    </div>
+
+                   
+
+                    <div class=" paginationBox ">
+                        <ul class="pagination">
+                            {% if leads.has_previous %}
+                            <li><a href="?page=1{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}{% if telecaller_emp %}&telecaller={{ telecaller_emp }}{% endif %}{% if d3 %}&wsdate={{ d3 }}{% endif %}{% if d4 %}&wedate={{ d4 }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-double-left"></span></a></li>
+                            <li><a href="?page={{ leads.previous_page_number }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}{% if telecaller_emp %}&telecaller={{ telecaller_emp }}{% endif %}{% if d3 %}&wsdate={{ d3 }}{% endif %}{% if d4 %}&wedate={{ d4 }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-left"></span></a></li>
+                            {% endif %}
+                            {% for num in leads.paginator.page_range %}
+                                {% if num <= 4 or num == leads.paginator.num_pages or leads.number == num %}
+                                    <li {% if leads.number == num %} class="active" {% endif %}>
+                                        <a href="?page={{ num }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}{% if telecaller_emp %}&telecaller={{ telecaller_emp }}{% endif %}{% if d3 %}&wsdate={{ d3 }}{% endif %}{% if d4 %}&wedate={{ d4 }}{% endif %}" class="btn btn-dark"><span>{{ num }}</span></a></li>
+                                {% endif %}
+                               
+                            {% endfor %}
+                            {% if leads.has_next %}
+                            <li><a href="?page={{ leads.next_page_number }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}{% if telecaller_emp %}&telecaller={{ telecaller_emp }}{% endif %}{% if d3 %}&wsdate={{ d3 }}{% endif %}{% if d4 %}&wedate={{ d4 }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-right"></span></a></li>
+                            <li><a href="?page={{ leads.paginator.num_pages }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}{% if telecaller_emp %}&telecaller={{ telecaller_emp }}{% endif %}{% if d3 %}&wsdate={{ d3 }}{% endif %}{% if d4 %}&wedate={{ d4 }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-double-right"></span></a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+
+                </form>
+
+                    
+
+                {% else %}
+        
+                    <div class="d-flex justify-content-center">
+                        <img src="{% static 'images\file-icons\no-data-file.png' %}">
+                    </div>
+        
+                {% endif %}
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
 <!-- Modal -->
 <div class="modal fade" id="activityPanel" tabindex="-1" aria-labelledby="activityPanelLable" aria-hidden="true">
     <div class="modal-dialog modal-xl" id="activityBox" >
       
     </div>
-  </div>
+</div>
 
 
 
 <!-------------------------------------------------->
 
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.js"></script>  
 <script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
 
 <script>
-    new DataTable('#leads-data', {
-        pagingType: 'simple_numbers'
-    });
+    $(document).ready(function() {
+       new DataTable('#waste-leadsData', {
+           search: {
+            enable: true 
+           },
+           columnDefs: [
+           {
+               orderable: false,
+               className: 'check-single',
+               targets: 0,
+           }
+       ],
+       paging: false 
+       
+   });
+  
+});
 </script>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
     $(document).ready(function() {
         $(document).on("click", ".fetch-lead-details", function(e) {
@@ -322,6 +701,55 @@
         }
     });
 
+</script>
+
+<script>
+    $(document).ready(function () {
+        
+    $("#client-change").on("change", function () {
+        
+        var selectedClientId = $(this).val();
+      
+        
+        $.ajax({
+            url: "{% url 'leadCategories' %}",
+            type: 'GET',
+            dataType: 'json',
+            data: {
+                client_id: selectedClientId
+            },
+            success: function (data) {
+              
+                if (data.success) {
+                    
+                    var leadCategorySelect = $("#lead-category");
+                  
+                    leadCategorySelect.empty(); 
+      
+                    var option = '<option value="">' + 'Select Category' + '</option>';
+                    leadCategorySelect.append(option);
+                    data.lead_categories.forEach(function (category) {
+                        var option = '<option value="' + category.id + '">' + category.name + '</option>';
+                        leadCategorySelect.append(option);
+                    });
+
+                    
+                    updateTable(data.leads_data);
+                    
+                } else {
+                    
+                    console.error('Error: ' + data.message);
+                }
+               
+            },
+            error: function (xhr, status, error) {
+                // Handle Ajax errors (optional)
+                console.error('Ajax Error: ' + status + ' - ' + error);
+            }
+        });
+      });
+
+    });
 </script>
 
 

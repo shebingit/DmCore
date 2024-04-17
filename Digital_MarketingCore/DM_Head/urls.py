@@ -208,7 +208,10 @@ urlpatterns = [
 
 
     path('Reports/',views.head_Reports,name='head_Reports'),
-
+    path('Lead-Categories/',views.leadCategories,name='leadCategories'),
+    path('Waste-Reason/',views.HD_featchLeadwasteReason,name='HD_featchLeadwasteReason'),
+    
+    path('leadFollwup_data/<int:lead_id>/', views.leadFollwup_data, name='leadFollwup_data'),
     
     
 

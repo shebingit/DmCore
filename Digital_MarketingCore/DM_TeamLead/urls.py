@@ -151,7 +151,9 @@ urlpatterns = [
 
 
 
-
+    # 17/04/24
+    
+    path('TL-Leads',views.tl_lead_list,name='tl_lead_list'),
 
 
 

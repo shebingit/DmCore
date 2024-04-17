@@ -2246,6 +2246,15 @@ def DAM_waste_dateApprove(request,waID):
         if waste.confirmation == 1:
             waste.Status = 1
             waste.save()
+            lead_obj = Leads.objects.get(id=waste.leadId.id)
+            lead_obj.waste_data = 1
+            
+            if waste.assignto_tc_id:
+                lead_obj.waste_data_reason = waste.assignto_tc_id.TC_Id.emp_name + '( ' +  str(waste.waste_marked_Date)  +' )' + ' :- ' +  waste.reason 
+            else:
+                lead_obj.waste_data_reason =  str(waste.waste_marked_Date) + ' :- ' + waste.reason
+
+            lead_obj.save()
 
             db = DataBank.objects.get(lead_Id__id=waste.leadId.id)
             db.current_status = 'Marked as Waste'
@@ -2258,7 +2267,7 @@ def DAM_waste_dateApprove(request,waID):
             fh.hr_telecaller_Id = waste.assignto_tc_id
             fh.hs_comp_Id=dash_details.emp_comp_id
             fh.final_status = 'Marked as Waste'
-            fh.save()
+            #fh.save()
 
             
 
