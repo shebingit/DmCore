@@ -126,10 +126,9 @@
 
 
 <div class="row ">
-    <div class="col-lg-5 col-md-4 col-sm-12 col-12"></div>
-    <div class="col-lg-7 col-md-8 col-sm-12 col-12">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-12">
         <div class="row g-1">
-            <div class="col-lg-6 col-md-6 col-sm-12 col-12">
+            <div class="col-lg-3 col-md-3 col-sm-12 col-12">
                 <div class="card">
                     <div class="card-body">
                         <div class="count">
@@ -140,7 +139,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6 col-md-6 col-sm-12 col-12">
+            <div class="col-lg-3 col-md-3 col-sm-12 col-12">
                 <div class="card">
                     <div class="card-body">
                         <div class="count">
@@ -151,7 +150,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6 col-md-6 col-sm-12 col-12">
+            <div class="col-lg-3 col-md-3 col-sm-12 col-12">
                 <div class="card">
                     <div class="card-body">
                         <div class="count">
@@ -161,7 +160,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6 col-md-6 col-sm-12 col-12">
+            <div class="col-lg-3 col-md-3 col-sm-12 col-12">
                 <div class="card">
                     <div class="card-body">
                         <div class="count">
@@ -197,7 +196,7 @@
                         
                     </h6>
                     
-                    <div class="convertion-Box">
+                    <!-- <div class="convertion-Box">
                         <button type="button" class="btn  btn-dark" data-toggle="modal" data-target="#ReportPanel" title="Print out the lead data">
                             <span class="mdi  mdi-content-paste text-secondary"></span>
                             <span class="small mr-1">Report</span>
@@ -218,7 +217,7 @@
                         </button>
                        
                         
-                    </div>
+                    </div> -->
                     
                 </div>
                 <p>
@@ -287,6 +286,8 @@
                         <div class="filterBox">
                             <div class="search-field" >
                                 <select id="" name="pgnum">
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
                                     <option value="50">50</option>
                                     {% if pg_num %}
                                     <option value="{{pg_num}}" selected>{{ pg_num}}</option>
@@ -442,18 +443,6 @@
 </div>
 
 
-<div class="row">
-    
-    <div class="col-12 col-lg-12 col-md-12 col-sm-12">
-        <div class="card">
-            <div class="card-body">
-                <div style="width:100%;">
-                    <div id="myline" style="width:100%;max-width:100%"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!--- Modal -->
 
@@ -586,30 +575,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
-<script>
-    const line_xArray = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    const line_yArray = [7,8,8,9,9,9,10,11,14,14,15,17];
-    
-    // Define Data
-    const line_data = [{
-      x: line_xArray,
-      y: line_yArray,
-      mode:"lines"
-    }];
-    
- 
-    const layout_line = {
-      xaxis: {range: ['januvary', 'December'], title: "Months 2024"},
-      yaxis: {range: [5, 18], title: "leads Count"},  
-      title: "Leads  vs. Month",
-      plot_bgcolor: '#020203' 
-    };
-    
-    // Display using Plotly
-    Plotly.newPlot("myline", line_data, layout_line);
-</script>
 
 
 

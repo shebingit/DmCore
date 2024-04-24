@@ -106,6 +106,9 @@ urlpatterns = [
 
     
     path('Executive-Collect-LeadRemove/<int:pk>/<int:leadCID>/',views.executive_collect_leadRemove,name='executive_collect_leadRemove'),
+
+    path('Executive-all-leads',views.executive_allleads,name='executive_allleads'),
+    path('Executive-waste-leads',views.executive_wasteleads,name='executive_wasteleads'),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

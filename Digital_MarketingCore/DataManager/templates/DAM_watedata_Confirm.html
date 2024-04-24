@@ -6,6 +6,17 @@
 <link href="https://cdn.datatables.net/2.0.3/css/dataTables.dataTables.css"  rel="stylesheet" >
 
 <style>
+
+  .table thead tr th{
+    font-size: 12.2px;
+    text-align: center;
+    letter-spacing: 1px;
+
+  } 
+
+  table.dataTable > tbody > tr > th, table.dataTable > tbody > tr > td {
+    padding: 3px 10px;
+}
     .dt-search label
     {
      display: none;
@@ -41,6 +52,66 @@
         color: #a5a5a5;
         font-size: 13px 
     }
+    .reason-box
+    {
+      padding: 10px 0px;
+      margin-top: 0.20rem;
+      color: rgba(255, 82, 82, 0.83);
+      font-size: 12.6px;
+
+    }
+    .tc
+    {
+      font-size: 12px;
+      padding-bottom: 0.20rem;
+    }
+    .form-section
+    {
+      display: grid;
+      grid-template-columns: 0.80fr 2fr;
+      border-bottom: 0.30px solid #929292;
+      padding-bottom: 0.70rem;
+    }
+    .search-form
+    {
+      display: flex;
+      align-items: center;
+      justify-content: end;
+      gap: 0.80rem;
+     
+    }
+    .input-groupBox input,
+    .input-groupBox select
+    {
+      background: #15171f;
+      color: #bebebe;
+      font-size: 12px;
+      outline: #dededf;
+      border: 0.0002px solid #94949490;
+      padding: 6px 15px;
+    }
+    .input-groupBox select
+    {
+      padding: 8px 15px; 
+    }
+    .search-box button
+    {
+      border-radius: 50%;
+      height: 35px;
+      width: 35px;
+      background-color: #232a46;
+      border: #15171f;
+      color: #dededf;
+    }
+    .search-box button:hover{
+      border: #0a0e1d;
+      color: #0f0f21;
+      background-color: #e0e1e5;
+    }
+    .mdi-check-circle
+    {
+      font-size: 10px;
+    }
   </style>
 
 <div>
@@ -56,69 +127,86 @@
     <div class="col-12 grid-margin">
       <div class="card">
         <div class="card-body">
-            <div class="d-flex justify-content-between">
-                <h6 class="card-title text-offwhite">Wating For Checking</h6>
+            <div class="form-section">
+                <h6 class="card-title text-offwhite">Wating For Checking - ( {{lead_waste_count}} )</h6>
+                <div>
+                  <form action="{% url 'DAM_waste_data_confirm' %}" method="post" class="search-form">
+                    <div class="input-groupBox">
+                      <select name="hr_id" id="">
+                        <option value="">select Hr</option>
+                        {% for hr in hr_objs %}
+                        <option value="{{hr.id}}">{{ hr.emp_name }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    {% csrf_token%}
+                    <div class="input-groupBox">
+                      <input type="date" name="sdate">
+                    </div>
+                    <div class="input-groupBox">
+                      <input type="date" name="edate">
+                    </div>
+                    <div class="input-groupBox">
+                      <select name="status" id="">
+                        <option value="">Status</option>
+                        <option value="1">Confirmed</option>
+                        <option value="0">Not Confirmed</option>
+                       
+                      </select>
+                    </div>
+                   
+                    <div class="search-box">
+                      <button type="submit"><span class="mdi mdi-magnify"></span></button>
+                    </div>
+                  </form>
+                </div>
               
             </div>
-
+      
           <div class="table-responsive">
-            <table class="table" id="leads-wastedata">
+            <table class="table table-bordered" id="leads-wastedata">
               <thead>
                 <tr>
-                  <th> No </th>
                   <th> Action</th>
-                  <th> Lead Name </th>
-                  <th> Client name | Lead Category </th>
-                  <th> Telecaller | Marked date </th>
+                  <th> Name </th>
+                  <th> Email id </th>
+                  <th> Contact </th>
+                  <th>Followup</th>
                   <th> Reason for </th>
-                
-                  
+
                 </tr>
               </thead>
               <tbody>
                 {% for wa in lead_waste %}
-                <tr class="clickable-row" data-href="#">
+                <tr class="clickable-row" data-href="#"> 
+                  <td>
+                    <a href="{% url 'DAM_waste_dateApprove' wa.id %}" class=" btn btn-outline-success pr-3" title="Approve the lead as waste">
+                      <span class="mdi mdi-check-circle-outline "> </span> 
+                    </a>
+                    <a href="{% url 'DAM_waste_dateCancel' wa.id %}" class="btn btn-outline-danger" title="Reject the lead as waste">
+                      <span class=" mdi mdi-delete-circle"> </span>
+                    </a>
                   
-                  <td>{{ forloop.counter}}</td> 
-                  <td>
-                   <ul>
-                    <li class="mt-2">
-                      <a href="{% url 'DAM_dataBnak_followup' wa.dbId.id %}" class="text-offwhite">
-                        <span class="mdi mdi-file small"></span> <span class="small ">Follow Up</span>
-                      </a>
-                    </li>
-                    <li class="mt-2">
-                      <a href="{% url 'DAM_waste_dateApprove' wa.id %}" class="text-success">
-                        <span class="mdi mdi-check small"></span> <span class="small">Approve</span>
-                      </a>
-                    </li>
-                    <li class="mt-2">
-                      <a href="{% url 'DAM_waste_dateCancel' wa.id %}" class="text-danger">
-                        <span class="mdi mdi-close small"></span> <span class="small">Cancel</span>
-                      </a>
-                    </li>
+                  </td>   
+                  <td><span class="mdi mdi-account pl-1"></span> {{ wa.leadId.lead_name}}</span>
                     
-                   </ul>
-
-                  </td>              
-                  <td><span class="pl-2">{{ wa.leadId.lead_name}}</span> </td>
-                  <td>
-                    <p>{{wa.client_id.client_name}}</p> 
-                    <p>{{wa.leadId.lead_category_id.lead_collection_for }}</p>
-                  </td>
-                  <td><p>{{ wa.TC_Id.emp_name}}</p>
-                    <p> {{wa.waste_marked_Date }}</p>
                    </td>
-                 
-                  <td> 
-                    <p>
-                   {{wa.reason}}
-                       
-                    </p>
-                    
+                  <td><span class="mdi mdi-email pl-1"></span> {{ wa.leadId.lead_email}}</td>
+                  <td><span class="mdi mdi-phone pl-1"></span> {{ wa.leadId.lead_contact}}</td>
+                  <td>
+                    <a href="{% url 'DAM_dataBnak_followup' wa.dbId.id %}" class="btn btn-outline-secondary">
+                      <span class="mdi mdi-file ">
+                    </a>
                   </td>
-                               
-                        
+                  <td>
+                    
+                    <div class="reason-box">
+                      <span class="">{{wa.reason}} </span>
+                    </div>
+                    <span class="tc"> {{ wa.TC_Id.emp_name}} ( {{wa.waste_marked_Date }} )</span> 
+                  </td>
+                 
+                                 
                 </tr>
                 {% endfor %}
               
@@ -135,12 +223,29 @@
 <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 <script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  
+
+
   <script>
-      new DataTable('#leads-wastedata', {
-          pagingType: 'simple_numbers'
-      });
-  </script>
+    $(document).ready(function() {
+       new DataTable('#leads-wastedata', {
+           search: {
+            enable: true 
+           },
+           columnDefs: [
+           {
+               orderable: false,
+               className: 'check-single',
+               targets: 0,
+           }
+       ],
+       paging: false 
+       
+   });
+  
+});
+</script>
 
 
 {% endblock %}
+
+ 

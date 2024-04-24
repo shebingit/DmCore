@@ -1,7 +1,7 @@
-{% extends 'TL_base.html' %}
+{% extends 'Executive_base.html' %}
 {% load static %}
-{% load custom_filters %}
 {% block body %}
+
 
 
 <link href="https://cdn.datatables.net/2.0.3/css/dataTables.dataTables.css"  rel="stylesheet" >
@@ -365,7 +365,7 @@
                 
             </div>
 
-            <form action="{% url 'tl_waste_data' %}" method="post">  
+            <form action="{% url 'executive_wasteleads' %}" method="post">  
                 {% csrf_token %}
                   
 
@@ -393,26 +393,13 @@
                       <label> select client</label>
                       <select class="form-control text-offwhite" name="cl_id" id="#" >
                         <option value="">----select client----</option>
-                        {% for cl in clients %}
+                        {% for cl in clients_objs %}
                           <option value="{{cl.id}}">{{cl.client_name}}</option>
                         {% endfor %}
                       </select>                        
                     </div>
                 </div>
                  
-                   
-
-                    <div class="col-sm-12 col-lg-3 col-md-3">
-                      <div class="form-group">
-                        <label> select employee</label>
-                        <select class="form-control text-offwhite" name="emp_id" id="#" >
-                          <option value="">----select employee----</option>
-                          {% for emp in employees %}
-                            <option value="{{emp.id}}">{{emp.emp_name}}</option>
-                          {% endfor %}
-                        </select>                        
-                      </div>
-                  </div>
                    
                     <div class="col-sm-12 col-lg-2 col-md-2">
                         <div class="form-group">
@@ -489,19 +476,19 @@
           <div class=" paginationBox ">
             <ul class="pagination">
                 {% if leads.has_previous %}
-                <li><a href="?page=1{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-double-left"></span></a></li>
-                <li><a href="?page={{ leads.previous_page_number }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-left"></span></a></li>
+                <li><a href="?page=1{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-double-left"></span></a></li>
+                <li><a href="?page={{ leads.previous_page_number }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-left"></span></a></li>
                 {% endif %}
                 {% for num in leads.paginator.page_range %}
                     {% if num <= 4 or num == leads.paginator.num_pages or leads.number == num %}
                         <li {% if leads.number == num %} class="active" {% endif %}>
-                            <a href="?page={{ num }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span>{{ num }}</span></a></li>
+                            <a href="?page={{ num }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span>{{ num }}</span></a></li>
                     {% endif %}
                    
                 {% endfor %}
                 {% if leads.has_next %}
-                <li><a href="?page={{ leads.next_page_number }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-right"></span></a></li>
-                <li><a href="?page={{ leads.paginator.num_pages }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-double-right"></span></a></li>
+                <li><a href="?page={{ leads.next_page_number }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-right"></span></a></li>
+                <li><a href="?page={{ leads.paginator.num_pages }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-double-right"></span></a></li>
                 {% endif %}
             </ul>
         </div>

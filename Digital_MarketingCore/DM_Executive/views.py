@@ -22,6 +22,7 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 import re
 from django.contrib import messages
+from django.core.paginator import Paginator
 
 
 # Create your views here.
@@ -2344,3 +2345,184 @@ def download_progressfile(request, progress_id, file_index):
             return response
     else:
         return HttpResponse("File not found", status=404)   
+    
+
+
+ # 24/04/24 Leads view------   
+
+
+def executive_allleads(request):
+    if 'emp_id' in request.session:
+        if request.session.has_key('emp_id'):
+            emp_id = request.session['emp_id']
+           
+        else:
+            return redirect('/')
+        
+        emp_dash = LogRegister_Details.objects.get(id=emp_id)
+        dash_details = EmployeeRegister_Details.objects.get(logreg_id=emp_dash)
+
+        # notification-----------
+        notifications = EmployeeRegister_Details.objects.filter(logreg_id=emp_dash)
+        notification=Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date','-notific_time')
+
+
+        task_Assign = TaskAssign.objects.filter(ta_workerId=dash_details).values('ta_workAssignId')
+        work_Assign = WorkAssign.objects.filter(id__in=task_Assign).values('wa_clientId')
+        clients = ClientRegister.objects.filter(id__in=work_Assign)
+
+        leads_obj = Leads.objects.filter(lead_collect_Emp_id=dash_details.id).order_by('-lead_add_date')
+       
+
+        Cl_ID = None
+        Ct_ID = None
+        d1 = None
+        d2 = None
+        client_name = None
+
+        if request.POST:
+            Cl_ID = request.POST['client_change']
+            # Ct_ID = request.POST['category_name']
+            d1 = request.POST['sdate']
+            d2 = request.POST['edate']
+            pg_num = request.POST['pgnum']
+
+        else :
+            Cl_ID = request.GET.get('Cl_ID')
+            # Ct_ID = request.GET.get('Ct_ID')
+            emp = request.GET.get('employee')
+            d1 = request.GET.get('start_date')
+            d2 = request.GET.get('end_date')
+            pg_num = request.GET.get('pg_num')
+
+        if pg_num is None:
+            pg_num = 10
+
+
+        if Cl_ID :
+            leads_obj = leads_obj.filter(lead_work_regId__clientId__id=Cl_ID)
+            client_name = ClientRegister.objects.get(id=Cl_ID)
+            # category_name = LeadCategory_Register.objects.get(id=Ct_ID)
+            
+        if d1:
+            leads_obj = leads_obj.filter(lead_add_date__gte=d1)
+        if d2:
+            leads_obj = leads_obj.filter(lead_add_date__lte=d2)
+
+            
+
+        leads_obj_count = leads_obj.count()
+
+        paginator = Paginator(leads_obj, pg_num)  
+        page_number = request.GET.get('page')
+       
+        leads = paginator.get_page(page_number)
+
+    
+        
+        content = {
+            'emp_dash':emp_dash,
+            'dash_details':dash_details,
+            'notifications':notifications,
+            'notification':notification,
+            'leads':leads,
+                   'clients_objs':clients,
+                   'leads_obj_count':leads_obj_count,
+                 'client_name':client_name,
+                'Cl_ID':Cl_ID,'Ct_ID':Ct_ID,'start_date':d1,'end_date':d2,'pg_num':pg_num
+            
+            
+        }
+
+        return render(request,'Executive_all_leads.html',content)
+
+    else:
+            return redirect('/')
+    
+
+
+
+def executive_wasteleads(request):
+    if 'emp_id' in request.session:
+        if request.session.has_key('emp_id'):
+            emp_id = request.session['emp_id']
+           
+        else:
+            return redirect('/')
+        
+        emp_dash = LogRegister_Details.objects.get(id=emp_id)
+        dash_details = EmployeeRegister_Details.objects.get(logreg_id=emp_dash)
+
+        # notification-----------
+        notifications = EmployeeRegister_Details.objects.filter(logreg_id=emp_dash)
+        notification=Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date','-notific_time')
+
+        
+        task_Assign = TaskAssign.objects.filter(ta_workerId=dash_details).values('ta_workAssignId')
+        work_Assign = WorkAssign.objects.filter(id__in=task_Assign).values('wa_clientId')
+        clients = ClientRegister.objects.filter(id__in=work_Assign)
+
+
+        waste_data = Leads.objects.filter(lead_collect_Emp_id=dash_details.id,waste_data=1).order_by('-lead_add_date')
+
+        Cl_ID = None
+        d1 = None
+        d2 = None
+        client_name = None
+        pg_num = None
+
+        if request.POST:
+            Cl_ID = request.POST['cl_id']
+            d1 = request.POST['fDate']
+            d2 = request.POST['toDate']
+            pg_num = request.POST['pgnum']
+
+        else :
+            Cl_ID = request.GET.get('Cl_ID')
+            d1 = request.GET.get('start_date')
+            d2 = request.GET.get('end_date')
+            pg_num = request.GET.get('pg_num')
+
+
+
+        if Cl_ID:
+            client_name = ClientRegister.objects.get(id=Cl_ID)        
+            waste_data = waste_data.filter(lead_work_regId__clientId=Cl_ID)
+
+            
+        if d1:
+            waste_data = waste_data.filter(lead_add_date__gte=d1)
+
+        if d2:
+            waste_data = waste_data.filter(lead_add_date__lte=d2)
+
+        waste_data_count =  waste_data.count() 
+
+        if pg_num is None:
+            pg_num = 10 
+
+        paginator = Paginator(waste_data, pg_num)  
+        page_number = request.GET.get('page')
+       
+        leads = paginator.get_page(page_number)
+                          
+        
+        content = {
+            'emp_dash':emp_dash,
+            'dash_details':dash_details,
+            'notifications':notifications,
+            'notification':notification,
+            'leads':leads,
+                   'clients_objs':clients,
+                   'waste_data_count':waste_data_count,
+                 'client_name':client_name,
+                'Cl_ID':Cl_ID,'start_date':d1,'end_date':d2,'pg_num':pg_num
+            
+            
+        }
+
+        return render(request,'Executive_waste_leads.html',content)
+
+    else:
+            return redirect('/')
+    

@@ -5198,42 +5198,34 @@ def head_Reports(request):
                                                                  Q(emp_designation_id__dashboard_id=2) | 
                                                                  Q(emp_designation_id__dashboard_id=3),
                                                                  emp_comp_id=dash_details.emp_comp_id,
-                                                                 emp_active_status=1)
-        if (d1 is None) and (d2 is None):
-           
-            leads_objs = leads_objs.filter(lead_add_date__gte=date.today(),lead_add_date__lte=date.today())
-            toady_trsf_count = Leads.objects.filter(lead_work_regId__wcompId=dash_details.emp_comp_id,
-                                                    lead_transfer_status=1,
-                                                    lead_transfer_date__gte=date.today(),
-                                                    lead_transfer_date__lte=date.today()).count()
+                                                                emp_active_status=1)
+        if d1:
+            pass
+        else:
+            d1=date.today()
+            today_val = 1
+
+        if d2:
+            pass
+        else:
+            today_val = 1
+            d2=date.today()
             
 
-            toady_tol_count = leads_objs.filter(lead_add_date__gte=date.today(),
-                                                lead_add_date__lte=date.today()).count()
+       
         
-            toady_trsf_pending_count = leads_objs.filter(lead_add_date__gte=date.today(),
-                                                    lead_add_date__lte=date.today(),
-                                                    lead_transfer_status=0,waste_data=0,repeated_status=0).count()
-        
-            toady_wsate_count = leads_objs.filter(waste_data=1,
-                                              lead_add_date__gte=date.today(),
-                                              lead_add_date__lte=date.today()).count()
-            today_val = 1
-        else:
-            toady_trsf_count = leads_objs.filter(lead_transfer_status=1,
-                                                 lead_transfer_date__gte=d1,
-                                                 lead_transfer_date__lte=d2).count()
+        toady_trsf_count = leads_objs.filter(lead_transfer_status=1,lead_transfer_date__gte=d1,lead_transfer_date__lte=d2).count()
 
-            toady_tol_count = leads_objs.filter(lead_add_date__gte=d1,
+        toady_tol_count = leads_objs.filter(lead_add_date__gte=d1,
                                                     lead_add_date__lte=d2).count()
             
-            toady_trsf_pending_count = leads_objs.filter(lead_add_date__gte=d1,
+        toady_trsf_pending_count = leads_objs.filter(lead_add_date__gte=d1,
                                                         lead_add_date__lte=d2,
                                                         lead_transfer_status=0,waste_data=0,repeated_status=0).count()
             
-            toady_wsate_count = leads_objs.filter(waste_data=1,
+        toady_wsate_count = leads_objs.filter(waste_data=1,
                                                 lead_add_date__gte=d1,
-                                                lead_add_date__lte=d2).count()
+                                                lead_add_date__lte=d2).count()    
         
         paginator = Paginator(leads_objs, pg_num) 
         page_number = request.GET.get('page')

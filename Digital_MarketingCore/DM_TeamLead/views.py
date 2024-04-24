@@ -3412,6 +3412,7 @@ def tl_waste_data(request):
 
         team = Allocation_Details.objects.filter(allocat_to=dash_details)
         team_ids = [t.allocatEmp_id_id for t in team]
+        team_ids.append(dash_details.id)
 
         clients = ClientRegister.objects.filter(compId=dash_details.emp_comp_id)
         employees = EmployeeRegister_Details.objects.filter(id__in=team_ids)
@@ -3419,20 +3420,72 @@ def tl_waste_data(request):
         # Notification-----------
         notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
 
-        waste_data = Leads.objects.filter(lead_collect_Emp_id__in=team_ids,waste_data=1).order_by('-id')
-        
+        waste_data = Leads.objects.filter(lead_collect_Emp_id__in=team_ids,waste_data=1).order_by('-lead_add_date')
+
+        Cl_ID = None
+        d1 = None
+        d2 = None
+        emp = None
+        client_name = None
+        select_emp = None
+        pg_num = None
+
+        if request.POST:
+            Cl_ID = request.POST['cl_id']
+            emp = request.POST['emp_id']
+            d1 = request.POST['fDate']
+            d2 = request.POST['toDate']
+            pg_num = request.POST['pgnum']
+
+        else :
+            Cl_ID = request.GET.get('Cl_ID')
+            emp = request.GET.get('employee')
+            d1 = request.GET.get('start_date')
+            d2 = request.GET.get('end_date')
+            pg_num = request.GET.get('pg_num')
+
+
+
+        if Cl_ID:
+            client_name = ClientRegister.objects.get(id=Cl_ID)        
+            waste_data = waste_data.filter(lead_work_regId__clientId=Cl_ID)
+
+        if emp:
+            select_emp = EmployeeRegister_Details.objects.get(id=emp)
+            waste_data = waste_data.filter(lead_collect_Emp_id=emp)
+            
+        if d1:
+            waste_data = waste_data.filter(lead_add_date__gte=d1)
+
+        if d2:
+            waste_data = waste_data.filter(lead_add_date__lte=d2)
+
+        waste_data_count =  waste_data.count() 
+
+        if pg_num is None:
+            pg_num = 10 
+
+        paginator = Paginator(waste_data, pg_num)  
+        page_number = request.GET.get('page')
+       
+        leads = paginator.get_page(page_number)
+                          
         
         content = {'emp_dash':emp_dash,
                    'dash_details':dash_details,
                    'notifications':notifications,
-                   'waste_data':waste_data,
+                   'leads':leads,
                    'clients':clients,
-                   'employees':employees}
+                   'waste_data_count':waste_data_count,
+                   'employees':employees,
+                   'select_emp':select_emp,'client_name':client_name,
+                    'Cl_ID':Cl_ID,'employee':emp,'start_date':d1,'end_date':d2,'pg_num':pg_num}
 
         return render(request,'TL_wasteData_clientWise.html',content)
 
     else:
-            return redirect('/')    
+            return redirect('/')   
+     
 
 def tl_update_target_on_wastedata(request,waste_id):
      
@@ -3452,7 +3505,7 @@ def tl_update_target_on_wastedata(request,waste_id):
         # Notification-----------
         notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
      
-        print(waste_id)
+      
         waste_lead = Leads.objects.get(id=waste_id)
         work_reg = waste_lead.lead_work_regId_id
         client = WorkRegister.objects.get(id=work_reg).clientId_id
@@ -3462,10 +3515,7 @@ def tl_update_target_on_wastedata(request,waste_id):
         taskDet_count = TaskDetails.objects.filter(tad_taskAssignId_id=taskAs_id,tad_collect_date=waste_lead.lead_add_date).count()
         workAs = TaskAssign.objects.get(id=taskAs_id).ta_workAssignId
         
-        print(taskAs_id)
-        print(taskDet)
-        print(workAs)
-
+       
      
         content = {'emp_dash':emp_dash,
                         'dash_details':dash_details,
@@ -3552,47 +3602,7 @@ def tl_update_target_dailyTask(request,tid,wid):
             return redirect('/')    
       
 
-def tl_filter_waste_data(request):
-    if 'emp_id' in request.session:
-        if request.session.has_key('emp_id'):
-            emp_id = request.session['emp_id']
-           
-        else:
-            return redirect('/')
-        
-        emp_dash = LogRegister_Details.objects.get(id=emp_id)
-        dash_details = EmployeeRegister_Details.objects.get(logreg_id=emp_dash)
-
-        team = Allocation_Details.objects.filter(allocat_to=dash_details)
-        team_ids = [t.allocatEmp_id_id for t in team]
-
-        clients = ClientRegister.objects.filter(compId=dash_details.emp_comp_id)
-        employees = EmployeeRegister_Details.objects.filter(id__in=team_ids)
-
-        # Notification-----------
-        notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
-
-        if request.POST:
-             client_id = request.POST['cl_id']
-             emp_id = request.POST['emp_id']
-             start = request.POST['fDate']
-             end = request.POST['toDate']
-
-             waste_data = Leads.objects.filter(waste_data=1, lead_work_regId__clientId=client_id, lead_collect_Emp_id=emp_id, lead_add_date__range=[start, end]).order_by('-id')
-
-           
-        
-        content = {'emp_dash':emp_dash,
-                   'dash_details':dash_details,
-                   'notifications':notifications,
-                   'waste_data':waste_data,
-                   'clients':clients,
-                   'employees':employees}
-
-        return render(request,'TL_wasteData_clientWise.html',content)
-
-    else:
-            return redirect('/')    
+  
 
 
 

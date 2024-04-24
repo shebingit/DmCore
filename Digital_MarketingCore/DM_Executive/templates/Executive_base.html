@@ -95,6 +95,24 @@
               <span class="menu-title">Works</span>
             </a>
           </li>
+
+          <li class="nav-item menu-items">
+            <a class="nav-link" data-toggle="collapse" href="#lead-list" aria-expanded="false" aria-controls="ui-basic">
+              <span class="menu-icon">
+                <i class="mdi mdi-file-chart"></i>
+              </span>
+              <span class="menu-title">Leads</span>
+              <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="lead-list">
+              <ul class="nav flex-column sub-menu">
+                <li class="nav-item"> <a class="nav-link" href="{% url 'executive_allleads' %}">All Leads</a></li>
+                <li class="nav-item"> <a class="nav-link" href="{% url 'executive_wasteleads' %}">Waste </a></li>
+              </ul>
+            </div>
+          </li>
+          
+          
           <li class="nav-item menu-items">
             <a class="nav-link" data-toggle="collapse" href="#schedule-list" aria-expanded="false" aria-controls="ui-basic">
               <span class="menu-icon">
@@ -111,14 +129,7 @@
             </div>
           </li>
           
-          <!-- <li class="nav-item menu-items">
-            <a class="nav-link" href="#">
-              <span class="menu-icon">
-                <i class="mdi mdi-table-large"></i>
-              </span>
-              <span class="menu-title">Link Name</span>
-            </a>
-          </li> -->
+          
          
           <li class="nav-item menu-items">
             <a class="nav-link" href="{% url 'executive_leave' %}">

@@ -2180,16 +2180,43 @@ def DAM_waste_data_confirm(request):
         # Notification-----------
         notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
 
+        hr_objs = EmployeeRegister_Details.objects.filter(emp_comp_id=dash_details.emp_comp_id,emp_designation_id__dashboard_id=4,emp_active_status=1)
         
-        lead_waste = Waste_Leads.objects.filter(client_id__compId__id=dash_details.emp_comp_id.id,Status=0)
+        lead_waste = Waste_Leads.objects.filter(client_id__compId=dash_details.emp_comp_id,Status=0).order_by('-waste_marked_Date')
+
+        if request.POST:
+
+            d1 = request.POST['sdate']
+            d2 = request.POST['edate']
+            hr = request.POST['hr_id']
+            status_val = request.POST['status']
+
+            if d1:
+                lead_waste = lead_waste.filter(waste_marked_Date__gte=d1)
+
+            if d2:
+                lead_waste = lead_waste.filter(waste_marked_Date__lte=d2)
+
+            if hr:
+                lead_waste = lead_waste.filter(TC_Id__id=hr)
+
+            if status_val:
+                lead_waste = lead_waste.filter(confirmation=status_val)
+
+        else:
+            lead_waste = lead_waste.filter(waste_marked_Date=date.today())
+
+        lead_waste_count = lead_waste.count()       
        
-        if not lead_waste.exists():
-            return redirect('DAM_wasteData_management')
+        # if not lead_waste.exists():
+        #     return redirect('DAM_wasteData_management')
 
         content = {'emp_dash':emp_dash,
                    'dash_details':dash_details,
                    'lead_waste':lead_waste,
-                   'notifications':notifications}
+                   'notifications':notifications,
+                   'hr_objs':hr_objs,
+                   'lead_waste_count':lead_waste_count}
         
         return render(request,'DAM_watedata_Confirm.html',content)
         
@@ -2308,16 +2335,16 @@ def DAM_waste_dateApprove(request,waID):
                     'success':success,
                     'notifications':notifications}
         else:
-            error_text='Oops! Confirmation Missing.'
-            error = True
+            success_text='Oops! Confirmation Missing.'
+            success = True
 
             lead_waste = Waste_Leads.objects.filter(client_id__compId__id=dash_details.emp_comp_id.id,Status=0)
 
             content = {'emp_dash':emp_dash,
                     'dash_details':dash_details,
                     'lead_waste':lead_waste,
-                    'error_text':error_text,
-                    'error':error,
+                    'success_text':success_text,
+                    'success':success,
                     'notifications':notifications}
             
     return render(request,'DAM_watedata_Confirm.html',content)

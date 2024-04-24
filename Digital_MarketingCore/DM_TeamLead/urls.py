@@ -145,7 +145,6 @@ urlpatterns = [
     # Waste Data Section----------------------------
 
     path('TL-WasteData-Section',views.tl_waste_data,name='tl_waste_data'),
-    path('TL-Filter-WasteData',views.tl_filter_waste_data,name='tl_filter_waste_data'),
     path('TL-Update-Target-on-WasteData\<int:waste_id>',views.tl_update_target_on_wastedata,name='tl_update_target_on_wastedata'),
     path('TL-Update-Target-DailyTask\<int:tid>\<int:wid>',views.tl_update_target_dailyTask,name='tl_update_target_dailyTask'),
 
