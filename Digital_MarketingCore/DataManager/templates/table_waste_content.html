@@ -1,0 +1,35 @@
+{% for wa in lead_waste %}
+<tr class="clickable-row" data-href="#"> 
+  <td>
+    <button  id="approve-btn" type="button" class="btn btn-outline-success pr-3 approve_btn" data-id="{{wa.id}}" title="Approve the lead as waste">
+      <span class="mdi mdi-check-circle-outline "> </span> 
+    </button>
+    <button  type="button" id="reject-btn" class="reject_btn btn btn-outline-danger" data-id="{{wa.id}}" title="Reject the lead as waste">
+      <span class=" mdi mdi-delete-circle"> </span>
+    </button>
+  
+  </td>   
+  <td><span class="mdi mdi-account pl-1"></span> {{ wa.leadId.lead_name}}</span>
+    
+   </td>
+  <td><span class="mdi mdi-email pl-1"></span> {{ wa.leadId.lead_email}}</td>
+  <td><span class="mdi mdi-phone pl-1"></span> {{ wa.leadId.lead_contact}}</td>
+  <td>
+    <a href="{% url 'DAM_dataBnak_followup' wa.dbId.id %}" class="btn btn-outline-secondary">
+      <span class="mdi mdi-file ">
+    </a>
+  </td>
+  <td>
+                    
+    <div class="reason-box">
+      {% if wa.confirmation == 1 %}
+      <span class="mdi mdi-check-circle text-success pr-1"></span>
+      {% endif %}
+      <span class="">{{wa.reason}} </span>
+    </div>
+    <span class="tc"> {{ wa.TC_Id.emp_name}} ( {{wa.waste_marked_Date }} )</span> 
+  </td>
+ 
+                 
+</tr>
+{% endfor %}

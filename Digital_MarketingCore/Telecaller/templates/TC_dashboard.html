@@ -2,6 +2,8 @@
 {% load static %}
 {% block body %}
 
+<link rel="stylesheet" href="{% static 'css/TeamLead/style.css' %}">
+
 <div>
   <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
@@ -11,89 +13,304 @@
     </nav>
 </div>
 
+<div class="row ">
+  <div class="col-md-4 col-sm-12 col-lg-4">
+    <a href="{% url 'TC_newleads' %}" style="text-decoration: none;"> 
+      <div class="card" >
+        <div class="card-body">
 
-    
-    <div class="row ">
-        <div class="col-md-4 " id="card1">
-          <a href="{% url 'TC_current_clients' %}" style="text-decoration: none;">
-          <div class="card" >
-            <div class="card-body">
-  
-              <div class="row">
-                <div class="col-md-9">
-                  
-                  <h5 class="card-title  fw-semibold">CURRENT CLIENTS</h5>
-                   
-                  <p class="text-offwhite">Assigning and ongoing Clients</p>
-  
-                </div>
-                <div class="col">    
-                    
-                  <i class="icon-lg mdi mdi-account-card-details text-success ml-auto" style="font-size: 40px;"></i>
-                  
-                </div>
-              </div>
+          <div class="row">
+            <div class="col-md-9">
+              
+              <h5 class="lead-head  fw-semibold">ALL -  LEADS</h5>
+              
+              <p class=" lead-head-p text-offwhite">Assigning and ongoing Clients</p>
+
             </div>
-          </div></a>
-
-        </div>      
-        
-        <div class="col-md-4 grid-margin">
-          <a href="{% url 'TC_previous_clients' %}" style="text-decoration: none;">
-          <div class="card">
-            <div class="card-body">
-              <div class="row">
-                <div class="col-md-9">
-                  
-                    
-                    <h5 class="card-title mb-9 fw-semibold">PREVIOUS CLIENTS</h5>
-                  
-                    <p class="text-offwhite">Already Completed Clients</p>
-                  
-                  
-  
-                </div>
-                <div class="col">
-                  
-                    <i class="icon-lg mdi mdi-arrange-send-backward text-primary ms-auto" style="font-size: 40px;"></i>
-               
-                  
-                </div>
-              </div>
+            <div class="col">    
+                
+              <i class="icon-lg mdi mdi-account-card-details text-success ml-auto" style="font-size: 40px;"></i>
+              
             </div>
           </div>
-          </a>
-        </div>   
-
-        <div class="col-md-4 grid-margin" style="width: 100%;">
-          <a href="{% url 'TC_waste_leads' %}" style="text-decoration: none;">
-          <div class="card">
-            <div class="card-body">
-              <div class="row">
-                <div class="col-md-9 text-danger">
-                  
-                    
-                    <h4 class="card-title mb-9 fw-semibold">WASTE LEADS</h4>
-                  
-                    <p class="text-offwhite" >Useless leads of different clients </p>
-                  
-                  
-  
-                </div>
-                <div class="col">
-                  
-                    <i class="icon-lg mdi mdi-alert-circle text-danger ms-auto" style="font-size: 40px;"></i>
-                    
-               
-                  
-                </div>
-              </div>
-            </div>
-          </div>
-          </a>
-        </div>   
+        </div>
       </div>
+    </a>
+  </div> 
+  <div class="col-md-4 col-sm-12 col-lg-4">
+    <a href="{% url 'Tc_follow_upLeads' %}" style="text-decoration: none;">
+      <div class="card" >
+        <div class="card-body">
 
+          <div class="row">
+            <div class="col-md-9">
+              
+              <h5 class="lead-head   fw-semibold">FOLLOW UP -  LEADS</h5>
+              
+              <p class=" lead-head-p text-offwhite">Assigning and ongoing Clients</p>
+
+            </div>
+            <div class="col">    
+                
+              <i class="icon-lg mdi mdi-account-card-details text-warning ml-auto" style="font-size: 40px;"></i>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div> 
+  <div class="col-md-4 col-sm-12 col-lg-4">
+    <a href="{% url 'TC_current_clients' %}" style="text-decoration: none;">
+      <div class="card" >
+        <div class="card-body">
+
+          <div class="row">
+            <div class="col-md-9">
+              
+              <h5 class="lead-head   fw-semibold">WASTE -  LEADS</h5>
+              
+              <p class=" lead-head-p text-offwhite">Assigning and ongoing Clients</p>
+
+            </div>
+            <div class="col">    
+                
+              <i class="icon-lg mdi mdi-account-card-details text-danger ml-auto" style="font-size: 40px;"></i>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div> 
+</div>
+
+
+<div class="row mt-3">
+  <div class="col-12 grid-margin">
+    <div class="card">
+      <div class="card-body">
+       
+          <div class="form-section">
+              <h6 class="card-title text-offwhite">   
+                  New Leads -  ( <span id="lead-count">{{accept_pending_leads_count}}</span>  )</h6>
+              <div>
+                <form action="{% url 'TC_dashboard' %}" method="post" class="search-form">
+                  {% csrf_token%}
+                 
+                 
+                  <div class="input-groupBox">
+                    <input type="date" name="sdate">
+                  </div>
+                  <div class="input-groupBox">
+                    <input type="date" name="edate" >
+                  </div>
+                  
+                  <div class="search-box">
+                    <button type="submit"><span class="mdi mdi-magnify"></span></button>
+                  </div>
+                </form>
+              </div>
+            
+          </div>
+    
+          <form action="{% url 'hr_leadAccept' %}" method="post">
+            {% csrf_token %}
+            
+            <div class="messageBoxform">
+              <div class="text-white mt-3 mb-4">
+                <span id="check-count">0</span>
+                <button type="submit" class="btn btn-outline-secondary"> <span class="small">Accept Leads</span> </a>
+              </div> 
+              {% if messages %}
+                    <div class="messageBox">
+                       
+                        <ul class="messages">
+                            {% for message in messages %}
+                            <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                       
+                    </div>
+                {% endif %}
+
+            </div>
+            
+
+            <div class="table-responsive">
+              <table class="table table-bordered new-leads-table" id="leads-wastedata">
+                <thead>
+                  <tr>
+                    <th>
+                      <div class="d-flex">
+                          <div class="form-check form-check-primary m-0">
+                          <label class="form-check-label">
+                              <input type="checkbox" class="form-check-input check-all">
+                              
+                          </label>
+                          </div>
+                          
+                      </div>
+                    </th>
+                  
+                    <th> Add Date</th>
+                    <th> Name </th>
+                    <th> Email id </th>
+                    <th> Contact </th>
+                    <th> Status </th>
+                  
+                  </tr>
+                </thead>
+                <tbody id="waste-lead-body">
+                  {% for db_lead in accept_pending_leads %}
+                  <tr class="clickable-row" data-href="{% url 'lead_track' db_lead.id  %}"> 
+                    <td>
+                      <div class="form-check form-check-primary">
+                        <label class="form-check-label">
+                        <input class="checkbox check-single" name="lead_check" value="{{ db_lead.id }}" id="" type="checkbox">
+                        </label>
+                      </div>
+                    </td>
+                    
+                    <td>{{ db_lead.Assign_Date |date:"d-M-y" }}</td>
+                    <td><span class="mdi mdi-account pl-1"></span> {{ db_lead.leadId.lead_name}}  </span>
+                      
+                    </td>
+                    <td><span class="mdi mdi-email pl-1"></span> {{ db_lead.leadId.lead_email}}</td>
+                    <td><span class="mdi mdi-phone pl-1"></span> {{ db_lead.leadId.lead_contact}}</td>
+                    <td><span class="badge badge-pill  badge-outline-info"> New Lead </td>
+                    
+                  </tr>
+                  {% endfor %}
+                
+                </tbody>
+              </table>
+            </div>
+          </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Scrtipt section -->
+
+
+
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+
+
+<script>
+  $(document).ready(function () {
+      // Check All checkbox change event
+      $('.check-all').change(function () {
+          if ($(this).is(':checked')) {
+              // Check all the individual checkboxes
+              $('.check-single').prop('checked', true);
+          } else {
+              // Uncheck all the individual checkboxes
+              $('.check-single').prop('checked', false);
+          }
+          
+          // Update the count of checked checkboxes
+          var checkedCount = $('.check-single:checked').length;
+          $('#check-count').text(checkedCount);
+      });
+      
+      // Individual checkbox change event
+      $('.check-single').change(function () {
+          // Update the count of checked checkboxes
+          var checkedCount = $('.check-single:checked').length;
+          $('#check-count').text(checkedCount);
+      });
+  });
+</script>
 
 
 {% endblock %}
+
+
+
+
+
+<div class="row ">
+  <div class="col-md-4 " id="card1">
+    <a href="{% url 'TC_current_clients' %}" style="text-decoration: none;">
+    <div class="card" >
+      <div class="card-body">
+
+        <div class="row">
+          <div class="col-md-9">
+            
+            <h5 class="card-title  fw-semibold">CURRENT CLIENTS</h5>
+             
+            <p class="text-offwhite">Assigning and ongoing Clients</p>
+
+          </div>
+          <div class="col">    
+              
+            <i class="icon-lg mdi mdi-account-card-details text-success ml-auto" style="font-size: 40px;"></i>
+            
+          </div>
+        </div>
+      </div>
+    </div></a>
+
+  </div>      
+  
+  <div class="col-md-4 grid-margin">
+    <a href="{% url 'TC_previous_clients' %}" style="text-decoration: none;">
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-9">
+            
+              
+              <h5 class="card-title mb-9 fw-semibold">PREVIOUS CLIENTS</h5>
+            
+              <p class="text-offwhite">Already Completed Clients</p>
+            
+            
+
+          </div>
+          <div class="col">
+            
+              <i class="icon-lg mdi mdi-arrange-send-backward text-primary ms-auto" style="font-size: 40px;"></i>
+         
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    </a>
+  </div>   
+
+  <div class="col-md-4 grid-margin" style="width: 100%;">
+    <a href="{% url 'TC_waste_leads' %}" style="text-decoration: none;">
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-9 text-danger">
+            
+              
+              <h4 class="card-title mb-9 fw-semibold">WASTE LEADS</h4>
+            
+              <p class="text-offwhite" >Useless leads of different clients </p>
+            
+            
+
+          </div>
+          <div class="col">
+            
+              <i class="icon-lg mdi mdi-alert-circle text-danger ms-auto" style="font-size: 40px;"></i>
+              
+         
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    </a>
+  </div>   
+</div>

@@ -1,0 +1,22 @@
+{% extends 'DAM_base.html' %}
+{% load static %}
+{% block body %}
+
+<style>
+    .breadcrumb-item,
+    .breadcrumb-item a
+    {
+        font-size: 13.5px;
+    }
+</style>
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'DAM_Dashboard_databank' %}">Data Bank</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Lead Tracker</li>
+        </ol>
+      </nav>
+</div>
+
+{% endblock %}

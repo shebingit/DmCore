@@ -121,8 +121,8 @@ urlpatterns = [
 
     path('WasteData-Management/',views.DAM_wasteData_management,name='DAM_wasteData_management'),
     path('WasteData-Confirm-section/',views.DAM_waste_data_confirm,name='DAM_waste_data_confirm'),
-    path('Waste-Data-Appove/<int:waID>',views.DAM_waste_dateApprove,name='DAM_waste_dateApprove'),
-    path('Waste-Data-Remove/<int:waID>',views.DAM_waste_dateCancel,name='DAM_waste_dateCancel'),
+    path('Waste-Data-Appove/',views.DAM_waste_dateApprove,name='DAM_waste_dateApprove'),
+    path('Waste-Data-Remove/',views.DAM_waste_dateCancel,name='DAM_waste_dateCancel'),
     path('WasteData-List/',views.DAM_Approved_waste_data,name='DAM_Approved_waste_data'),
     
     path('Client-WasteData/',views.DAM_client_waste_data,name='DAM_client_waste_data'),
@@ -157,6 +157,10 @@ urlpatterns = [
     
     path('DAM_Hr_JoinedLead/<int:pk>',views.DAM_Hr_JoinedLead,name='DAM_Hr_JoinedLead'),
     path('DAM_Hr_LeadStatusChange/<int:pk>',views.DAM_Hr_LeadStatusChange,name='DAM_Hr_LeadStatusChange'),
+
+
+
+      path('DataManager-LeadTrack/<int:dbid>',views.lead_track,name='lead_track'),
     
 
 

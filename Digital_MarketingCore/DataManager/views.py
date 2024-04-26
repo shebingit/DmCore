@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect
-from DM_Head.models import EmployeeRegister_Details,Notification,Leads,ClientTask_Register,LeadCategory_Register,lead_Details
+from DM_Head.models import EmployeeRegister_Details,Notification,Leads,ClientTask_Register,LeadCategory_Register,lead_Details,ClientRegister
 from Telecaller.models import Leads_assignto_tc,Waste_Leads,Leads_Call_Record
 from Registration_Login.models import LogRegister_Details
 from django.db.models import Q
@@ -11,6 +11,7 @@ from datetime import date
 import datetime
 from django.http import JsonResponse
 from django.contrib import messages
+from django.template.loader import render_to_string
 
 
 
@@ -85,28 +86,72 @@ def DAM_Dashboard_databank(request):
         # Notification-----------
         notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
 
-        if request.POST:
-            d1 = request.POST['fdate']
-            d2 = request.POST['edate']
-
-            dataBank_objs = DataBank.objects.filter(lead_Id__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id,Genarated_date__gte=d1,Genarated_date__lte=d2)
-            dataBank_count = DataBank.objects.filter(lead_Id__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id,Genarated_date__gte=d1,Genarated_date__lte=d2).count()
-
-        else:
-
-            dataBank_objs = DataBank.objects.filter(lead_Id__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id)
-            dataBank_count = DataBank.objects.filter(lead_Id__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id).count()
-
         clients_objs = ClientTask_Register.objects.filter(task_name='Lead Collection',cTcompId__id=dash_details.emp_comp_id.id)
 
-        source_objs = PlatForms.objects.filter(company_Id__id=dash_details.emp_comp_id.id)
+
+
+        cl_name = None
+        ct_name = None
+        exe_name = None
+        d1 = None
+        d2 = None
+        pg_num = 20
+        
+       
+
+        if request.POST:
+            cl = request.POST['client_id']
+            ct = request.POST['category']
+            exe = request.POST['executive'] 
+            d1 = request.POST['sdate']
+            d2 = request.POST['edate']
+            status_val =  request.POST['status_val']
+            pg_num = request.POST['pgnum']
+
+            dataBank_objs = DataBank.objects.filter(lead_Id__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id)
+            
+            if d1:
+                dataBank_objs = dataBank_objs.filter(Genarated_date__gte=d1)
+
+            if d2:
+                dataBank_objs = dataBank_objs.filter(Genarated_date__lte=d2)
+
+            if cl:
+                cl_name = ClientRegister.objects.filter(id=cl).values('client_name').first()
+                dataBank_objs = dataBank_objs.filter(lead_Id__lead_work_regId__clientId__id=cl)
+
+            if ct:
+                ct_name =LeadCategory_Register.objects.filter(id=ct).values('lead_collection_for').first()
+                dataBank_objs = dataBank_objs.filter(lead_Id__lead_category_id__id=ct)
+
+            if exe:
+                exe_name = EmployeeRegister_Details.objects.filter(id=exe).values('emp_name').first()
+                dataBank_objs = dataBank_objs.filter(lead_Id__lead_collect_Emp_id__id=exe)
+
+            if status_val:
+                dataBank_objs = dataBank_objs.filter(lead_status=status_val)
+
+            if pg_num:
+                pg_num =  int(pg_num)
+                dataBank_objs = dataBank_objs[:pg_num]
+            
+
+            dataBank_count = dataBank_objs.count()
+        
+        else:
+            dataBank_count = DataBank.objects.filter(lead_Id__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id).count()
+            dataBank_objs = DataBank.objects.filter(lead_Id__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id)[:pg_num]
+            
+
+        
         
         content = {'emp_dash':emp_dash,
                    'dash_details':dash_details,
                    'notifications':notifications,
                    'dataBank_objs':dataBank_objs,
                    'dataBank_count':dataBank_count,
-                   'clients_objs':clients_objs,'source_objs':source_objs}
+                   'd1':d1,'d2':d2,'cl_name':cl_name,'ct_name':ct_name,'exe_name':exe_name,'pg_num':pg_num,
+                   'clients_objs':clients_objs}
         
     return render(request,'DAM_Dashboard_dataBank.html',content)
 
@@ -299,39 +344,12 @@ def fetch_lead_executive(request):
 
             # Convert set of tuples back to a list of dictionaries
             unique_lead_executive_list = [{'id': lead[0], 'name': lead[1]} for lead in unique_set]
-
             
-
-            DB_data = DataBank.objects.filter(lead_Id__lead_category_id__id=category_id)
-            dataBank_count = DataBank.objects.filter(lead_Id__lead_category_id__id=category_id).count()
-            data_list = []
-           
-            for lead in DB_data:
-                
-                data = {
-                'lead_status':lead.lead_status,
-                'Genarated_date': lead.Genarated_date,
-                'lead_name': lead.lead_Id.lead_name,
-                'lead_email': lead.lead_Id.lead_email,
-                'lead_contact': lead.lead_Id.lead_contact,
-                'id': lead.id,
-                'lead_source':lead.lead_Id.lead_source,
-                'client_name':lead.lead_Id.lead_work_regId.clientId.client_name,
-                'lead_collection_for':lead.lead_Id.lead_category_id.lead_collection_for,
-                'emp_name': lead.lead_Id.lead_collect_Emp_id.emp_name,
-                'c_status': lead.current_status,
-                }
-                data_list.append(data)
-
             success = True
             message = "Operation successful"
-
-
-
-            # Return a JSON response with lead categories
-            return JsonResponse({'success': success, 'message': message,'dataBank_count':dataBank_count,'lead_executive_list': unique_lead_executive_list,'leads_data': data_list})
+            return JsonResponse({'success': success, 'message': message,'lead_executive_list': unique_lead_executive_list})
         else:
-            # Handle the case where client_id is not provided
+
             raise ValueError("Client ID is not provided in the request.")
 
     except Exception as e:
@@ -355,24 +373,52 @@ def DAM_Dashboard_allocation(request):
         # Notification-----------
         notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
 
-        dataBank_objs = DataBank.objects.filter(lead_Id__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id,lead_status='Not Attended').exclude(current_status='Marked as Waste')
-        dataBank_count = DataBank.objects.filter(lead_Id__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id,lead_status='Not Attended').exclude(current_status='Marked as Waste').count()
-        employees = EmployeeRegister_Details.objects.filter(emp_designation_id__dashboard_id=4)# Q(emp_designation_id__dashboard_id=5)
+        employees = EmployeeRegister_Details.objects.filter(emp_designation_id__dashboard_id=4)
         executives = EmployeeRegister_Details.objects.filter(Q(emp_designation_id__dashboard_id=3) | Q(emp_designation_id__dashboard_id=2) | Q(emp_designation_id__dashboard_id=1))
-        
-        countList = []
 
-        for e in executives:
-            countNo = DataBank.objects.filter(lead_Id__lead_collect_Emp_id=e,lead_allocate_status=0).count()
-            empName = e.emp_name
-            countList.append({empName: countNo})
+       
+        d1 = None
+        d2 = None
+        pgnum = 30
+        selected_emp = None
+        status_val = None
+
+        dataBank_objs = DataBank.objects.filter(lead_Id__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id,lead_status='Not Attended').exclude(current_status='Marked as Waste')
+       
+
+        if request.POST:
+            emp = request.POST['executive_id']
+            d1 = request.POST['sdate']
+            d2 = request.POST['edate']
+            pgnum = request.POST['pgnum']
+
+           
+            
+            if d1:
+
+                dataBank_objs = dataBank_objs.filter(lead_Id__lead_add_date__gte=d1)
+
+            if d2:
+
+                dataBank_objs = dataBank_objs.filter(lead_Id__lead_add_date__lte=d2)
+            
+            if emp:
+                selected_emp = EmployeeRegister_Details.objects.get(id=emp)
+                dataBank_objs = dataBank_objs.filter(lead_Id__lead_collect_Emp_id=emp)
+         
+        dataBank_count = dataBank_objs.count()
+            
+        if pgnum:
+            pgnum = int(pgnum)
+            dataBank_objs = dataBank_objs[:pgnum]
 
         content = {'emp_dash':emp_dash,
                    'dash_details':dash_details,
                    'employees':employees,
                    'executives':executives,
                    'notifications':notifications,
-                   'dataBank_count':dataBank_count,'dataBank_objs':dataBank_objs,'countList':countList}
+                   'dataBank_count':dataBank_count,'dataBank_objs':dataBank_objs,
+                   'selected_emp':selected_emp,'d1':d1,'d2':d2,'pg_num':pgnum}
         
     return render(request,'DAM_dashboard_allocation.html',content)
 
@@ -406,7 +452,7 @@ def DMA_allocate_lead(request):
                 db.allocated_date = date.today()
                 
                 db.lead_status = 'Allocated' 
-                db.save()
+                #db.save()
                 count = count + 1
 
                 ld_obj = Leads_assignto_tc()
@@ -416,7 +462,7 @@ def DMA_allocate_lead(request):
                 ld_obj.client_id = db.lead_Id.lead_work_regId.clientId
                 ld_obj.Assign_Date =  date.today()
                 ld_obj.Allocate_time = datetime.datetime.now().time()
-                ld_obj.save()
+                #ld_obj.save()
 
                 fh_obj = FollowupHistory()
                 fh_obj.hs_lead_Id = db.lead_Id
@@ -425,35 +471,16 @@ def DMA_allocate_lead(request):
                 fh_obj.note ='Lead allocated'
                 fh_obj.final_status='Allocated'
                 fh_obj.hs_comp_Id = db.lead_Id.lead_work_regId.clientId.compId
-                fh_obj.save()
+                #fh_obj.save()
 
-            success = True
             success_text = str(count) + ' lead allocated to ' + str(emp.emp_name) + ' successfully.'
+            messages.success(request, success_text)
+        
+        return redirect('DAM_Dashboard_allocation')
 
 
-            dataBank_objs = DataBank.objects.filter(lead_Id__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id,lead_status='Not Attended')
-            dataBank_count = DataBank.objects.filter(lead_Id__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id,lead_status='Not Attended').count()
-            employees = EmployeeRegister_Details.objects.filter(emp_designation_id__dashboard_id=4)
-            executives = EmployeeRegister_Details.objects.filter(Q(emp_designation_id__dashboard_id=3) | Q(emp_designation_id__dashboard_id=2) | Q(emp_designation_id__dashboard_id=1))
 
-            countList = []
-
-            for e in executives:
-                countNo = DataBank.objects.filter(lead_Id__lead_collect_Emp_id=e,lead_allocate_status=0).count()
-                empName = e.emp_name
-                countList.append({empName: countNo})
-
-
-            content = {'emp_dash':emp_dash,
-                    'dash_details':dash_details,
-                    'employees':employees,
-                    'notifications':notifications,
-                    'executives':executives,
-                    'success_text':success_text,
-                    'success':success,
-                    'dataBank_count':dataBank_count,'dataBank_objs':dataBank_objs,'countList':countList}
-            
-            return render(request,'DAM_dashboard_allocation.html',content)
+           
 
 
 def DAM_allAllocationList(request):   
@@ -878,18 +905,44 @@ def DAM_Dashboard_followups(request):
         # Notification-----------
         notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
 
-        employees = EmployeeRegister_Details.objects.filter(Q(emp_designation_id__dashboard_id=4) | Q(emp_designation_id__dashboard_id=5))
-        
+        employees = EmployeeRegister_Details.objects.filter(emp_designation_id__dashboard_id=4)
+
+        dataBank_objs = Leads_assignto_tc.objects.filter(dataBank_ID__lead_Id__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id,dataBank_ID__lead_allocate_status=1 )
+        dataBank_objs = dataBank_objs.order_by('-Assign_Date')
+
+        d1 = None
+        d2 = None
+        select_emp = None
+        status_val = None
+        pgnum = 30
+
         if request.POST:
 
-            emp_ID = request.POST['selected_emp']
-            dataBank_objs = Leads_assignto_tc.objects.filter(TC_Id__id=emp_ID,dataBank_ID__lead_Id__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id,dataBank_ID__lead_allocate_status=1 )
-            dataBank_count = dataBank_objs.count()
-        
-        else:
-            dataBank_objs = Leads_assignto_tc.objects.filter(dataBank_ID__lead_Id__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id,dataBank_ID__lead_allocate_status=1 )
-            dataBank_count = dataBank_objs.count()
-       
+            d1 = request.POST['sdate']
+            d2 = request.POST['edate']
+            hr_id = request.POST['hr_id']
+            status_val =  request.POST['status_val']
+            pgnum = request.POST['pgnum']
+
+            if d1:
+                dataBank_objs = dataBank_objs.filter(Assign_Date__gte=d1)
+            if d2:
+                dataBank_objs = dataBank_objs.filter(Assign_Date__lte=d2)
+
+            if hr_id:
+                select_emp = EmployeeRegister_Details.objects.get(id=hr_id)
+                dataBank_objs = dataBank_objs.filter(TC_Id__id=hr_id)
+
+            if status_val:
+                dataBank_objs = dataBank_objs.filter(dataBank_ID__lead_status=status_val)
+
+        dataBank_count = dataBank_objs.count()
+            
+        if pgnum:
+            pgnum = int(pgnum)
+            dataBank_objs = dataBank_objs[:pgnum]
+
+
         follow_obj = FollowupStatus.objects.filter(company_Id__id=dash_details.emp_comp_id.id)
 
         content = {'emp_dash':emp_dash,
@@ -897,10 +950,12 @@ def DAM_Dashboard_followups(request):
                         'employees':employees,
                         'notifications':notifications,
                         'follow_obj':follow_obj,
-                        'dataBank_count':dataBank_count,'dataBank_objs':dataBank_objs}
+                        'dataBank_count':dataBank_count,'dataBank_objs':dataBank_objs,
+                        'd1':d1,'d2':d2,'select_emp':select_emp,'pg_num':pgnum,'status_val':status_val}
         
                 
         return render(request,'DAM_Dashboard_followup.html',content)
+
 
 def DAM_assign_remove(request,lassignID):
 
@@ -1826,45 +1881,20 @@ def fetch_lead_categories(request):
        
 
         if client_id is not None:
-            # Fetch lead categories based on the selected client ID
+        
             lead_categories = LeadCategory_Register.objects.filter(cTaskId__client_Id__id=client_id)
            
-            # Convert lead categories to a list of dictionaries
             lead_categories_list = [{'id': category.id, 'name': category.lead_collection_for} for category in lead_categories]
 
-            units_list = [{'name': unlist.lead_collection_for} for unlist in lead_categories]
-
             DB_data = DataBank.objects.filter(lead_Id__lead_work_regId__clientId__id=client_id)
-            dataBank_count = DataBank.objects.filter(lead_Id__lead_work_regId__clientId__id=client_id).count()
-            data_list = []
-           
-            for lead in DB_data:
-                
-                data = {
-                
-                'lead_status':lead.lead_status,
-                'Genarated_date': lead.Genarated_date,
-                'lead_name': lead.lead_Id.lead_name,
-                'lead_email': lead.lead_Id.lead_email,
-                'lead_contact': lead.lead_Id.lead_contact,
-                'id': lead.id,
-                'lead_source':lead.lead_Id.lead_source,
-                'client_name':lead.lead_Id.lead_work_regId.clientId.client_name,
-                'lead_collection_for':lead.lead_Id.lead_category_id.lead_collection_for,
-                'emp_name': lead.lead_Id.lead_collect_Emp_id.emp_name,
-                'c_status': lead.current_status,
-                }
-                data_list.append(data)
-
+            dataBank_count =DB_data.count()
+            
             success = True
             message = "Operation successful"
 
-
-
-            # Return a JSON response with lead categories
-            return JsonResponse({'success': success, 'message': message,'dataBank_count':dataBank_count,'lead_categories': lead_categories_list,'leads_data': data_list})
+            return JsonResponse({'success': success, 'message': message,'lead_categories': lead_categories_list})
         else:
-            # Handle the case where client_id is not provided
+          
             raise ValueError("Client ID is not provided in the request.")
 
     except Exception as e:
@@ -2184,6 +2214,13 @@ def DAM_waste_data_confirm(request):
         
         lead_waste = Waste_Leads.objects.filter(client_id__compId=dash_details.emp_comp_id,Status=0).order_by('-waste_marked_Date')
 
+        d1 = None
+        d2 = None
+        hr = None
+        selected_hr = None
+        status_val = None
+
+
         if request.POST:
 
             d1 = request.POST['sdate']
@@ -2198,13 +2235,12 @@ def DAM_waste_data_confirm(request):
                 lead_waste = lead_waste.filter(waste_marked_Date__lte=d2)
 
             if hr:
+                selected_hr = EmployeeRegister_Details.objects.get(id=hr)
                 lead_waste = lead_waste.filter(TC_Id__id=hr)
 
             if status_val:
                 lead_waste = lead_waste.filter(confirmation=status_val)
 
-        else:
-            lead_waste = lead_waste.filter(waste_marked_Date=date.today())
 
         lead_waste_count = lead_waste.count()       
        
@@ -2215,64 +2251,38 @@ def DAM_waste_data_confirm(request):
                    'dash_details':dash_details,
                    'lead_waste':lead_waste,
                    'notifications':notifications,
-                   'hr_objs':hr_objs,
+                   'hr_objs':hr_objs,'d1':d1,'d2':d2,'hr':hr,'status_val':status_val,'selected_hr':selected_hr,
                    'lead_waste_count':lead_waste_count}
         
         return render(request,'DAM_watedata_Confirm.html',content)
-        
-     
+    
 
-        
-       
+def DAM_waste_dateApprove(request):
 
-
-def DAM_Approved_waste_data(request):
     if 'emp_id' in request.session:
         if request.session.has_key('emp_id'):
             emp_id = request.session['emp_id']
-           
         else:
             return redirect('/')
         
         emp_dash = LogRegister_Details.objects.get(id=emp_id)
         dash_details = EmployeeRegister_Details.objects.get(logreg_id=emp_dash)
 
-        # Notification-----------
-        notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
+    if request.POST:
 
-        
-        lead_waste = Waste_Leads.objects.filter(client_id__compId__id=dash_details.emp_comp_id.id,Status=1)
-
-        if not lead_waste.exists():
-            return redirect('DAM_wasteData_management')
-
-            
-        content = {'emp_dash':emp_dash,
-                    'dash_details':dash_details,
-                    'lead_waste':lead_waste,
-                    'notifications':notifications}
-            
-        return render(request,'DAM_watedata_list.html',content)
+        lead_id = request.POST.get('lead_id')
+        hr = request.POST.get('hr')
+        d1 = request.POST.get('sdate')
+        d2 = request.POST.get('edate')
+        status_val = request.POST.get('status_val')
         
         
-def DAM_waste_dateApprove(request,waID):
-    if 'emp_id' in request.session:
-        if request.session.has_key('emp_id'):
-            emp_id = request.session['emp_id']
-           
-        else:
-            return redirect('/')
-        
-        emp_dash = LogRegister_Details.objects.get(id=emp_id)
-        dash_details = EmployeeRegister_Details.objects.get(logreg_id=emp_dash)
+        waste = Waste_Leads.objects.get(id=lead_id)
 
-        # Notification-----------
-        notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
-
-        waste = Waste_Leads.objects.get(id=waID)
         if waste.confirmation == 1:
             waste.Status = 1
             waste.save()
+
             lead_obj = Leads.objects.get(id=waste.leadId.id)
             lead_obj.waste_data = 1
             
@@ -2291,15 +2301,11 @@ def DAM_waste_dateApprove(request,waID):
             fh.hs_lead_Id=waste.leadId
             fh.note = 'Lead marked as waste'
             fh.allocated_date = date.today()
-            fh.hr_telecaller_Id = waste.assignto_tc_id
+            fh.hr_telecaller_Id = waste.TC_Id
             fh.hs_comp_Id=dash_details.emp_comp_id
             fh.final_status = 'Marked as Waste'
-            #fh.save()
+            fh.save()
 
-            
-
-            success_text='Data Marked as waste successfully.'
-            success = True
 
             # Waste Data notification----
 
@@ -2326,31 +2332,42 @@ def DAM_waste_dateApprove(request,waID):
 
                 notific_obj.save()
 
-                lead_waste = Waste_Leads.objects.filter(client_id__compId__id=dash_details.emp_comp_id.id,Status=0)
+            lead_waste = Waste_Leads.objects.filter(client_id__compId__id=dash_details.emp_comp_id.id,Status=0).order_by('-waste_marked_Date')
 
-                content = {'emp_dash':emp_dash,
-                    'dash_details':dash_details,
-                    'lead_waste':lead_waste,
-                    'success_text':success_text,
-                    'success':success,
-                    'notifications':notifications}
-        else:
-            success_text='Oops! Confirmation Missing.'
-            success = True
+            if d1:
+                lead_waste = lead_waste.filter(waste_marked_Date__gte=d1)
 
-            lead_waste = Waste_Leads.objects.filter(client_id__compId__id=dash_details.emp_comp_id.id,Status=0)
+            if d2:
+                lead_waste = lead_waste.filter(waste_marked_Date__lte=d2)
 
-            content = {'emp_dash':emp_dash,
-                    'dash_details':dash_details,
-                    'lead_waste':lead_waste,
-                    'success_text':success_text,
-                    'success':success,
-                    'notifications':notifications}
+            if hr:
+                lead_waste = lead_waste.filter(TC_Id__id=hr)
+
+            if status_val:
+                lead_waste = lead_waste.filter(confirmation=status_val)
             
-    return render(request,'DAM_watedata_Confirm.html',content)
+            lead_waste_count = lead_waste.count()     
+
+            content = {'lead_waste':lead_waste}
+
+            table_content = render_to_string('table_waste_content.html', content, request=request)
+
+            return JsonResponse({
+                'lead_waste_count': lead_waste_count,
+                'table_content': table_content
+            })
+        
+        
+
+        else:
+           return JsonResponse({'status': 'Confirmation Missing'})   
+    else:
+        return JsonResponse({'status': 'error'}, status=400)   
+                 
 
 
-def DAM_waste_dateCancel(request,waID):
+def DAM_waste_dateCancel(request):
+
     if 'emp_id' in request.session:
         if request.session.has_key('emp_id'):
             emp_id = request.session['emp_id']
@@ -2361,24 +2378,113 @@ def DAM_waste_dateCancel(request,waID):
         emp_dash = LogRegister_Details.objects.get(id=emp_id)
         dash_details = EmployeeRegister_Details.objects.get(logreg_id=emp_dash)
 
-        waste = Waste_Leads.objects.get(id=waID)
-        data=Leads_assignto_tc.objects.get(id=waste.assignto_tc_id.id)
-        data.Response='Not Waste'
-        data.save()
+        if request.POST:
 
-        FBH = FollowupHistory()
-        FBH.hs_lead_Id= waste.leadId
-        FBH.hs_comp_Id= dash_details.emp_comp_id
-        FBH.hr_telecaller_Id= waste.TC_Id
+            lead_id = request.POST.get('lead_id')
+            hr = request.POST.get('hr')
+            d1 = request.POST.get('sdate')
+            d2 = request.POST.get('edate')
+            status_val = request.POST.get('status_val')
+            
+            waste = Waste_Leads.objects.get(id=lead_id)
+            data=Leads_assignto_tc.objects.get(id=waste.assignto_tc_id.id)
+            data.Response='Not Waste'
+            data.save()
 
-        FBH.allocated_date = date.today()
-        FBH.note = 'Changed the status Marked as waste to Not a waste '
-        FBH.final_status = 'Not Waste'
-        FBH.save()
+            FBH = FollowupHistory()
+            FBH.hs_lead_Id= waste.leadId
+            FBH.hs_comp_Id= dash_details.emp_comp_id
+            FBH.hr_telecaller_Id= waste.TC_Id
 
-        waste.delete()
+            FBH.allocated_date = date.today()
+            FBH.note = 'Changed the status Marked as waste to Not a waste '
+            FBH.final_status = 'Not Waste'
+            FBH.save()
 
-        return redirect('DAM_waste_data_confirm')
+            waste.delete()
+
+            lead_waste = Waste_Leads.objects.filter(client_id__compId__id=dash_details.emp_comp_id.id,Status=0).order_by('-waste_marked_Date')
+            
+            if d1:
+                lead_waste = lead_waste.filter(waste_marked_Date__gte=d1)
+
+            if d2:
+                lead_waste = lead_waste.filter(waste_marked_Date__lte=d2)
+
+            if hr:
+                lead_waste = lead_waste.filter(TC_Id__id=hr)
+
+            if status_val:
+                lead_waste = lead_waste.filter(confirmation=status_val)
+            
+            lead_waste_count = lead_waste.count()     
+
+            content = {'lead_waste':lead_waste}
+
+            table_content = render_to_string('table_waste_content.html', content, request=request)
+
+            return JsonResponse({
+                'lead_waste_count': lead_waste_count,
+                'table_content': table_content
+            })
+    
+        else:
+            return JsonResponse({'status': 'error'}, status=400)   
+
+
+
+def DAM_Approved_waste_data(request):
+    if 'emp_id' in request.session:
+        if request.session.has_key('emp_id'):
+            emp_id = request.session['emp_id']
+           
+        else:
+            return redirect('/')
+        
+        emp_dash = LogRegister_Details.objects.get(id=emp_id)
+        dash_details = EmployeeRegister_Details.objects.get(logreg_id=emp_dash)
+
+        # Notification-----------
+        notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
+        hr_objs = EmployeeRegister_Details.objects.filter(emp_comp_id=dash_details.emp_comp_id,emp_designation_id__dashboard_id=4,emp_active_status=1)
+        
+        lead_waste = Waste_Leads.objects.filter(client_id__compId__id=dash_details.emp_comp_id.id,Status=1)
+        
+        d1 = None
+        d2 = None
+        hr = None
+        selected_hr = None
+       
+
+
+        if request.POST:
+
+            d1 = request.POST['sdate']
+            d2 = request.POST['edate']
+            hr = request.POST['hr_id']
+           
+
+            if d1:
+                lead_waste = lead_waste.filter(waste_marked_Date__gte=d1)
+
+            if d2:
+                lead_waste = lead_waste.filter(waste_marked_Date__lte=d2)
+
+            if hr:
+                selected_hr = EmployeeRegister_Details.objects.get(id=hr)
+                lead_waste = lead_waste.filter(TC_Id__id=hr)
+
+        lead_waste_count = lead_waste.count()   
+
+            
+        content = {'emp_dash':emp_dash,
+                    'dash_details':dash_details,
+                    'lead_waste':lead_waste,
+                    'lead_waste_count':lead_waste_count,
+                    'hr_objs':hr_objs,'d1':d1,'d2':d2,'hr':hr,'selected_hr':selected_hr,
+                    'notifications':notifications}
+            
+        return render(request,'DAM_watedata_list.html',content)
 
 
 
@@ -3148,3 +3254,27 @@ def DAM_Hr_LeadStatusChange(request,pk):
     db_obj.save()
     messages.success(request,f"{assign_obj.leadId.lead_name } joind status changed.")
     return redirect('DAM_Hr_JoinedLead',assign_obj.TC_Id.id)
+
+
+
+def lead_track(request,dbid):
+    if 'emp_id' in request.session:
+        if request.session.has_key('emp_id'):
+            emp_id = request.session['emp_id']
+           
+        else:
+            return redirect('/')
+        
+        emp_dash = LogRegister_Details.objects.get(id=emp_id)
+        dash_details = EmployeeRegister_Details.objects.get(logreg_id=emp_dash)
+
+        # Notification-----------
+        notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
+
+        content = {'emp_dash':emp_dash,
+                   'dash_details':dash_details,
+                   'notifications':notifications,
+                   
+                   }
+        
+        return render(request,'DAM_leadTrack.html',content)

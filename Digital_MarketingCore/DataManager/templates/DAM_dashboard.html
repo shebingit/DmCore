@@ -12,88 +12,7 @@
       </nav>
 </div>
 
-        <div class="row">
-            <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
-                <div class="card">
-                <div class="card-body">
-                    <div class="row">
-                    <div class="col-9">
-                        <div class="d-flex align-items-center align-self-start">
-                        <h3 class="mb-0">{{ dataBank_count }}</h3>
-                        <!-- <p class="text-success ms-2 mb-0 font-weight-medium">+3.5%</p> -->
-                        </div>
-                    </div>
-                    <div class="col-3">
-                        <div class="icon icon-box-success ">
-                        <span class="mdi mdi-arrow-top-right icon-item"></span>
-                        </div>
-                    </div>
-                    </div>
-                    <h5 class="text-offwhite font-weight-normal">Total Leads</h5>
-                </div>
-                </div>
-            </div>
-            <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
-                <div class="card">
-                <div class="card-body">
-                    <div class="row">
-                    <div class="col-9">
-                        <div class="d-flex align-items-center align-self-start">
-                            <h3 class="mb-0">{{ dataBank_allocate_count }}</h3>
-                            <!-- <p class="text-success ms-2 mb-0 font-weight-medium">+3.5%</p> -->
-                        </div>
-                    </div>
-                    <div class="col-3">
-                        <div class="icon icon-box-success ">
-                        <span class="mdi mdi-arrow-top-right icon-item"></span>
-                        </div>
-                    </div>
-                    </div>
-                    <h5 class="text-offwhite font-weight-normal">Allocated Leads</h5>
-                </div>
-                </div>
-            </div>
-            <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
-                <div class="card">
-                <div class="card-body">
-                    <div class="row">
-                    <div class="col-9">
-                        <div class="d-flex align-items-center align-self-start">
-                            <h3 class="mb-0">{{ dataBank_open_count }}</h3>
-                            <!-- <p class="text-success ms-2 mb-0 font-weight-medium">+3.5%</p> -->
-                        </div>
-                    </div>
-                    <div class="col-3">
-                        <div class="icon icon-box-success ">
-                        <span class="mdi mdi-arrow-top-right icon-item"></span>
-                        </div>
-                    </div>
-                    </div>
-                    <h5 class="text-offwhite font-weight-normal">Opend Leads</h5>
-                </div>
-                </div>
-            </div>
-            <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
-                <div class="card">
-                <div class="card-body">
-                    <div class="row">
-                    <div class="col-9">
-                        <div class="d-flex align-items-center align-self-start">
-                            <h3 class="mb-0">{{ dataBank_close_count }}</h3>
-                            <!-- <p class="text-success ms-2 mb-0 font-weight-medium">+3.5%</p> -->
-                        </div>
-                    </div>
-                    <div class="col-3">
-                        <div class="icon icon-box-success ">
-                        <span class="mdi mdi-arrow-top-right icon-item"></span>
-                        </div>
-                    </div>
-                    </div>
-                    <h5 class="text-offwhite font-weight-normal">Closed Leads</h5>
-                </div>
-                </div>
-            </div>
-        </div>
+        
 
         <div class="row">
             <div class="col-xl-4 col-sm-12 grid-margin stretch-card">
@@ -150,7 +69,7 @@
                             <div class="col-9 col-sm-9">
                             <div class="d-flex align-items-center align-self-start">
                                 <h4 class="mb-0">Follow Up </h4>
-                                <p class="text-warning ml-2 mb-0 font-weight-medium"> - {{ dataBank_followup_count }}</p>
+                                <p class="text-warning ml-2 mb-0 font-weight-medium"> </p>
                             </div>
                             </div>
                             <div class="col-3 col-sm-3">
@@ -304,33 +223,7 @@
             </div>
         
         </div>
-        <div class="row">
-            <div class="col-xl-6  col-lg-6 grid-margin stretch-card">
-                <div class="card " style="overflow-x: scroll;" >
-                  <div class="card-body">
-                    <h4 class="card-title">Leads in Dates</h4>
-                    
-                    <canvas id="barChart" style="height:230px"></canvas>
-                    <p  class="form-control" style="display:none;"  id="labels_names">{{ labels }}</p>
-                    <p class="form-control" style="display:none;" id="votes_data">{{ votes_data }}</p>
-                  </div>
-                </div>
-            </div>
         
-       
-            <div class="col-xl-6  col-lg-6 grid-margin stretch-card">
-                <div class="card"  style="overflow-x: scroll;">
-                  <div class="card-body">
-                    <h4 class="card-title">Leads From Platforms</h4>
-                    
-                    <canvas id="barChart-platform" style="height:230px"></canvas>
-                    <p  class="form-control" style="display:none;"  id="plflabels_names">{{ PlatForms_labels }}</p>
-                    <p class="form-control" style="display:none;" id="plfvotes_data">{{ PlatForms_votes_data }}</p>
-                  </div>
-                </div>
-            </div>
-            
-        </div>
         
       
 
@@ -342,6 +235,114 @@
 {% endblock %}
 
 
+<div class="row">
+    <div class="col-xl-6  col-lg-6 grid-margin stretch-card">
+        <div class="card " style="overflow-x: scroll;" >
+          <div class="card-body">
+            <h4 class="card-title">Leads in Dates</h4>
+            
+            <canvas id="barChart" style="height:230px"></canvas>
+            <p  class="form-control" style="display:none;"  id="labels_names">{{ labels }}</p>
+            <p class="form-control" style="display:none;" id="votes_data">{{ votes_data }}</p>
+          </div>
+        </div>
+    </div>
 
 
+    <div class="col-xl-6  col-lg-6 grid-margin stretch-card">
+        <div class="card"  style="overflow-x: scroll;">
+          <div class="card-body">
+            <h4 class="card-title">Leads From Platforms</h4>
+            
+            <canvas id="barChart-platform" style="height:230px"></canvas>
+            <p  class="form-control" style="display:none;"  id="plflabels_names">{{ PlatForms_labels }}</p>
+            <p class="form-control" style="display:none;" id="plfvotes_data">{{ PlatForms_votes_data }}</p>
+          </div>
+        </div>
+    </div>
+    
+</div>
 
+
+<div class="row">
+    <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+        <div class="card">
+        <div class="card-body">
+            <div class="row">
+            <div class="col-9">
+                <div class="d-flex align-items-center align-self-start">
+                <h3 class="mb-0">{{ dataBank_count }}</h3>
+                <!-- <p class="text-success ms-2 mb-0 font-weight-medium">+3.5%</p> -->
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="icon icon-box-success ">
+                <span class="mdi mdi-arrow-top-right icon-item"></span>
+                </div>
+            </div>
+            </div>
+            <h5 class="text-offwhite font-weight-normal">Total Leads</h5>
+        </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+        <div class="card">
+        <div class="card-body">
+            <div class="row">
+            <div class="col-9">
+                <div class="d-flex align-items-center align-self-start">
+                    <h3 class="mb-0">{{ dataBank_allocate_count }}</h3>
+                    <!-- <p class="text-success ms-2 mb-0 font-weight-medium">+3.5%</p> -->
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="icon icon-box-success ">
+                <span class="mdi mdi-arrow-top-right icon-item"></span>
+                </div>
+            </div>
+            </div>
+            <h5 class="text-offwhite font-weight-normal">Allocated Leads</h5>
+        </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+        <div class="card">
+        <div class="card-body">
+            <div class="row">
+            <div class="col-9">
+                <div class="d-flex align-items-center align-self-start">
+                    <h3 class="mb-0">{{ dataBank_open_count }}</h3>
+                    <!-- <p class="text-success ms-2 mb-0 font-weight-medium">+3.5%</p> -->
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="icon icon-box-success ">
+                <span class="mdi mdi-arrow-top-right icon-item"></span>
+                </div>
+            </div>
+            </div>
+            <h5 class="text-offwhite font-weight-normal">Opend Leads</h5>
+        </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+        <div class="card">
+        <div class="card-body">
+            <div class="row">
+            <div class="col-9">
+                <div class="d-flex align-items-center align-self-start">
+                    <h3 class="mb-0">{{ dataBank_close_count }}</h3>
+                    <!-- <p class="text-success ms-2 mb-0 font-weight-medium">+3.5%</p> -->
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="icon icon-box-success ">
+                <span class="mdi mdi-arrow-top-right icon-item"></span>
+                </div>
+            </div>
+            </div>
+            <h5 class="text-offwhite font-weight-normal">Closed Leads</h5>
+        </div>
+        </div>
+    </div>
+</div>

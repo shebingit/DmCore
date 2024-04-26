@@ -1,32 +1,32 @@
-{% extends 'DAM_base.html' %}
+{% extends 'TC_base.html' %}
 {% load static %}
 {% block body %}
 
-<link href="https://cdn.datatables.net/2.0.3/css/dataTables.dataTables.css"  rel="stylesheet" >
-<link rel="stylesheet" href="{% static 'css/dmanager/style.css' %}">
 
+<link href="https://cdn.datatables.net/2.0.3/css/dataTables.dataTables.css"  rel="stylesheet" >
+<link rel="stylesheet" href="{% static 'css/TeamLead/style.css' %}">
 
 <div>
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'dataManager_dashboard' %}">Dashboard</a></li>
-          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'DAM_Dashboard_databank' %}">Data Bank</a></li>
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'TC_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'TC_newleads' %}">Leads</a></li>
+         
         </ol>
-      </nav>
+    </nav>
 </div>
-
-
 
 
 <div class="row ">
     <div class="col-12 grid-margin">
       <div class="card">
         <div class="card-body">
-          <h6 class="card-title text-offwhite"> Leads -  ( <span id="lead-count">{{dataBank_count}}</span>  )</h6>
+         
             <div class="form-section">
-               
+                <h6 class="card-title text-offwhite"> {% if status_val %}  {{ status_val }}   {% endif %}  
+                     Leads -  ( <span id="lead-count">{{assing_leads_count}}</span>  )</h6>
                 <div>
-                  <form action="{% url 'DAM_Dashboard_databank' %}" method="post" class="search-form">
+                  <form action="{% url 'TC_newleads' %}" method="post" class="search-form">
                     {% csrf_token%}
                    
 
@@ -46,38 +46,18 @@
                       </select>
                     </div>
                    
-                    <div class="input-groupBox">
-                      <select name="client_id" id="client-change">
-                        <option value="">select client</option>
-                        {% for client in clients_objs %}
-                        <option value="{{ client.client_Id.id }}"> {{ client.client_Id.client_name }}</option>
-                        {% endfor %}
-                  
-                      </select>
-                    </div>
-
-                    <div class="input-groupBox">
-                      <select name="category" id="lead-category">
-                        <option value="">select category</option> 
-                      </select>
-                    </div>
+                   
                     
-                    <div class="input-groupBox">
-                      <select name="executive"  id="lead-executive">
-                        <option value="">select executive </option> 
-                      </select>
-                    </div>
                    
                     <div class="input-groupBox">
-                      <input type="date" name="sdate" id="s-date" {% if d1 %} value="{{d1}}" {% endif %}>
+                      <input type="date" name="sdate">
                     </div>
                     <div class="input-groupBox">
-                      <input type="date" name="edate" id="e-date" {% if d2 %} value="{{d2}}" {% endif %}>
+                      <input type="date" name="edate" >
                     </div>
                     <div class="input-groupBox">
                       <select name="status_val" >
                         <option value="">select status</option>
-                        <option value="Not Attended">Not Attended</option>
                         <option value="Allocated">Allocated</option>
                         <option value="Opend">Opend</option>
                         <option value="Closed">Closed</option>
@@ -95,9 +75,7 @@
       
             <div class="filter-values">
               <p>
-                {% if cl_name %} <span>{{ cl_name.client_name }} {% endif %}</span>
-                {% if ct_name %} <span> ( {{ ct_name.lead_collection_for }}  ) {% endif %}</span>
-                {% if exe_name %} <span> - {{ exe_name.emp_name }}  {% endif %}</span>
+               
                 {% if d1 %} <span> ( {{ d1 }} ) {% endif %}  </span>
                 {% if d2 %} <span> -  ( {{ d2 }} ){% endif %} </span>
                 
@@ -117,35 +95,35 @@
                 </tr>
               </thead>
               <tbody id="waste-lead-body">
-                {% for db_lead in dataBank_objs %}
+                {% for db_lead in assing_leads %}
                 <tr class="clickable-row" data-href="{% url 'lead_track' db_lead.id  %}"> 
                   <td>{{ forloop.counter }}</td>
                   
-                  <td>{{ db_lead.Genarated_date |date:"d-M-y" }}</td>
-                  <td><span class="mdi mdi-account pl-1"></span> {{ db_lead.lead_Id.lead_name}}  {{ db_lead.id}}</span>
+                  <td>{{ db_lead.Assign_Date |date:"d-M-y" }}</td>
+                  <td><span class="mdi mdi-account pl-1"></span> {{ db_lead.leadId.lead_name}}  </span>
                     
                    </td>
-                  <td><span class="mdi mdi-email pl-1"></span> {{ db_lead.lead_Id.lead_email}}</td>
-                  <td><span class="mdi mdi-phone pl-1"></span> {{ db_lead.lead_Id.lead_contact}}</td>
+                  <td><span class="mdi mdi-email pl-1"></span> {{ db_lead.leadId.lead_email}}</td>
+                  <td><span class="mdi mdi-phone pl-1"></span> {{ db_lead.leadId.lead_contact}}</td>
                   <td>
-                    {% if db_lead.lead_status == 'Not Attended' %}
+                    {% if db_lead.dataBank_ID.lead_status == 'Not Attended' %}
                     <span class="badge badge-pill  badge-outline-info">
-                     {{ db_lead.lead_status }} 
+                     {{ db_lead.dataBank_ID.lead_status }} 
                     </span>
                     {% endif %}
-                    {% if db_lead.lead_status == 'Allocated' %} 
+                    {% if db_lead.dataBank_ID.lead_status == 'Allocated' %} 
                     <span class="badge badge-pill badge-outline-primary">
-                      {{ db_lead.lead_status }} 
+                      {{ db_lead.dataBank_ID.lead_status }} 
                       </span>
                     {% endif %}
-                    {% if db_lead.lead_status == 'Opend' %}
+                    {% if db_lead.dataBank_ID.lead_status == 'Opend' %}
                     <span class="badge badge-pill badge-outline-success">
-                      {{ db_lead.lead_status }} 
+                      {{ db_lead.dataBank_ID.lead_status }} 
                       </span>
                     {% endif %}
-                    {% if db_lead.lead_status == 'Closed' %} 
+                    {% if db_lead.dataBank_ID.lead_status == 'Closed' %} 
                     <span class="badge badge-pill badge-outline-danger">
-                      {{ db_lead.lead_status }} 
+                      {{ db_lead.dataBank_ID.lead_status }} 
                       </span>
                     {% endif %}
                   </td>
@@ -161,7 +139,9 @@
     </div>
 </div>
   
-  
+
+
+<!--- Script Secton -->
 
 <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -359,5 +339,3 @@
 
 
 {% endblock %}
-
-

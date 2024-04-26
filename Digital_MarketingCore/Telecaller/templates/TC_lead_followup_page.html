@@ -2,56 +2,8 @@
 {% load static %}
 {% block body %}
 
-<!----------------------------------- Style Section ------------------------------------------------------------------->
-<style>
-  .bg-danger {
-    background-color: #f50a168a !important;
-    color: rgb(225, 226, 226);
-  }
-
-  .bg-warning {
-    background-color: #ffca09a3 !important;
-    color: rgb(225, 226, 226);
-  }
-
-  .bg-danger a,
-  .bg-warning a {
-    color: rgb(225, 226, 226);
-  }
-
-  /*Pagination Styling */
-
-  div.dataTables_wrapper div.dataTables_paginate ul.pagination {
-    margin: 1rem 0.5rem;
-    white-space: nowrap;
-    justify-content: flex-end;
-  }
-
-  div.dataTables_wrapper div.dataTables_paginate ul.pagination li a {
-    border: none !important;
-    color: #c9c9c9;
-    font-size: 13px;
-  }
-
-  div.dataTables_wrapper div.dataTables_paginate ul.pagination li:hover a {
-    background: #dc1a1a !important;
-    color: #f8f7f7;
-  }
-  .alert-fill-success {
-    color: white;
-    background: #00d25b;
-  }
-  .alert-fill-danger {
-  color: white;
-  background: #fc424a;
-  }
-  .alert {
-    font-size: 0.795rem;
-  }
-  #data-table_previous {
-    color: #0000 !important;
-  }
-</style>
+<link href="https://cdn.datatables.net/2.0.3/css/dataTables.dataTables.css"  rel="stylesheet" >
+<link rel="stylesheet" href="{% static 'css/TeamLead/style.css' %}">
 
 
 
@@ -60,12 +12,166 @@
 <div>
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'TC_current_clients' %}">Current
-          Clients</a></li>
-      <li class="breadcrumb-item active text-md" aria-current="page">Followup Leads</li>
+      <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'TC_dashboard' %}">Dashboard</a></li>
+      <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'TC_newleads' %}">Followup Leads</a></li> 
     </ol>
   </nav>
 </div>
+
+
+
+<div class="row ">
+  <div class="col-12 grid-margin">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="card-title text-offwhite"> Followup -  ( <span id="lead-count">{{dataBank_count}}</span>  )</h6>
+          <div class="form-section">
+             
+              <div>
+                <form action="{% url 'DAM_Dashboard_databank' %}" method="post" class="search-form">
+                  {% csrf_token%}
+                 
+
+                  <div class="input-groupBox">
+                    <select name="pgnum" >
+                      <option value="" >All</option>
+                      {% if pg_num %}
+                      <option value="{{pg_num}}" selected>{{pg_num}}</option>
+                      {% endif %}
+                      <option value="20">20</option>
+                      <option value="25">25</option>
+                      <option value="50">50</option>
+                      <option value="100">100</option>
+                      <option value="250">250</option>
+                      <option value="500">500</option>
+                      <option value="1000">1000</option>
+                    </select>
+                  </div>
+                 
+                  <div class="input-groupBox">
+                    <select name="client_id" id="client-change">
+                      <option value="">select client</option>
+                      {% for client in clients_objs %}
+                      <option value="{{ client.client_Id.id }}"> {{ client.client_Id.client_name }}</option>
+                      {% endfor %}
+                
+                    </select>
+                  </div>
+
+                  <div class="input-groupBox">
+                    <select name="category" id="lead-category">
+                      <option value="">select category</option> 
+                    </select>
+                  </div>
+                  
+                  <div class="input-groupBox">
+                    <select name="executive"  id="lead-executive">
+                      <option value="">select executive </option> 
+                    </select>
+                  </div>
+                 
+                  <div class="input-groupBox">
+                    <input type="date" name="sdate" id="s-date" {% if d1 %} value="{{d1}}" {% endif %}>
+                  </div>
+                  <div class="input-groupBox">
+                    <input type="date" name="edate" id="e-date" {% if d2 %} value="{{d2}}" {% endif %}>
+                  </div>
+                  <div class="input-groupBox">
+                    <select name="status_val" >
+                      <option value="">select status</option>
+                      <option value="Not Attended">Not Attended</option>
+                      <option value="Allocated">Allocated</option>
+                      <option value="Opend">Opend</option>
+                      <option value="Closed">Closed</option>
+                    </select>
+                  </div>
+                  
+                 
+                  <div class="search-box">
+                    <button type="submit"><span class="mdi mdi-magnify"></span></button>
+                  </div>
+                </form>
+              </div>
+            
+          </div>
+    
+
+        <div class="table-responsive">
+          <table class="table table-bordered" id="leads-wastedata">
+            <thead>
+              <tr>
+                <th> No</th>
+                <th></th>
+                <th> Add Date</th>
+                <th> Name </th>
+                <th> Email id </th>
+                <th> Contact </th>
+                <th> Response </th>
+               
+              </tr>
+            </thead>
+            <tbody id="waste-lead-body">
+              {% for db_lead in dataBank_objs %}
+              <tr class="clickable-row" data-href="{% url 'lead_track' db_lead.id  %}"> 
+                <td>{{ forloop.counter }}</td>
+                <td>
+                  <a href="{% url 'Lead_FollowUp_Updates' db_lead.id %}" class="text-secondary">
+                    <span class="mdi mdi-phone-forward mdi-18px"></span> 
+                  </a>
+                </td>
+                
+                <td>{{ db_lead.Assign_Date |date:"d-M-y" }}</td>
+                <td><span class="mdi mdi-account pl-1"></span> {{ db_lead.leadId.lead_name}}  {{ db_lead.id}}</span>
+                  
+                 </td>
+                <td><span class="mdi mdi-email pl-1"></span> {{ db_lead.leadId.lead_email}}</td>
+                <td><span class="mdi mdi-phone pl-1"></span> {{ db_lead.leadId.lead_contact}}</td>
+                <td>
+                  
+                  <span class="badge badge-pill  badge-outline-secondary">
+                   {{ db_lead.dataBank_ID.Response }} 
+                  
+                </td>
+                
+              </tr>
+              {% endfor %}
+            
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+<script>
+  $(document).ready(function() {
+     new DataTable('#leads-wastedata', {
+         search: {
+          enable: true 
+         },
+         columnDefs: [
+         {
+             orderable: false,
+             className: 'check-single',
+             targets: 0,
+         }
+     ],
+     
+     
+ });
+
+});
+</script>
+
 
 <div class="card">
 
@@ -87,7 +193,7 @@
       {% endfor %}
                  
       {% endif %}
-      <table class="table  table-bordered table-hover" id="data-table">
+      <table class="table  table-bordered table-hover" >
         <thead>
           <tr>
             <th scope="col">ID</th>
@@ -100,7 +206,7 @@
           </tr>
         </thead>
         <tbody>
-          {% for d in data %}
+          {% for d in dataBank_objs %}
 
           {% if d.Next_update_date < t_date %}
            <tr class="bg-danger ">
@@ -236,6 +342,14 @@
 
 <!-----------------------------------Scripts Section ------------------------------------------------------------------->
 
+
+
+
+
+
+{% endblock %}
+
+
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
 <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
@@ -255,7 +369,53 @@
   
 </script>
 
+<!----------------------------------- Style Section ------------------------------------------------------------------->
+<style>
+  .bg-danger {
+    background-color: #f50a168a !important;
+    color: rgb(225, 226, 226);
+  }
 
+  .bg-warning {
+    background-color: #ffca09a3 !important;
+    color: rgb(225, 226, 226);
+  }
 
+  .bg-danger a,
+  .bg-warning a {
+    color: rgb(225, 226, 226);
+  }
 
-{% endblock %}
+  /*Pagination Styling */
+
+  div.dataTables_wrapper div.dataTables_paginate ul.pagination {
+    margin: 1rem 0.5rem;
+    white-space: nowrap;
+    justify-content: flex-end;
+  }
+
+  div.dataTables_wrapper div.dataTables_paginate ul.pagination li a {
+    border: none !important;
+    color: #c9c9c9;
+    font-size: 13px;
+  }
+
+  div.dataTables_wrapper div.dataTables_paginate ul.pagination li:hover a {
+    background: #dc1a1a !important;
+    color: #f8f7f7;
+  }
+  .alert-fill-success {
+    color: white;
+    background: #00d25b;
+  }
+  .alert-fill-danger {
+  color: white;
+  background: #fc424a;
+  }
+  .alert {
+    font-size: 0.795rem;
+  }
+  #data-table_previous {
+    color: #0000 !important;
+  }
+</style>

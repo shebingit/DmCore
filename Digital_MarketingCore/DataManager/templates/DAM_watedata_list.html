@@ -2,6 +2,115 @@
 {% load static %}
 {% block body %}
 
+<link href="https://cdn.datatables.net/2.0.3/css/dataTables.dataTables.css"  rel="stylesheet" >
+<style>
+
+  .table thead tr th{
+    font-size: 12.2px;
+    text-align: center;
+    letter-spacing: 1px;
+
+  } 
+
+  table.dataTable > tbody > tr > th, table.dataTable > tbody > tr > td {
+    padding: 3px 10px;
+}
+    .dt-search label
+    {
+     display: none;
+
+    }
+    div.dt-container .dt-search input {
+        border: 1px solid #707070;
+        border-radius: 3px;
+        padding: 5px;
+        background-color: transparent;
+        color: #a5a5a5;
+        margin-left: 3px;
+        font-size: 13px;
+    }
+
+    div.dt-container select.dt-input {
+        padding: 4px 10px;
+        border: 1px solid #707070;
+        color: #a5a5a5;
+        font-size: 13px;
+        background-color: transparent;
+        width: 100px;
+    }
+    div.dt-container select option{
+        background-color: #15171f; 
+    }
+    div.dt-container .dt-length label
+    {
+        display: none;
+    }
+    div.dt-container .dt-info
+    {
+        color: #a5a5a5;
+        font-size: 13px 
+    }
+    .reason-box
+    {
+      padding: 10px 0px;
+      margin-top: 0.20rem;
+      color: rgba(255, 82, 82, 0.83);
+      font-size: 12.6px;
+
+    }
+    .tc
+    {
+      font-size: 12px;
+      padding-bottom: 0.20rem;
+    }
+    .form-section
+    {
+      display: grid;
+      grid-template-columns: 0.80fr 2fr;
+      border-bottom: 0.30px solid #929292;
+      padding-bottom: 0.70rem;
+    }
+    .search-form
+    {
+      display: flex;
+      align-items: center;
+      justify-content: end;
+      gap: 0.80rem;
+     
+    }
+    .input-groupBox input,
+    .input-groupBox select
+    {
+      background: #15171f;
+      color: #bebebe;
+      font-size: 12px;
+      outline: #dededf;
+      border: 0.0002px solid #94949490;
+      padding: 6px 15px;
+    }
+    .input-groupBox select
+    {
+      padding: 8px 15px; 
+    }
+    .search-box button
+    {
+      border-radius: 50%;
+      height: 35px;
+      width: 35px;
+      background-color: #232a46;
+      border: #15171f;
+      color: #dededf;
+    }
+    .search-box button:hover{
+      border: #0a0e1d;
+      color: #0f0f21;
+      background-color: #e0e1e5;
+    }
+    .mdi-check-circle
+    {
+      font-size: 10px;
+    }
+</style>
 <div>
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -11,75 +120,89 @@
       </nav>
 </div>
 
-
-<div class="row ">
+  <div class="row ">
     <div class="col-12 grid-margin">
       <div class="card">
         <div class="card-body">
-            <div class="d-flex justify-content-between">
-                <h6 class="card-title text-offwhite">Wating and Confirmed List</h6>
-                <div class="add-items d-flex ">
+            <div class="form-section">
+                <h6 class="card-title text-offwhite">Approved Waste List -  ( <span id="lead-count">{{lead_waste_count}}</span>  )</h6>
+                <div>
+                  <form action="{% url 'DAM_Approved_waste_data' %}" method="post" class="search-form">
+                    {% csrf_token%}
+                    <div class="search-box">
+                      <a href="{% url 'DAM_Approved_waste_data' %}"><span class="mdi mdi-refresh"></span></a>
+                    </div>
+                    <div class="input-groupBox">
+                      <select name="hr_id" id="hr-id">
+                        {% if selected_hr %}
+                        <option value="{{selected_hr.id}}" selected>{{ selected_hr.emp_name }}</option>
+                        {% else %}
+                        <option value="">select Hr</option>
+                        {% endif %}
+                        {% for hr in hr_objs %}
+                        <option value="{{hr.id}}">{{ hr.emp_name }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  
+                    <div class="input-groupBox">
+                      <input type="date" name="sdate" id="s-date" {% if d1 %} value="{{d1}}" {% endif %}>
+                    </div>
+                    <div class="input-groupBox">
+                      <input type="date" name="edate" id="e-date" {% if d2 %} value="{{d2}}" {% endif %}>
+                    </div>
+                   
+                   
+                    <div class="search-box">
+                      <button type="submit"><span class="mdi mdi-magnify"></span></button>
+                    </div>
+                  </form>
+                </div>
               
-                    <input  class="form-control text-offwhite" name="#" id="search-data" placeholder="search here..">
-                    <button class="btn btn-outline-danger mdi mdi-close" id="closeBtn" type="button"></button> 
-                  </div>
-                
             </div>
-  
-           
-            
-    
+      
           <div class="table-responsive">
-            <table class="table" id="table-details">
+            <table class="table table-bordered" id="leads-wastedata">
               <thead>
                 <tr>
-                  <th> No </th>
-                  <th> Action</th>
-                 
-                  <th> Lead Name </th>
-                  <th> Client name </th>
-                  <th> Lead Category </th>
-                  <th> Marked date </th>
-                  <th> Telecaller \ Hr </th>
+                  <th>No</th>
+                  <th> Name </th>
+                  <th> Email id </th>
+                  <th> Contact </th>
+                  <th> Followup</th>
                   <th> Reason for </th>
-                  <th> Confirmation </th>
-                
-                  
+
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="waste-lead-body">
                 {% for wa in lead_waste %}
-                <tr class="clickable-row" data-href="#">
-                  
-                  <td>{{ forloop.counter}}</td> 
+                <tr class="clickable-row" data-href="#"> 
                   <td>
+                    {{forloop.counter}}
+                    
+                  </td>   
+                  <td><span class="mdi mdi-account pl-1"></span> {{ wa.leadId.lead_name}}</span>
+                    
+                   </td>
+                  <td><span class="mdi mdi-email pl-1"></span> {{ wa.leadId.lead_email}}</td>
+                  <td><span class="mdi mdi-phone pl-1"></span> {{ wa.leadId.lead_contact}}</td>
+                  <td>
+                    <a href="{% url 'DAM_dataBnak_followup' wa.dbId.id %}" class="btn btn-outline-secondary">
+                      <span class="mdi mdi-file ">
+                    </a>
+                  </td>
+                  <td>
+                    
+                    <div class="reason-box">
+                      {% if wa.confirmation == 1 %}
+                      <span class="mdi mdi-check-circle text-success pr-1"></span>
+                      {% endif %}
+                      <span class="">{{wa.reason}} </span>
+                    </div>
+                    <span class="tc"> {{ wa.TC_Id.emp_name}} ( {{wa.waste_marked_Date }} )</span> 
+                  </td>
                  
-                    
-                      <a href="{% url 'DAM_dataBnak_followup' wa.dbId.id %}" class="text-offwhite">
-                        <span class="mdi mdi-file small"></span> <span class="small ">Follow Up</span>
-                      </a>
-                  </td>              
-                  <td><span class="pl-2">{{ wa.leadId.lead_name}}</span> </td>
-                  <td>{{wa.client_id.client_name}} </td>
-                  <td> {{wa.leadId.lead_category_id.lead_collection_for }}</td>
-                  <td> {{wa.waste_marked_Date }} </td>
-                  <td> {{ wa.TC_Id.emp_name}}</td>
-                  <td> 
-                    <p>
-                   {{wa.reason}}
-                       
-                    </p>
-                    
-                  </td>
-                  <td class="text-center">
-                    {% if wa.confirmation == 1%}
-                    <span class="mdi mdi-check-all text-success mdi-18px"></span>
-                    {% else %}
-                    <span class="mdi mdi-rotate-right mdi-spin text-warning mdi-18px"></span>
-                    {% endif %}
-                  </td>
-                               
-                        
+                                 
                 </tr>
                 {% endfor %}
               
@@ -89,76 +212,36 @@
         </div>
       </div>
     </div>
-  </div>
+</div>
   
   
   
+ 
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
   <script>
-   
-    const inputField = document.getElementById('search-data');
-    const closeBtn = document.getElementById('closeBtn');
-    const empTable = document.getElementById('table-details');
-    closeBtn.style.display = 'none';
-  
-    inputField.addEventListener('input', function() {
-        filterTable();
-    });
-  
-    function filterTable() {
-        const filterValue = inputField.value.toLowerCase();
-        const rows = empTable.getElementsByTagName('tr');
-  
-        for (let i = 1; i < rows.length; i++) {
-            const Cell1 = rows[i].getElementsByTagName('td')[1];
-            const Cell2 = rows[i].getElementsByTagName('td')[2];
-            const Cell3 = rows[i].getElementsByTagName('td')[3];
-            const Cell4 = rows[i].getElementsByTagName('td')[4];
-            const Cell5 = rows[i].getElementsByTagName('td')[5];
-            const Cell6 = rows[i].getElementsByTagName('td')[6];
-            const Cell7 = rows[i].getElementsByTagName('td')[7];
-            const Cell8 = rows[i].getElementsByTagName('td')[8];
-  
-            if (Cell1 || Cell2 || Cell3 || Cell4|| Cell5 || Cell6 || Cell7 || Cell8) {
-  
-                const datacell1 = Cell1.textContent || Cell1.innerText;
-                const datacell2 = Cell2.textContent || Cell2.innerText;
-                const datacell3 = Cell3.textContent || Cell3.innerText;
-                const datacell4 = Cell4.textContent || Cell4.innerText;
-                const datacell5 = Cell5.textContent || Cell5.innerText;
-                const datacell6 = Cell6.textContent || Cell6.innerText;
-                const datacell7 = Cell7.textContent || Cell7.innerText;
-                const datacell8 = Cell7.textContent || Cell8.innerText;
-                
-  
-                if (datacell1.toLowerCase().includes(filterValue) || datacell2.toLowerCase().includes(filterValue) || datacell3.toLowerCase().includes(filterValue)
-                || datacell4.toLowerCase().includes(filterValue) || datacell5.toLowerCase().includes(filterValue) || datacell6.toLowerCase().includes(filterValue) 
-                || datacell7.toLowerCase().includes(filterValue) || datacell8.toLowerCase().includes(filterValue) ) 
-                {
-                    rows[i].style.display = '';
-                } else {
-                    rows[i].style.display = 'none';
-                }
-            }
-        }
-    }
-  
-     // To display the close button and hide the close button based on the search input 
-    inputField.addEventListener('input', function() {
-    if (inputField.value == '') {
-        closeBtn.style.display = 'none';
+    $(document).ready(function() {
+       new DataTable('#leads-wastedata', {
+           search: {
+            enable: true 
+           },
+           columnDefs: [
+           {
+               orderable: false,
+               className: 'check-single',
+               targets: 0,
+           }
+       ],
+       paging: false 
        
-    } else {
-        closeBtn.style.display = 'block';
-        
-    }
-    });
+   });
   
-    closeBtn.addEventListener('click', function() {
-    inputField.value = '';
-    closeBtn.style.display = 'none';
-    filterTable(); // Display the full table data
-    });
-  </script>
+});
+</script>
 
 
 {% endblock %}

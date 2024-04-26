@@ -112,7 +112,7 @@
     {
       font-size: 10px;
     }
-  </style>
+</style>
 
 <div>
     <nav aria-label="breadcrumb">
@@ -128,27 +128,42 @@
       <div class="card">
         <div class="card-body">
             <div class="form-section">
-                <h6 class="card-title text-offwhite">Wating For Checking - ( {{lead_waste_count}} )</h6>
+                <h6 class="card-title text-offwhite">Wating For Checking -  ( <span id="lead-count">{{lead_waste_count}}</span>  )</h6>
                 <div>
                   <form action="{% url 'DAM_waste_data_confirm' %}" method="post" class="search-form">
+                    {% csrf_token%}
+                    <div class="search-box">
+                      <a href="{% url 'DAM_waste_data_confirm' %}"><span class="mdi mdi-refresh"></span></a>
+                    </div>
                     <div class="input-groupBox">
-                      <select name="hr_id" id="">
+                      <select name="hr_id" id="hr-id">
+                        {% if selected_hr %}
+                        <option value="{{selected_hr.id}}" selected>{{ selected_hr.emp_name }}</option>
+                        {% else %}
                         <option value="">select Hr</option>
+                        {% endif %}
                         {% for hr in hr_objs %}
                         <option value="{{hr.id}}">{{ hr.emp_name }}</option>
                         {% endfor %}
                       </select>
                     </div>
-                    {% csrf_token%}
+                  
                     <div class="input-groupBox">
-                      <input type="date" name="sdate">
+                      <input type="date" name="sdate" id="s-date" {% if d1 %} value="{{d1}}" {% endif %}>
                     </div>
                     <div class="input-groupBox">
-                      <input type="date" name="edate">
+                      <input type="date" name="edate" id="e-date" {% if d2 %} value="{{d2}}" {% endif %}>
                     </div>
                     <div class="input-groupBox">
-                      <select name="status" id="">
+                      <select name="status" id="status-val">
+                        {% if status_val %}
+                        <option value="{{status_val}}" selected>
+                          {% if status_val == '1' %} Confirmed  {% else %} Not Confirmed   {% endif %}
+                        </option>
+                        {% else %}
                         <option value="">Status</option>
+                        {% endif %}
+                      
                         <option value="1">Confirmed</option>
                         <option value="0">Not Confirmed</option>
                        
@@ -176,16 +191,16 @@
 
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="waste-lead-body">
                 {% for wa in lead_waste %}
                 <tr class="clickable-row" data-href="#"> 
                   <td>
-                    <a href="{% url 'DAM_waste_dateApprove' wa.id %}" class=" btn btn-outline-success pr-3" title="Approve the lead as waste">
+                    <button  id="approve-btn" type="button" class="btn btn-outline-success pr-3 approve_btn" data-id="{{wa.id}}" title="Approve the lead as waste">
                       <span class="mdi mdi-check-circle-outline "> </span> 
-                    </a>
-                    <a href="{% url 'DAM_waste_dateCancel' wa.id %}" class="btn btn-outline-danger" title="Reject the lead as waste">
+                    </button>
+                    <button  type="button" id="reject-btn" class="reject_btn btn btn-outline-danger" data-id="{{wa.id}}" title="Reject the lead as waste">
                       <span class=" mdi mdi-delete-circle"> </span>
-                    </a>
+                    </button>
                   
                   </td>   
                   <td><span class="mdi mdi-account pl-1"></span> {{ wa.leadId.lead_name}}</span>
@@ -201,6 +216,9 @@
                   <td>
                     
                     <div class="reason-box">
+                      {% if wa.confirmation == 1 %}
+                      <span class="mdi mdi-check-circle text-success pr-1"></span>
+                      {% endif %}
                       <span class="">{{wa.reason}} </span>
                     </div>
                     <span class="tc"> {{ wa.TC_Id.emp_name}} ( {{wa.waste_marked_Date }} )</span> 
@@ -216,16 +234,17 @@
         </div>
       </div>
     </div>
-  </div>
+</div>
   
   
 
 <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 
-  <script>
+<script>
     $(document).ready(function() {
        new DataTable('#leads-wastedata', {
            search: {
@@ -246,6 +265,81 @@
 </script>
 
 
+<script>
+  $(document).ready(function() {
+    $(document).on("click", ".approve_btn", function() {
+        var leadId = $(this).data('id');
+        var hr = $('#hr-id').val();  
+        var sdate = $('#s-date').val(); 
+        var edate = $('#e-date').val(); 
+        var status_val = $('#status-val').val(); 
+       
+        $.ajax({
+            url: "{% url 'DAM_waste_dateApprove' %}", 
+            type: 'POST',
+            data: {
+                lead_id: leadId,
+                hr: hr,
+                sdate: sdate,
+                edate: edate,
+                status_val: status_val,
+                csrfmiddlewaretoken: '{{ csrf_token }}' // 
+            },
+            success: function(response) {
+                if (response.status)
+                {
+                  alert(response.status);
+                }
+                else{
+                alert('Lead waste approved successfully!');
+                $('#waste-lead-body').empty();  
+                $('#lead-count').text(response.lead_waste_count);
+                $('#waste-lead-body').html(response.table_content);   
+                }
+                
+            },
+            error: function(xhr, status, error) {
+              alert('An error occurred while processing the request.');
+              console.error(xhr.responseText);
+            }
+           
+        });
+    });
+    $(document).on("click", ".reject_btn", function() {
+      var leadId = $(this).data('id');
+      var hr = $('#hr-id').val();  
+      var sdate = $('#s-date').val(); 
+      var edate = $('#e-date').val(); 
+      var status_val = $('#status-val').val(); 
+    
+      $.ajax({
+          url: "{% url 'DAM_waste_dateCancel' %}", 
+          type: 'POST',
+          data: {
+              lead_id: leadId,
+              hr: hr,
+              sdate: sdate,
+              edate: edate,
+              status_val: status_val,
+              csrfmiddlewaretoken: '{{ csrf_token }}' // 
+          },
+          success: function(response) {
+              alert('Lead waste rejected successfully!');
+              $('#waste-lead-body').empty();  
+              $('#lead-count').text(response.lead_waste_count);
+              $('#waste-lead-body').html(response.table_content);  
+              
+          },
+          error: function(xhr, status, error) {
+              alert('An error occurred while processing the request.');
+              console.error(xhr.responseText);
+          }
+         
+      });
+  });
+});
+</script>
+
+
 {% endblock %}
 
- 
