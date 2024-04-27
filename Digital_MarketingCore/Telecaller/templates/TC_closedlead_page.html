@@ -2,116 +2,230 @@
 {% load static %}
 {% block body %}
 
-<!-------Style Section -->
-<style>
-/*Pagination Styling */
 
-  div.dataTables_wrapper div.dataTables_paginate ul.pagination {
-    margin: 1rem 0.5rem;
-    white-space: nowrap;
-    justify-content: flex-end;
-  }
-
-  div.dataTables_wrapper div.dataTables_paginate ul.pagination li a {
-    border: none !important;
-    color: #c9c9c9;
-    font-size: 13px;
-  }
-
-  div.dataTables_wrapper div.dataTables_paginate ul.pagination li:hover a {
-    background: #dc1a1a !important;
-    color: #f8f7f7;
-  }
-
-  #data-table_previous {
-    color: #0000 !important;
-  }
-</style>
-
-
+<link href="https://cdn.datatables.net/2.0.3/css/dataTables.dataTables.css"  rel="stylesheet" >
+<link rel="stylesheet" href="{% static 'css/TeamLead/style.css' %}">
 
 <div>
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'TC_current_clients' %}">Current Clients</a></li>
-          <li class="breadcrumb-item active text-md" aria-current="page">Closed Leads</li>
-        </ol>
-      </nav>
-  </div>
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'TC_dashboard' %}">Dashboard</a></li>
+      <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'Tc_closedlead' %}">Closed Leads </a></li> 
+    </ol>
+  </nav>
+</div>
 
-<div class="card">
-  <div class="card-body">
-    <div class="row">
-      <div class="col-sm-12 col-lg-8 col-md-8 col-xl-9  grid-margin">
-        <h6 class="card-title custom-letter-spacing"> Closed Leads List - (  <span id="check-count"> {{ leads_obj_count }} </span> )</h6>
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-danger mb-2" data-toggle="modal" data-target="#staticBackdrop">
+  waste
+</button>
+
+<div class="row ">
+  <div class="col-12 grid-margin">
+    <div class="card">
+      <div class="card-body">
+       
+          <div class="form-section">
+              <h6 class="card-title text-offwhite"> Closed Leads -  ( <span id="lead-count">{{dataBank_objs_count}}</span>  )</h6>
+              <div>
+                <form action="{% url 'Tc_closedlead' %}" method="post" class="search-form">
+                  {% csrf_token%}
+                 
+
+                  <div class="input-groupBox">
+                    <select name="pgnum" >
+                      <option value="" >All</option>
+                      {% if pg_num %}
+                      <option value="{{pg_num}}" selected>{{pg_num}}</option>
+                      {% endif %}
+                      <option value="20">20</option>
+                      <option value="25">25</option>
+                      <option value="50">50</option>
+                      <option value="100">100</option>
+                      <option value="250">250</option>
+                      <option value="500">500</option>
+                      <option value="1000">1000</option>
+                    </select>
+                  </div>
+                 
+                  
+                  <div class="input-groupBox">
+                    <input type="date" name="sdate" title="Allocate From Date Picker" >
+                  </div>
+                  <div class="input-groupBox">
+                    <input type="date" name="edate" title="Allocate To Date Picker">
+                  </div>
+                  
+                  <div class="input-groupBox">
+                    <select name="status_val" >
+                      <option value="">select status</option>
+                      {% for status_v in follow_objs %}
+                      <option value="{{status_v.status_name}}">{{status_v.status_name}}</option>
+                      {% endfor %}
+                      
+                    </select>
+                  </div>
+                  
+                 
+                  <div class="search-box">
+                    <button type="submit"><span class="mdi mdi-magnify"></span></button>
+                  </div>
+                </form>
+              </div>
+            
+          </div>
+    
+
+        <div class="table-responsive">
+          <table class="table table-bordered" id="leads-wastedata">
+            <thead>
+              <tr>
+                <th> No</th>
+                <th> Recall</th>
+                <th> Add Date</th>
+                <th> Name </th>
+                <th> Email id </th>
+                <th> Contact </th>
+                <th> Details</th>
+                <th> Final Status </th>
+               
+              </tr>
+            </thead>
+            <tbody id="waste-lead-body">
+              {% for db_lead in dataBank_objs %}
+              <tr class="clickable-row" data-href="{% url 'lead_track' db_lead.id  %}"> 
+                <td>{{ forloop.counter }}</td>
+                <td>
+                  <a href="{% url 'hr_recallUpdate' db_lead.id %}" class="text-danger">
+                    <span class="mdi mdi-cached mdi-18px"></span> 
+                  </a>
+                </td>
+                
+                <td>{{ db_lead.Assign_Date |date:"d-M-y" }}</td>
+                <td><span class="mdi mdi-account pl-1"></span> {{ db_lead.leadId.lead_name}}  </span>
+                  
+                 </td>
+                <td><span class="mdi mdi-email pl-1"></span> {{ db_lead.leadId.lead_email}}</td>
+                <td><span class="mdi mdi-phone pl-1"></span> {{ db_lead.leadId.lead_contact}}</td>
+                <td>
+                  <a href="{% url 'Tc_followupDetails' db_lead.id %}" class="badge badge-pill  badge-outline-success ">
+                    <span class="mdi mdi-file-document"></span> </a>
+                </td>
+                <td>
+                  
+                  <span class="badge badge-pill  badge-outline-secondary">
+                   <span class="current-status text-offwhite" style="font-size: 11px;">  {{ db_lead.dataBank_ID.current_status }} </span> 
+                  
+                </td>
+                
+                
+              </tr>
+              {% endfor %}
+            
+            </tbody>
+          </table>
+        </div>
       </div>
-
     </div>
-    
-    <div class="table-responsive">
-      <table class="table  table-bordered table-hover" id="data-table">
-        <thead >
-          <tr>
-            <th scope="col">No</th>
-            <th scope="col">Name | Email | Contact </th>
-            <th scope="col" >Client Name | Lead Category</th>
-            
-            <th scope="col">Final Status</th>
-  
-            <th class="text-center"> Follow up Details</th>
-            <th class="text-center"> Recall </th>
-  
-          </tr>
-        </thead>
-        <tbody>
-          {% for d in data %}
-  
-          <tr class="text-secondary">
-            <td class="">{{ forloop.counter}}</th>
-            <td>
-              <p class="text-offwhite">{{d.leadId.lead_name}}</p>
-              <p>{{d.leadId.lead_email}}</p>
-              <p>{{d.leadId.lead_contact}}</p>
-            </td>
-            
-            <td class="">
-              <p class=""> {{d.leadId.lead_work_regId.clientId.client_name}}</p>
-              <p > {{d.leadId.lead_category_id.lead_collection_for}}   </p>
-            </td>
-            <td class=""><p>{{d.dataBank_ID.current_status}}</p></td>
-            <td class=" text-center">
-              <a href="{% url 'Tc_followupDetails' d.id %}" class="btn btn-success p-2">
-                <span class="mdi mdi-file-document"></span> </a>
-            </td>
-            <td class=" text-center">
-              <a href="{% url 'hr_recallUpdate' d.id %}" class="btn btn-danger p-2">
-                <span class="mdi mdi-cached "></span> </a>
-            </td>
-        
-          </tr>
-         
-          {% endfor %}
-  
-        </tbody>
-        
-      </table>
-    
-    </div>
-
   </div>
 </div>
 
-  
-<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
-<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
+
+
+<div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog  modal-xl">
+    <div class="modal-content card  ">
+      <form action="{% url 'closechange' %}" method="post">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">Modal title</h5>
+          <button type="button" class="close text-danger" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body ">
+          <div class="table-responsive">
+            <table class="table table-bordered" id="leads-wastedata">
+              <thead>
+                <tr>
+                  <th> No</th>
+                  <th></th>
+                  <th> Add Date</th>
+                  <th> Name </th>
+                  <th> Contact </th>
+                  <th> Final Status </th>
+                
+                </tr>
+              </thead>
+              <tbody id="waste-lead-body">
+                {% for db_lead in dataBank_objs_m %}
+                <tr> 
+                  <td>{{ forloop.counter }}</td>
+                  <td>
+                    <div class="form-check form-check-primary">
+                      <label class="form-check-label">
+                      <input class="checkbox check-single" name="lead_check" value="{{ db_lead.id }}" id="" type="checkbox">
+                      </label>
+                  </div>
+                  </td>
+                  
+                  <td>{{ db_lead.Assign_Date |date:"d-M-y" }}</td>
+                  <td><span class="mdi mdi-account pl-1"></span> {{ db_lead.leadId.lead_name}}  </span></td>
+                  
+                  <td><span class="mdi mdi-phone pl-1"></span> {{ db_lead.leadId.lead_contact}}</td>
+                
+                  <td>
+                    
+                    <span class="badge badge-pill  badge-outline-secondary">
+                    <span class="current-status text-offwhite" style="font-size: 11px;">  {{ db_lead.dataBank_ID.current_status }} </span> 
+                    
+                  </td>
+                  
+                  
+                </tr>
+                {% endfor %}
+              
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-success">Change</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
 
 <script>
-$(document).ready(function() {
-    new DataTable('#data-table');
-    
+  $(document).ready(function() {
+     new DataTable('#leads-wastedata', {
+         search: {
+          enable: true 
+         },
+         columnDefs: [
+         {
+             orderable: false,
+             className: 'check-single',
+             targets: 0,
+         }
+     ],
+     
+     
+ });
+
 });
 </script>
+
+
 
 
 

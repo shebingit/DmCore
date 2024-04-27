@@ -1,3 +1,4 @@
+from datetime import date
 from django.shortcuts import render,redirect
 from .models import *
 from Supper_admin.views import supper_admin_dashboard
@@ -212,22 +213,16 @@ def login_submitt(request):
                             return render(request,'Executive_dashboard.html',content)
                             
                         elif dash_details.emp_designation_id.dashboard_id == 4:
-                            data = Leads_assignto_tc.objects.filter(TC_Id=dash_details,Status =1,Update_Action=0)
-                            data1 = Leads_assignto_tc.objects.filter(TC_Id=dash_details,Status =0,Update_Action=0)
-                            data2 = Leads_assignto_tc.objects.filter(TC_Id=dash_details,Status =1,Update_Action=1)
-                            data3 = Waste_Leads.objects.filter(TC_Id=dash_details,Status =1)
-                            data4 = Waste_Leads.objects.filter(TC_Id=dash_details,Status =0)
+                            
                             notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
         
-        
-                            l=len(data)+len(data1)
-                            l2=len(data2)
-                            l3=len(data3)+len(data4)
+                            today_date = date.today()
+                           
                             content = {'emp_dash':emp_dash,
                                    'dash_details':dash_details,
                                    'success':success,
                                    'success_text':success_text,
-                                   'l':l,'l2':l2,'l3':l3,
+                                   'today_date':today_date,
                                    'notifications':notifications
                                    
                                      }

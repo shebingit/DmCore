@@ -10,7 +10,7 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'TC_dashboard' %}">Dashboard</a></li>
-          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'TC_newleads' %}">Leads</a></li>
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'TC_leads' %}">Leads</a></li>
          
         </ol>
     </nav>
@@ -26,7 +26,7 @@
                 <h6 class="card-title text-offwhite"> {% if status_val %}  {{ status_val }}   {% endif %}  
                      Leads -  ( <span id="lead-count">{{assing_leads_count}}</span>  )</h6>
                 <div>
-                  <form action="{% url 'TC_newleads' %}" method="post" class="search-form">
+                  <form action="{% url 'TC_leads' %}" method="post" class="search-form">
                     {% csrf_token%}
                    
 
@@ -96,7 +96,7 @@
               </thead>
               <tbody id="waste-lead-body">
                 {% for db_lead in assing_leads %}
-                <tr class="clickable-row" data-href="{% url 'lead_track' db_lead.id  %}"> 
+                <tr class="clickable-row" data-href="{% url 'Tc_followupDetails' db_lead.id  %}"> 
                   <td>{{ forloop.counter }}</td>
                   
                   <td>{{ db_lead.Assign_Date |date:"d-M-y" }}</td>

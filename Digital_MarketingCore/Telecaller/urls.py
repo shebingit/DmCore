@@ -6,57 +6,68 @@ from django.conf import settings
 urlpatterns = [
    
     path('TC_dashboard',views.TC_dashboard,name='TC_dashboard'),
-    path('TC_current_clients',views.TC_current_clients,name='TC_current_clients'),
-    path('TC_current_clients_details/<id>',views.TC_current_clients_details,name='TC_current_clients_details'),
-    path('TC_update_Clients_Response/<id>',views.TC_update_Clients_Response,name='TC_update_Clients_Response'),
-    path('TC_previous_clients',views.TC_previous_clients,name='TC_previous_clients'),
-    path('TC_previous_clients_details/<id>',views.TC_previous_clients_details,name='TC_previous_clients_details'),
+   
+    # Profile setion ----------------------
     path('TC_profile',views.TC_profile,name='TC_profile'),
     path('TC_profile_detailsUpdate',views.TC_profile_detailsUpdate,name='TC_profile_detailsUpdate'),
     path('TC_profileImage_remove',views.TC_profileImage_remove,name='TC_profileImage_remove'),
+
+
+    # Leave setion ----------------------
+
     path('TC_leave',views.TC_leave,name='TC_leave'),
     path('TC_leave_search',views.TC_leave_search,name='TC_leave_search'),
+
+
+    # Action setion ----------------------
+
     path('TC_actionTaken',views.TC_actionTaken,name='TC_actionTaken'),
+
+
+    # Feedback setion ----------------------
+
     path('TC_feedback',views.TC_feedback,name='TC_feedback'),
     path('TC_feedback_Typechange',views.TC_feedback_Typechange,name='TC_feedback_Typechange'),
+
+
+    #Complaints setion ---------------------
+
     path('TC_complaints',views.TC_complaints,name='TC_complaints'),
     path('TC_complaint_add',views.TC_complaint_add,name='TC_complaint_add'),
-    path('TC_leads/<id>',views.TC_leads,name='TC_leads'),
-    path('TC_newleads/',views.TC_newleads,name='TC_newleads'),
 
-    path('TC_waiting_leads/<id>',views.TC_waiting_leads,name='TC_waiting_leads'),
-    path('TC_rejected_leads/<id>',views.TC_rejected_leads,name='TC_rejected_leads'),
-    path('TC_completed_leads/<id>',views.TC_completed_leads,name='TC_completed_leads'),
-   
-
+    # Leads setion -------------------------
+    path('TC-Leads/',views.TC_leads,name='TC_leads'),
+    path('HR-leadAccept',views.hr_leadAccept,name='hr_leadAccept'),
     path('TC_waste_leads',views.TC_waste_leads,name='TC_waste_leads'),
-    path('TC_waste_leads_action/<id>',views.TC_waste_leads_action,name='TC_waste_leads_action'),
-    path('TC_waste_leads_details/<id>',views.TC_waste_leads_details,name='TC_waste_leads_details'),
-    path('TC_waste_leads_page/<id>',views.TC_waste_leads_page,name='TC_waste_leads_page'),
-    path('TC_pending_waste_leads/<id>',views.TC_pending_waste_leads,name='TC_pending_waste_leads'),
-    path('TC_notification',views.TC_notification,name='TC_notification'),
-    path('TC_open_notification/<n_id>',views.TC_open_notification,name='TC_open_notification'),
-    path('TC_delete_notification/<n_id>',views.TC_delete_notification,name='TC_delete_notification'),
+    path('HR-leadReport/<str:date_str>',views.hr_leadReport,name='hr_leadReport'),
+    
 
-    # follow up setion -----------------------
+    # Follow up setion -----------------------
 
     path('Follow-UpLeads',views.Tc_follow_upLeads,name='Tc_follow_upLeads'),
     path('Lead-Follow-Updates/<int:flID>',views.Lead_FollowUp_Updates,name='Lead_FollowUp_Updates'),
+    path('TC_update_Clients_Response/<id>',views.TC_update_Clients_Response,name='TC_update_Clients_Response'),
     path('Tc_followupDetails/<int:lID>',views.Tc_followupDetails,name='Tc_followupDetails'),
-    
+    path('TC_waste_leads_action/<int:id>',views.TC_waste_leads_action,name='TC_waste_leads_action'),
+    path('HR-leadRecall/<int:assID>',views.hr_recallUpdate,name='hr_recallUpdate'),
 
 
     #closed Section ----------------------------
   
     path('Closed-Leads',views.Tc_closedlead,name='Tc_closedlead'),
-
-    path('HR-leadAccept',views.hr_leadAccept,name='hr_leadAccept'),
     path('HR-leadClose/<int:laID>',views.hr_leadClose,name='hr_leadClose'),
     path('HR-leadJoined/<int:ljID>',views.hr_leadJoined,name='hr_leadJoined'),
-    path('HR-leadReport/<str:date_str>',views.hr_leadReport,name='hr_leadReport'),
-    path('HR-leadRecall/<int:assID>',views.hr_recallUpdate,name='hr_recallUpdate'),
     
-     
+    
+    
+    #Notification Section ----------------------------
+    path('TC_notification',views.TC_notification,name='TC_notification'),
+    path('TC_open_notification/<n_id>',views.TC_open_notification,name='TC_open_notification'),
+    path('TC_delete_notification/<n_id>',views.TC_delete_notification,name='TC_delete_notification'),
+
+
+
+    path('closechange',views.closechange,name='closechange'),
     
     
 

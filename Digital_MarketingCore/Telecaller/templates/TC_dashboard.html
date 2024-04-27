@@ -14,20 +14,20 @@
 </div>
 
 <div class="row ">
-  <div class="col-md-4 col-sm-12 col-lg-4">
-    <a href="{% url 'TC_newleads' %}" style="text-decoration: none;"> 
+  <div class="col-md-4 col-sm-12 col-lg-4 mt-2">
+    <a href="{% url 'TC_leads' %}" style="text-decoration: none;"> 
       <div class="card" >
         <div class="card-body">
 
           <div class="row">
-            <div class="col-md-9">
+            <div class="col-9">
               
               <h5 class="lead-head  fw-semibold">ALL -  LEADS</h5>
               
-              <p class=" lead-head-p text-offwhite">Assigning and ongoing Clients</p>
+              <p class=" lead-head-p text-offwhite">All allocated leads of clients</p>
 
             </div>
-            <div class="col">    
+            <div class="col-3">    
                 
               <i class="icon-lg mdi mdi-account-card-details text-success ml-auto" style="font-size: 40px;"></i>
               
@@ -37,20 +37,20 @@
       </div>
     </a>
   </div> 
-  <div class="col-md-4 col-sm-12 col-lg-4">
+  <div class="col-md-4 col-sm-12 col-lg-4 mt-2">
     <a href="{% url 'Tc_follow_upLeads' %}" style="text-decoration: none;">
       <div class="card" >
         <div class="card-body">
 
           <div class="row">
-            <div class="col-md-9">
+            <div class="col-9">
               
               <h5 class="lead-head   fw-semibold">FOLLOW UP -  LEADS</h5>
               
-              <p class=" lead-head-p text-offwhite">Assigning and ongoing Clients</p>
+              <p class=" lead-head-p text-offwhite">All followup leads of clients</p>
 
             </div>
-            <div class="col">    
+            <div class="col-3">    
                 
               <i class="icon-lg mdi mdi-account-card-details text-warning ml-auto" style="font-size: 40px;"></i>
               
@@ -59,23 +59,69 @@
         </div>
       </div>
     </a>
-  </div> 
-  <div class="col-md-4 col-sm-12 col-lg-4">
-    <a href="{% url 'TC_current_clients' %}" style="text-decoration: none;">
+  </div>
+  <div class="col-md-4 col-sm-12 col-lg-4 mt-2">
+    <a href="{% url 'TC_waste_leads' %}" style="text-decoration: none;">
       <div class="card" >
         <div class="card-body">
 
           <div class="row">
-            <div class="col-md-9">
+            <div class="col-9">
               
               <h5 class="lead-head   fw-semibold">WASTE -  LEADS</h5>
               
-              <p class=" lead-head-p text-offwhite">Assigning and ongoing Clients</p>
+              <p class=" lead-head-p text-offwhite">All waste leads of clients</p>
+
+            </div>
+            <div class="col-3">    
+                
+              <i class="icon-lg mdi mdi-account-card-details text-danger ml-auto" style="font-size: 40px;"></i>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-md-4 col-sm-12 col-lg-4 mt-2">
+    <a href="{% url 'Tc_closedlead' %}" style="text-decoration: none;">
+      <div class="card" >
+        <div class="card-body">
+
+          <div class="row">
+            <div class="col-9">
+              
+              <h5 class="lead-head   fw-semibold">CLOSED -  LEADS</h5>
+              
+              <p class=" lead-head-p text-offwhite">All closed leads of clients</p>
 
             </div>
             <div class="col">    
                 
-              <i class="icon-lg mdi mdi-account-card-details text-danger ml-auto" style="font-size: 40px;"></i>
+              <i class="icon-lg mdi mdi-account-card-details text-info ml-auto" style="font-size: 40px;"></i>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>   
+  <div class="col-md-4 col-sm-12 col-lg-4 mt-2">
+    <a href="{% url 'hr_leadReport' today_date  %}" style="text-decoration: none;">
+      <div class="card" >
+        <div class="card-body">
+
+          <div class="row">
+            <div class="col-9">
+              
+              <h5 class="lead-head   fw-semibold">LEADS - REPORT  </h5>
+              
+              <p class=" lead-head-p text-offwhite">Reports of leads based on clients</p>
+
+            </div>
+            <div class="col-3">    
+                
+              <i class="icon-lg mdi mdi-account-card-details text-secondary ml-auto" style="font-size: 40px;"></i>
               
             </div>
           </div>
@@ -230,87 +276,3 @@
 
 {% endblock %}
 
-
-
-
-
-<div class="row ">
-  <div class="col-md-4 " id="card1">
-    <a href="{% url 'TC_current_clients' %}" style="text-decoration: none;">
-    <div class="card" >
-      <div class="card-body">
-
-        <div class="row">
-          <div class="col-md-9">
-            
-            <h5 class="card-title  fw-semibold">CURRENT CLIENTS</h5>
-             
-            <p class="text-offwhite">Assigning and ongoing Clients</p>
-
-          </div>
-          <div class="col">    
-              
-            <i class="icon-lg mdi mdi-account-card-details text-success ml-auto" style="font-size: 40px;"></i>
-            
-          </div>
-        </div>
-      </div>
-    </div></a>
-
-  </div>      
-  
-  <div class="col-md-4 grid-margin">
-    <a href="{% url 'TC_previous_clients' %}" style="text-decoration: none;">
-    <div class="card">
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-9">
-            
-              
-              <h5 class="card-title mb-9 fw-semibold">PREVIOUS CLIENTS</h5>
-            
-              <p class="text-offwhite">Already Completed Clients</p>
-            
-            
-
-          </div>
-          <div class="col">
-            
-              <i class="icon-lg mdi mdi-arrange-send-backward text-primary ms-auto" style="font-size: 40px;"></i>
-         
-            
-          </div>
-        </div>
-      </div>
-    </div>
-    </a>
-  </div>   
-
-  <div class="col-md-4 grid-margin" style="width: 100%;">
-    <a href="{% url 'TC_waste_leads' %}" style="text-decoration: none;">
-    <div class="card">
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-9 text-danger">
-            
-              
-              <h4 class="card-title mb-9 fw-semibold">WASTE LEADS</h4>
-            
-              <p class="text-offwhite" >Useless leads of different clients </p>
-            
-            
-
-          </div>
-          <div class="col">
-            
-              <i class="icon-lg mdi mdi-alert-circle text-danger ms-auto" style="font-size: 40px;"></i>
-              
-         
-            
-          </div>
-        </div>
-      </div>
-    </div>
-    </a>
-  </div>   
-</div>

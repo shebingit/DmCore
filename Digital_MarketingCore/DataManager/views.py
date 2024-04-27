@@ -452,7 +452,7 @@ def DMA_allocate_lead(request):
                 db.allocated_date = date.today()
                 
                 db.lead_status = 'Allocated' 
-                #db.save()
+                db.save()
                 count = count + 1
 
                 ld_obj = Leads_assignto_tc()
@@ -462,7 +462,7 @@ def DMA_allocate_lead(request):
                 ld_obj.client_id = db.lead_Id.lead_work_regId.clientId
                 ld_obj.Assign_Date =  date.today()
                 ld_obj.Allocate_time = datetime.datetime.now().time()
-                #ld_obj.save()
+                ld_obj.save()
 
                 fh_obj = FollowupHistory()
                 fh_obj.hs_lead_Id = db.lead_Id
@@ -471,7 +471,7 @@ def DMA_allocate_lead(request):
                 fh_obj.note ='Lead allocated'
                 fh_obj.final_status='Allocated'
                 fh_obj.hs_comp_Id = db.lead_Id.lead_work_regId.clientId.compId
-                #fh_obj.save()
+                fh_obj.save()
 
             success_text = str(count) + ' lead allocated to ' + str(emp.emp_name) + ' successfully.'
             messages.success(request, success_text)
@@ -2293,8 +2293,13 @@ def DAM_waste_dateApprove(request):
 
             lead_obj.save()
 
+            assign_obj = Leads_assignto_tc.objects.get(id=waste.assignto_tc_id.id)
+            assign_obj.Status = 2
+            assign_obj.save()
+
             db = DataBank.objects.get(lead_Id__id=waste.leadId.id)
             db.current_status = 'Marked as Waste'
+            db.lead_status = 'Closed'
             db.save 
 
             fh = FollowupHistory()
