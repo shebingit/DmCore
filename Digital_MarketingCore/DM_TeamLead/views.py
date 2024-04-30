@@ -12,6 +12,9 @@ import pandas as pd
 from openpyxl.workbook import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
 from django.db.models import Sum, Avg
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+import re
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
@@ -2631,14 +2634,13 @@ def tl_lead_collected_data(request,pk):
     
         leads_obj = Leads.objects.filter(lead_work_regId=work_reg,lead_collect_Emp_id=dash_details,lead_category_id=lead_category,lead_add_date=date.today())
         leads_obj_count = leads_obj.count()
-        lead_Details_obj = lead_Details.objects.filter(leadId__in=leads_obj)
-
+       
         
         content = {'emp_dash':emp_dash,
                     'dash_details':dash_details,
                     'notifications':notifications,
-                    'leads_obj':leads_obj,
-                     'lead_Details_obj':lead_Details_obj,
+                    'leads':leads_obj,
+                    
                      'leads_obj_count':leads_obj_count,
                      'lf_obj':lf_obj,
                      'taskAs':taskAs,
@@ -2800,6 +2802,8 @@ def tl_lead_file_upload(request,pk):
                 for _, row in df.iterrows():
                     lead_data = {header: row[header] for header in headers}
 
+                    repeated = Leads.objects.filter(Q(lead_email=lead_data['Email Id']) | Q(lead_contact=lead_data['Contact Number']),lead_category_id=lead_category)
+                   
                     lead = Leads()
                     lead.lead_work_regId = works_obj
                     lead.lead_taskAssignId = taskAs
@@ -2811,6 +2815,35 @@ def tl_lead_file_upload(request,pk):
                     lead.lead_contact = lead_data['Contact Number']
                     lead.lead_source =lead_data['Lead Source']
                     lead.save()
+
+                    if repeated:
+                        for i in repeated:
+                            lead.repeated_status=1
+                            lead.save()
+
+                        lead_email = lead.lead_email
+
+                        if lead_email is not None and isinstance(lead_email, str):
+
+                            try:
+                                validate_email(lead_email)
+
+                            except ValidationError as e:
+                                lead.waste_data=1
+                                lead.save()
+                        else:
+                            print("Email is None")
+                            lead.lead_email='No Email id'
+                            lead.save()
+
+    
+                    # Validate phone number
+                    if not is_valid_phone_number(lead.lead_contact):
+                        # Invalid phone number, mark as waste data
+                        lead.waste_data=1
+                        lead.save() 
+                        
+                  
 
                     for key, value in lead_data.items():
                         if key not in ('Full Name', 'Email Id', 'Contact Number'):
@@ -2828,8 +2861,8 @@ def tl_lead_file_upload(request,pk):
 
         lf_obj = LeadField_Register.objects.filter(field_work_regId=works_obj,field_lead_category=lead_category.id)
         leads_obj = Leads.objects.filter(lead_work_regId=works_obj,lead_collect_Emp_id=dash_details,lead_category_id=lead_category,lead_add_date=date.today())
-        leads_obj_count = Leads.objects.filter(lead_work_regId=works_obj,lead_collect_Emp_id=dash_details,lead_category_id=lead_category,lead_add_date=date.today()).count()
-        lead_Details_obj = lead_Details.objects.filter(leadId__in=leads_obj)
+        leads_obj_count = leads_obj.count()
+       
 
         
 
@@ -2838,8 +2871,8 @@ def tl_lead_file_upload(request,pk):
                     'notifications':notifications,
                     'works_obj':works_obj,
                     'lf_obj':lf_obj,
-                    'leads_obj':leads_obj,
-                    'lead_Details_obj':lead_Details_obj,
+                    'leads':leads_obj,
+                  
                     'leads_obj_count':leads_obj_count,
                     'taskAs':taskAs,
                     'lead_category':lead_category,
@@ -2851,9 +2884,25 @@ def tl_lead_file_upload(request,pk):
 
     else:
             return redirect('/')
+    
+    
+def is_valid_phone_number(phone_number):
+    # Check if phone_number is None or not a string
+    if phone_number is None or not isinstance(str(phone_number), str):
+        return False
+
+    # Remove non-digit characters from the phone number
+    cleaned_phone_number = re.sub(r'\D', '', str(phone_number))
+
+    # Check if the cleaned phone number has exactly 10 digits
+    if len(cleaned_phone_number) == 10:
+        return True
+    else:
+        return False
 
 from django.db.models import Count
 from django.db.models import Q
+
 
 def tl_duplicate_data(request,pk):
 

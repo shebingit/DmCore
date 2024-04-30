@@ -1592,6 +1592,7 @@ def head_lead_collected_data(request,pk,lcID):
                                          waste_data=0,
                                          lead_status=0,
                                          repeated_status=0).order_by('-lead_add_date')
+        
         leads_obj_count = leads_obj.count()
         
         d1= None
@@ -5313,6 +5314,96 @@ def leadFollwup_data(request,lead_id):
         'fields_obj':fields_obj,
     }
     return render(request, 'leadFollowup_content.html', context)
+
+
+
+#29/04/24 -- Repeated Lead
+
+
+def head_repeated_lead(request):
+    if 'emp_id' in request.session:
+        if request.session.has_key('emp_id'):
+            emp_id = request.session['emp_id']
+           
+        else:
+            return redirect('/')
+        
+        emp_dash = LogRegister_Details.objects.get(id=emp_id)
+        dash_details = EmployeeRegister_Details.objects.get(logreg_id=emp_dash)
+
+        # Notification-----------
+        notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
+
+
+
+        works_obj = WorkRegister.objects.filter(wcompId=dash_details.emp_comp_id)
+
+
+        # Get leads with duplicate email addresses
+        duplicate_email_leads = Leads.objects.values('lead_email').annotate(email_count=Count('lead_email')).filter(email_count__gt=1)
+
+        # Get leads with duplicate phone numbers
+        duplicate_phone_leads = Leads.objects.values('lead_contact').annotate(phone_count=Count('lead_contact')).filter(phone_count__gt=1)
+
+        for item in duplicate_phone_leads:
+            leads_with_phone = Leads.objects.filter(lead_contact__exact=item['lead_contact'])
+            if len(leads_with_phone) > 1:
+                for lead in leads_with_phone:
+                    l = Leads.objects.get(id=lead.id)
+                    l.repeated_status=1
+                    #l.save()
+                
+
+        LCR = LeadCategory_Register.objects.filter(cTaskId__cTcompId=dash_details.emp_comp_id)
+        executive_data  = EmployeeRegister_Details.objects.filter(Q(emp_designation_id__dashboard_id=1) | Q(emp_designation_id__dashboard_id=2) | Q(emp_designation_id__dashboard_id=3),emp_comp_id=dash_details.emp_comp_id,emp_active_status=1)
+
+
+        repeated_leads_obj = Leads.objects.filter(lead_work_regId__in=works_obj,repeated_status=1).order_by('-lead_contact')
+
+        if request.POST:
+            category = request.POST['select_category']
+            emp = request.POST['select_emp']
+
+            if category:
+                repeated_leads_obj = repeated_leads_obj.filter(lead_category_id__id=category)
+
+            if emp:
+                repeated_leads_obj = repeated_leads_obj.filter(lead_collect_Emp_id=emp)
+       
+        repeated_leads_obj_count = repeated_leads_obj.count()
+
+        content = {'emp_dash':emp_dash,
+                    'dash_details':dash_details,
+                    'notifications':notifications,
+                    'repeated_leads_obj':repeated_leads_obj,
+                    'repeated_leads_obj_count':repeated_leads_obj_count,
+                    'executive_data':executive_data,
+                    'LCR':LCR
+                    
+        }
+
+        return render(request,'HD_Repeated.html',content)
+
+    else:
+            return redirect('/')    
+
+
+def lead_repeat_delete(request):
+    checked_values = request.POST.get('checked_values')
+
+    id_list = checked_values.split(',') 
+    count_val = 0
+
+    for ids in id_list:
+
+        try:
+            leads_obj = Leads.objects.get(id=ids)
+            leads_obj.delete() 
+            count_val = count_val + 1
+        except Leads.DoesNotExist:
+            continue
+    return JsonResponse({'message': f'Data deleted {count_val} successfully .'})
+            
 
 
 

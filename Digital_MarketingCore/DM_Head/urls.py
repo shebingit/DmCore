@@ -212,6 +212,10 @@ urlpatterns = [
     path('Waste-Reason/',views.HD_featchLeadwasteReason,name='HD_featchLeadwasteReason'),
     
     path('leadFollwup_data/<int:lead_id>/', views.leadFollwup_data, name='leadFollwup_data'),
+
+    path('Repeated-Lead/',views.head_repeated_lead,name='head_repeated_lead'),
+    path('Repeated-DeleteLead/',views.lead_repeat_delete,name='lead_repeat_delete'),
+    
     
     
 

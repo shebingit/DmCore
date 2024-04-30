@@ -1708,6 +1708,7 @@ def is_valid_phone_number(phone_number):
     else:
         return False
 
+
 def executive_lead_file_upload(request,pk,id):
     if 'emp_id' in request.session:
         if request.session.has_key('emp_id'):
@@ -1752,7 +1753,8 @@ def executive_lead_file_upload(request,pk,id):
                     lead_data = {header: row[header] for header in headers}
 
                    
-
+                    repeated = Leads.objects.filter(Q(lead_email=lead_data['Email Id']) | Q(lead_contact=lead_data['Contact Number']),lead_category_id=lead_category_assign.lcta_id.lc_id)
+                    
                     lead = Leads()
                     lead.lead_work_regId = works_obj
                     lead.lead_collect_Emp_id = dash_details
@@ -1762,18 +1764,30 @@ def executive_lead_file_upload(request,pk,id):
                     lead.lead_source = lead_data['Lead Source']
                     lead.lead_taskAssignId=task
                     lead.lead_category_id=lead_category_assign.lcta_id.lc_id
-                   
-
                     lead.save()
 
-                    try:
-                        validate_email(lead.lead_email)
-                        
+                    
+                    if repeated:
+                        for i in repeated:
+                            lead.repeated_status=1
+                            lead.save()
 
-                    except ValidationError:
-                        # Invalid email, mark as waste data
-                        lead.waste_data=1
+                        lead_email = lead.lead_email
 
+                        if lead_email is not None and isinstance(lead_email, str):
+
+                            try:
+                                validate_email(lead_email)
+
+                            except ValidationError as e:
+                                lead.waste_data=1
+                                lead.save()
+                        else:
+                            print("Email is None")
+                            lead.lead_email='No Email id'
+                            lead.save()
+
+    
                     # Validate phone number
                     if not is_valid_phone_number(lead.lead_contact):
                         # Invalid phone number, mark as waste data

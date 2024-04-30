@@ -637,8 +637,8 @@ def hr_leadAccept(request):
 
             db = DataBank.objects.get(id= data.dataBank_ID.id)
             db.lead_status ='Opend'
-            #db.save()
-            #data.save()
+            db.save()
+            data.save()
             allocate_count = allocate_count + 1
         
         success_text = str(allocate_count) + ' leads accepted ' + 'successfully.'
@@ -1203,7 +1203,7 @@ def closechange(request):
             wl.leadId = la.leadId
             wl.assignto_tc_id = la
             wl.dbId = db
-            wl.client_id = la.leadId.lead_work_regId.wa_clientId
+            wl.client_id = la.leadId.lead_work_regId.clientId
             wl.TC_Id = la.TC_Id
             wl.waste_marked_Date = date.today()
             wl.reason = db.current_status

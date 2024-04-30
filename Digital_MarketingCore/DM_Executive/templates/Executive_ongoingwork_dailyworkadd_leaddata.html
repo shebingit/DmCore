@@ -151,6 +151,7 @@
                                 <th>Lead Source</th>
                                 <th> Details  </th>
                                 <th> Status </th>
+                                <th> Repeated ? </th>
                             
                                 
                             </tr>
@@ -185,6 +186,7 @@
                                 {% endif %}
                             
                             </td>
+                            <td>{% if lead.repeated_status == 1 %} <span class="text-danger">Yes</span>{% endif %}</td>
                             
                             
                             
