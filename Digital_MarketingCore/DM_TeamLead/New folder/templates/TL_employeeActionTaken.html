@@ -1,0 +1,136 @@
+{% extends 'TL_base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'tl_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Employees Actions Taken</li>
+        </ol>
+      </nav>
+</div>
+
+
+
+<div class="row ">
+    <div class="col-12 grid-margin">
+      <div class="card">
+        <div class="card-body">
+            <div class="d-flex">
+                <h4 class="card-title">Actions Taken</h4>
+                
+            </div>
+
+            <form action="{% url 'tl_emp_filter_actionTaken' %}" method="post">
+                {% csrf_token %}
+
+                <div class="row">
+                    
+                    <div class="col-sm-12 col-lg-5 col-md-5">
+                        <div class="form-group">
+                          <label> select employee</label>
+                          <select class="form-control text-offwhite" name="emp_id" id="#" required>
+                            <option value="0">----select employee----</option>
+                            {% for emp in employees %}
+                              <option value="{{emp.id}}">{{emp.emp_name}}</option>
+                            {% endfor %}
+                          </select>                        
+                        </div>
+                    </div>
+                   
+                    <div class="col-sm-12 col-lg-3 col-md-3">
+                        <div class="form-group">
+                          <label>from date</label>
+                          <input type="date" class="form-control text-offwhite" name="fDate" >                    
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-3 col-md-3">
+                        <div class="form-group">
+                          <label>to date</label>
+                          <input type="date" class="form-control text-offwhite" name="toDate" >                       
+                        </div>
+                    </div>
+                    
+                    <div class="col-sm-12 col-lg-1 col-md-1 d-flex  justify-content-center  align-items-center">
+                       
+                      <button class=" btn btn-primary " type="submit"><i class="mdi mdi-magnify mdi-18px"></i></button> 
+
+                    </div>
+                    
+                </div>
+            </form>
+            
+          {% if employees_action %}
+          <div class="table-responsive">
+            <table class="table" id="employee-leaves">
+              <thead>
+                <tr>
+                  <th> No </th>
+                  <th> Employees Id </th>
+                  <th> Employees Name </th>
+                  <th> Designation </th>
+                  <th> Date </th>
+                  <th> Reason </th>
+                  <th> Action Head </th>
+                  <th> Action Content </th>
+                  <th> Taken By </th>
+                  <th> Status </th>
+                 
+                </tr>
+              </thead>
+              <tbody>
+                {% for action in employees_action %}
+                <tr>
+                  <td>
+                    {{forloop.counter}}
+                  </td>
+                  <td>
+                    {% if action.act_emp_id.emp_regId %}
+                    {{action.act_emp_id.emp_regId}}
+                    {% else %} 
+                    EMP0000 
+                    {% endif %}
+                  </td> 
+                  <td>
+                    {% if action.act_emp_id.emp_profile %}
+                    <img src="{{action.act_emp_id.emp_profile.url}}" alt="Profile-image" />
+                    {% else %}
+                    <img src="{% static 'images/faces/profile-icon.png' %}" alt="Profile-image" />
+                    {% endif %}
+                    <span class="pl-2">{{action.act_emp_id.emp_name}}</span>
+                  </td>
+                  <td> {{action.act_emp_id.emp_designation_id.desig_name}} </td>
+                  <td> {{action.action_date}}</td>
+                  
+                  <td> {{action.act_reason|tostr|split_into_paragraphs:75|safe}} </td>
+                  <td> {{action.act_head}} </td>
+                  <td> {{action.act_content|tostr|split_into_paragraphs:75|safe}} </td>
+                  <td> {{action.act_from_name}} </td>
+                  <td> 
+                    {% if action.status == 0 %}
+                    <button class="btn btn-outline-warning "><span class="small">Pending</span></button>
+                    {% elif action.status == 1 %}
+                    <button class="btn btn-outline-success small"><span class="small">Action Taken</span></button>
+                    {% endif %}
+                  </td>
+                 
+                </tr>
+               {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="d-flex justify-content-center">
+            <img src="{% static 'images\file-icons\no-data-file.png' %}">
+          </div>
+         {% endif %}
+        </div>
+      </div>
+    </div>
+</div>
+
+
+
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends 'TL_base.html' %}
+{% load static %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'tl_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Action Taken Edit</li>
+        </ol>
+      </nav>
+</div>
+
+<div class="row">
+
+    <div class="col-md-12 col-xl-12 col-sm-12 col-lg-12 grid-margin stretch-card">
+
+        <div class="card" id="take-action" >
+          <div class="card-body">
+            <div class="leave-form">
+              <h4 class="card-title mb-4"> Take Actions  </h4>
+              <form action="{% url 'tl_action_takenEdit' action.id %}" method="post">
+                {% csrf_token %}
+                <div class="row">
+                  <div class="col-sm-12 col-lg-6 col-md-6">
+                    <div class="form-group">
+                      <label>select employee </label>
+                      <select class="form-control text-offwhite" name="action_employeeId" id="#" required>
+                        <option value="{{action.act_emp_id.id}}" selected>{{action.act_emp_id.emp_name}}</option>
+                        {% for emp in employees%}
+                        <option value="{{emp.id}}">{{emp.emp_name}}</option>
+                        {% endfor %}
+                      </select>                      
+                    </div>
+                  </div>
+                  <div class="col-sm-12 col-lg-6 col-md-6">
+                    <div class="form-group">
+                      <label>date</label>
+                      <input type="date" class="form-control text-offwhite" name="action_taken_date" value="{{action.action_date|date:'Y-m-d'}}" id="#" required >                    
+                    </div>
+                  </div>
+                  <div class="col-sm-12 col-lg-12 col-md-12">
+                    <div class="form-group">
+                      <label>reason</label>
+                      <input type="text" class="form-control text-offwhite" name="reason_content_head" value="{{action.act_head}}" id="#" required >                    
+                    </div>
+                  </div>
+                  <div class="col-sm-12 col-lg-12 col-md-12">
+                    <div class="form-group add-items">
+                      <label>reason for action ? </label>
+                      <textarea  class="to-do-textarea  text-offwhite" name="reason_content" id="#" placeholder="enter text..">{{action.act_reason}}</textarea>
+                    </div>
+                  </div>
+                  <div class="col-sm-12 col-lg-12 col-md-12">
+                    <div class="form-group add-items">
+                      <label>what action taken ? </label>
+                      <textarea  class="to-do-textarea  text-offwhite" name="what_action_content" id="#" placeholder="enter text..">{{action.act_content}}</textarea>
+                    </div>
+                  </div>
+                  <div class="col-sm-12 col-lg-12 col-md-12 d-flex  justify-content-center  align-items-center">       
+                    <button class=" btn btn-outline-primary " type="submit"><i class="mdi mdi-pencil mdi-18px"></i>Edit</button> 
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+    
+      </div>
+
+</div>
+
+{% endblock %}

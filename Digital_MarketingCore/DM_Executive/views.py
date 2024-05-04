@@ -1487,7 +1487,7 @@ def executive_leadcategory(request,pk):
         # taskassign details
         task=TaskAssign.objects.get(id=pk)
         clientid=task.ta_taskId.client_Id.id
-        work_id=(task.ta_workAssignId.wa_work_regId).id
+       
         
 
         # leadcategory assign details
@@ -1752,55 +1752,42 @@ def executive_lead_file_upload(request,pk,id):
                 for _, row in df.iterrows():
                     lead_data = {header: row[header] for header in headers}
 
-                   
-                    repeated = Leads.objects.filter(Q(lead_email=lead_data['Email Id']) | Q(lead_contact=lead_data['Contact Number']),lead_category_id=lead_category_assign.lcta_id.lc_id)
+
+                    lead_exists = Leads.objects.filter(lead_email=lead_data['Email Id'],lead_category_id=lead_category_assign.lcta_id.lc_id).exists() or Leads.objects.filter(lead_contact=lead_data['Contact Number'],lead_category_id=lead_category_assign.lcta_id.lc_id).exists()
                     
                     lead = Leads()
+
+                    if lead_exists:
+                        lead.repeated_status=1
+                    else:
+                        lead.repeated_status=0
+
                     lead.lead_work_regId = works_obj
                     lead.lead_collect_Emp_id = dash_details
                     lead.lead_name = lead_data['Full Name']
                     lead.lead_email = lead_data['Email Id']
-                    lead.lead_contact = lead_data['Contact Number']
+                        
                     lead.lead_source = lead_data['Lead Source']
                     lead.lead_taskAssignId=task
                     lead.lead_category_id=lead_category_assign.lcta_id.lc_id
-                    lead.save()
-
-                    
-                    if repeated:
-                        for i in repeated:
-                            lead.repeated_status=1
-                            lead.save()
-
-                        lead_email = lead.lead_email
-
-                        if lead_email is not None and isinstance(lead_email, str):
-
-                            try:
-                                validate_email(lead_email)
-
-                            except ValidationError as e:
-                                lead.waste_data=1
-                                lead.save()
-                        else:
-                            print("Email is None")
-                            lead.lead_email='No Email id'
-                            lead.save()
-
-    
-                    # Validate phone number
-                    if not is_valid_phone_number(lead.lead_contact):
-                        # Invalid phone number, mark as waste data
-                        lead.waste_data=1
                         
-                    lead.save()    
+                        
+                    phno = str(lead_data.get('Contact Number', ''))
+
+                    # Validate phone number
+                    if not is_valid_phone_number(phno):
+                        lead.waste_data=1
+                          
+                    lead.lead_contact = phno
+                    lead.save()
+                    
 
                     for key, value in lead_data.items():
                         if key not in ('Full Name', 'Email Id', 'Contact Number','Lead Source'):
                             lead_details = lead_Details(leadId=lead, lead_field_name=key, lead_field_data=value)
                             lead_details.leadId = lead
                             lead_details.save()
-                    
+                        
                     lead_category_assign.lca_target_achived = int(lead_category_assign.lca_target_achived) + 1
                     lead_category_assign.save()
 

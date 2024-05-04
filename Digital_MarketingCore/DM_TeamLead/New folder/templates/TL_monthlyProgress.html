@@ -1,0 +1,252 @@
+{% extends 'TL_base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block body %}
+
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'tl_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'tl_progress_section' %}">Progress</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Monthly Progress</li>
+        </ol>
+      </nav>
+</div>
+
+<div class="row">
+    <div class="col-12 grid-margin">
+      <div class="card">
+        <div class="card-body">
+              <form action="{% url 'tl_filter_monthly_progress' %}" method="post">
+                {% csrf_token %} 
+                <div class="row">
+                    <div class="col-md-8 col-sm-12 col-lg-12 grid-margin">
+                        <h4 class="card-title custom-letter-spacing">List of monthly progress</h4>
+                        <p class="card-description mb-3"> A list of monthly progress that employees work on for different clients </p>
+                    </div>
+                    <div class="col-md-4 col-sm-12 col-lg-2 grid-margin">
+                        <button class="btn btn-outline-warning" type="button" data-toggle="modal" data-target="#weekly">
+                            <span class="mdi mdi-file-outline icon-sm mr-1"></span>
+                            <span class="small">Monthly upload</span>
+                        </button>
+                    </div>
+                    
+                    <div class="col-md-6 col-sm-12 col-lg-3 grid-margin">
+                    
+                        <div class="form-group add-items"> 
+                            <input type="hidden" value="{{work.id}}"  name="Work_id">
+                            <label>select employee</label>
+                            <select class="form-control text-offwhite" name="emp_id" id="emp_name" required>
+                              <option value="">Select Employee</option>
+                              {% for emp in employees %}
+                              <option value="{{emp.id}}">{{emp.emp_name}}</option>
+                              {% endfor %}
+                            </select>       
+                            
+                        </div>
+                    
+                    </div>
+                    <div class="col-md-5 col-sm-12 col-lg-2 grid-margin">
+                        <div class="form-group add-items">
+                          <label>from date</label>
+                          <input type="date" class="form-control text-offwhite" name="fDate" id="from_date" required >    
+                        </div>
+                    </div>
+                    <div class="col-md-5 col-sm-12 col-lg-2">
+                        <div class="form-group add-items">
+                          <label>to date</label>
+                          <input type="date" class="form-control text-offwhite" name="toDate" id="to_date" required  >     
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-12 col-lg-1 grid-margin">
+                        <button type="submit" class="btn btn-outline-primary mt-4"><span class="mdi mdi-magnify"></span></button>
+                    </div>
+                </div>
+            </form>
+      {% for progress in monthlyProgress %}
+          <div class="row">
+           
+            <div class="col-md-12 col-lg-12 col-sm-12 col-xl-12">
+              <div id="dragula-left" class="py-2">
+               
+                <div class="card blockquote-primary mb-2">
+                  <div class="card-body p-3">
+                    <div class="">
+                   
+                      <div class="media-body ml-3">
+                        <i class="mdi mdi-file-outline icon-sm align-self-center me-3"></i>
+                        <h6 class="mb-1 custom-letter-spacing text-offwhite">{{progress.wp_workerId.emp_name}} </h6>
+                        <h6 class="mb-1 custom-letter-spacing text-offwhite">{{progress.wp_from_date}} to {{progress.wp_to_date}} </h6>
+                        <div class="row">
+                            <div class="col-md-5 col-lg-5 col-sm-12 col-xl-6 grid-margin">
+                                <p class="mb-0 text-muted text-justify">{{progress.work_discription}}
+                                 </p>
+                            </div>
+                            <div class="col-md-3 col-lg-3 col-sm-6 col-xl-2 grid-margin">
+                              {% if progress.wp_progress < 10 %}
+                              <div class="progress progress-sm">
+                                  <div class="progress-bar bg-danger progress-bar-animated progress-bar-striped" role="progressbar" aria-valuenow="{{ progress.wp_progress }}" style="width: {{ progress.wp_progress }}%" aria-valuemin="0" aria-valuemax="100">
+                                      {{ progress.wp_progress }}%
+                                  </div>
+                              </div>
+                          {% elif progress.wp_progress >= 10 and progress.wp_progress < 80 %}
+                              <div class="progress progress-sm">
+                                  <div class="progress-bar bg-warning progress-bar-animated progress-bar-striped" role="progressbar" aria-valuenow="{{ progress.wp_progress }}" style="width: {{ progress.wp_progress }}%" aria-valuemin="0" aria-valuemax="100">
+                                      {{ progress.wp_progress }}%
+                                  </div>
+                              </div>
+                          {% else %}
+                              <div class="progress progress-sm">
+                                  <div class="progress-bar bg-success progress-bar-animated progress-bar-striped" role="progressbar" aria-valuenow="{{ progress.work_assign_progress }}" style="width: {{ progress.work_assign_progress }}%" aria-valuemin="0" aria-valuemax="100">
+                                      {{ progress.work_assign_progress }}%
+                                  </div>
+                              </div>
+                          {% endif %}
+                            </div>
+                            <div class="col-md-2 col-lg-2 col-sm-6 col-xl-2 grid-margin">
+                            {% for file_info in progress.wp_file %}
+                              <a href="{% url 'download_file_progress' progress.id forloop.counter0 %}" class="btn btn-outline-primary"><span class="mr-1 mdi mdi-arrow-collapse-down"></span></a>
+                              {% endfor %}
+                            </div>
+                            <div class="col-md-2 col-lg-2 col-sm-6 col-xl-2 grid-margin">
+                                {% if progress.wp_status %}
+                                <a href="" class="btn btn-outline-success">
+                                    <span class="mdi mdi-close"></span> 
+                                    <span class="small">Verified</span>
+                                </a>
+                                {% else %}
+                                <a href="#" class="btn btn-outline-danger" data-toggle="modal" data-target="#verifyWork{{progress.id}}">
+                                    <span class="mdi mdi-close"></span> 
+                                    <span class="small">verify</span>
+                                </a>
+                                {% endif %}
+                                
+                            </div>
+                        </div>
+                        
+                      </div>
+                    </div>
+                  </div>
+                </div>
+               
+              </div>
+            </div>
+            
+            
+          </div>
+      {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!--progress Verification Modal-->
+  {% for progress in monthlyProgress %}
+
+  <div class="modal fade" id="verifyWork{{progress.id}}" >
+  <div class="modal-dialog" >
+    <div class="modal-content">
+
+      <div class="card">
+        <div class="card-head d-flex justify-content-between align-items-center mt-3 mb-0 ">
+          <h4 class="card-title mt-3 ml-3">Verify Weekly Progress </h4>
+          <span class="mdi mdi-close-box mdi-18px text-danger mr-2"  data-dismiss="modal"></span>
+        </div>
+        
+        <div class="card-body mt-0">
+          <form action="{% url 'tl_verify_progress' progress.id %}" method="post"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <p>*Update the progress if there is any change after verification.</p>
+              <div class="form-group add-items ">
+                <label>Current Progress</label>
+                <input type="number" class="form-control text-offwhite" name="c_progress"  value="{{ progress.wp_progress }}" >
+              </div>
+              <div class="form-group add-items ">
+                <label>Verified Progress </label>
+                <input type="number" class="form-control text-offwhite" name="verified_progress"  >
+              </div> 
+           
+          <div class="add-items d-flex justify-content-center ">
+            <button class=" btn btn-outline-primary " type="submit">Verify</button> 
+        </div>
+       </form>
+        </div>
+
+      </div>
+    
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+
+
+  <!-- Monthly progress upload -->
+   <div class="modal fade" id="weekly">
+    <div class="modal-dialog  ">
+      <div class="modal-content">
+  
+        <div class="card">
+          <div class="card-head d-flex justify-content-between align-items-center mt-3 mb-0 ">
+            <h4 class="card-title mt-3 ml-3">Upload Monthly Data </h4>
+            <span class="mdi mdi-close-box mdi-18px text-danger mr-2"  data-dismiss="modal"></span>
+          </div>  
+          <div class="card-body mt-0">
+
+            <form action="{% url 'tl_add_weekly_progress' %}" method="post"  enctype="multipart/form-data">
+              {% csrf_token %}
+                <div class="form-group add-items ">
+                  <label>Check progress type</label>
+                  <div class="row">
+                    <div class="col-lg-6 col-md-6 col-xl-6 col-sm-12">
+                      <div class="form-check">
+                        <label class="form-check-label">
+                          <input type="radio" class="form-check-input" name="progress_type" id="#" value="Weekly" > Weekly Progress </label>
+                          
+                      </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-xl-6 col-sm-12">
+                      <div class="form-check">
+                        <label class="form-check-label">
+                          <input type="radio" class="form-check-input" name="progress_type" id="#" value="Monthly" checked> Monthly Progress </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group add-items ">
+                  <label>From Date</label>
+                  <input type="date" class="form-control text-offwhite" name="fdate" required> 
+                </div> 
+                <div class="form-group add-items ">
+                  <label>To Date</label>
+                  <input type="date" class="form-control text-offwhite" name="todate" required> 
+                </div> 
+                <div class="form-group add-items ">
+                  <label>Progress</label>
+                  <input type="number" class="form-control text-offwhite" name="progress" required>  
+                </div> 
+                <div class="form-group add-items ">
+                  <label>More about monthly progress</label>
+                  <textarea class="to-do-textarea  text-offwhite" name="about"  placeholder="enter more...">  </textarea>
+                </div>
+                <div class="form-group add-items ">
+                  <label>Files</label>
+                  <input type="file" class="form-control text-offwhite" name="file" multiple>  
+              </div> 
+             
+            <div class="add-items d-flex justify-content-center ">
+              <button class=" btn btn-outline-primary " type="submit">Upload</button> 
+          </div>
+         </form>
+
+          </div>
+  
+        </div>
+      
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

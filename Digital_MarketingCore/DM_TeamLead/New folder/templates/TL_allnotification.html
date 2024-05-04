@@ -1,0 +1,68 @@
+{% extends 'TL_base.html' %}
+{% load static %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'tl_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Notifications</li>
+        </ol>
+      </nav>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title mb-2"> Notifications  </h4>
+        <div class="d-flex justify-content-end">
+          <div class="preview-thumbnail">
+            <div class="preview-icon bg-danger">
+              <i class="mdi mdi-delete p-1"></i>
+            </div>
+          </div>
+
+        </div>
+        <div class="preview-list">
+          {% for note in notifications %}
+          <div class="preview-item border-bottom">
+            <div class="form-check  m-0">
+              <label class="form-check-label">
+                <input type="checkbox" class="form-check-input">
+              </label>
+            </div>
+            <div class="preview-thumbnail mr-1">
+              <div class="preview-icon bg-danger">
+                <a href="{% url 'tl_delete_notification' note.id %}"><i class="mdi mdi-delete p-1 text-white"></i></a>
+              </div>
+            </div>
+            <div class="preview-thumbnail">
+              <div class="preview-icon bg-primary">
+                {% if note.notific_status == 0 %}
+                <a href="{% url 'tl_open_notification' note.id %}"><i class="mdi mdi-email text-dark"></i></a>
+                {% else %}
+                <i class="mdi mdi-email-open"></i>
+                {% endif %}
+              </div>
+            </div>
+            <div class="preview-item-content d-sm-flex flex-grow">
+              <div class="flex-grow">
+                <h6 class="preview-subject">{{note.notific_head}}</h6>
+                <p class="text-muted mb-0">{{note.notific_content}}</p>
+              </div>
+              <div class="mr-auto text-sm-right pt-2 pt-sm-0">
+                <p class="text-muted">{{note.notific_time}}</p>
+                <p class="text-muted mb-0">30 tasks, 5 issues </p>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+         
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

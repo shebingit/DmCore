@@ -1,0 +1,141 @@
+{% extends 'TL_base.html' %}
+{% load static %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'tl_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Employees Complaints</li>
+        </ol>
+      </nav>
+</div>
+
+
+
+<div class="row ">
+    <div class="col-12 grid-margin">
+      <div class="card">
+        <div class="card-body">
+            <div class="d-flex">
+                <h4 class="card-title">Complaints</h4>
+                
+            </div>
+
+            <form action="{% url 'tl_emp_filter_complaints' %}" method="post">
+                {% csrf_token %}
+
+                <div class="row">
+                    
+                    <div class="col-sm-12 col-lg-5 col-md-5">
+                        <div class="form-group">
+                          <label> select employee</label>
+                          <select class="form-control text-offwhite" name="emp_id" id="#" required>
+                            <option value="0">----select employee----</option>
+                            {% for emp in employees %}
+                              <option value="{{emp.id}}">{{emp.emp_name}}</option>
+                            {% endfor %}
+                          </select>                        
+                        </div>
+                    </div>
+                   
+                    <div class="col-sm-12 col-lg-3 col-md-3">
+                        <div class="form-group">
+                          <label>from date</label>
+                          <input type="date" class="form-control text-offwhite" name="fDate" >                    
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-lg-3 col-md-3">
+                        <div class="form-group">
+                          <label>to date</label>
+                          <input type="date" class="form-control text-offwhite" name="toDate" >                       
+                        </div>
+                    </div>
+                    
+                    <div class="col-sm-12 col-lg-1 col-md-1 d-flex  justify-content-center  align-items-center">
+                       
+                      <button class=" btn btn-primary " type="submit"><i class="mdi mdi-magnify mdi-18px"></i></button> 
+
+                    </div>
+                    
+                </div>
+            </form>
+            
+          {% if employees_complaints %}
+          <div class="table-responsive">
+            <table class="table" id="employee-leaves">
+              <thead>
+                <tr>
+                  <th> No </th>
+                  <th> Employees Id </th>
+                  <th> Employees Name </th>
+                  <th> Designation </th>
+                  <th> Date </th>
+                  <th> Complaint</th>
+                  <th> Content </th>
+                  <th> Action</th>
+                  <th> Action Taken Date </th>
+                 
+                </tr>
+              </thead>
+              <tbody>
+                {% for complaint in employees_complaints %}
+                <tr>
+                  <td>
+                    {{forloop.counter}}
+                  </td>
+                  <td>
+                    {% if complaint.complaint_emp_id.emp_regId %}
+                    {{complaint.complaint_emp_id.emp_regId}}
+                    {% else %} 
+                    EMP0000 
+                    {% endif %}
+                  </td> 
+                  <td>
+                    {% if complaint.complaint_emp_id.emp_profile %}
+                    <img src="{{complaint.complaint_emp_id.emp_profile.url}}" alt="Profile-image" />
+                    {% else %}
+                    <img src="{% static 'images/faces/profile-icon.png' %}" alt="Profile-image" />
+                    {% endif %}
+                    <span class="pl-2">{{complaint.complaint_emp_id.emp_name}}</span>
+                  </td>
+                  <td> {{complaint.complaint_emp_id.emp_designation_id.desig_name}} </td>
+                  <td> {{complaint.complaint_date}}</td>
+                  
+                  <td> {{complaint.compaint_head}} </td>
+                  <td> {{complaint.compaint_content}} </td>
+                  <td> 
+                    {% if complaint.action %}
+                    {{complaint.action}}
+                    {% else %}
+                    <button class="btn btn-outline-warning "><span class="small">No Action Taken</span></button>
+                    
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if complaint.action_date %}
+                    {{complaint.action_date}}
+                    {% else %}
+                    <button class="btn btn-outline-warning "><span class="small">No Action Taken</span></button>
+                    {% endif %}
+                  </td>
+                  
+                 
+                </tr>
+               {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="d-flex justify-content-center">
+            <img src="{% static 'images\file-icons\no-data-file.png' %}">
+          </div>
+         {% endif %}
+        </div>
+      </div>
+    </div>
+</div>
+
+
+
+{% endblock %}

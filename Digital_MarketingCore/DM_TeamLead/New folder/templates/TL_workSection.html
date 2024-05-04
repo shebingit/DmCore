@@ -1,0 +1,155 @@
+{% extends 'TL_base.html' %}
+{% load static %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'tl_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Work Section</li>
+        </ol>
+      </nav>
+</div>
+<div class="row">
+    <!-- <div class="col-xl-3 col-sm-12 grid-margin stretch-card">
+        <a href="" class="a-hover">
+            <div class="card">
+                <div class="card-body">
+                <div class="row">
+                    <div class="col-9">
+                    <div class="d-flex align-items-center align-self-start">
+                        <h4 class="mb-0">Work View </h4>
+                    </div>
+                    </div>
+                    <div class="col-3">
+                    <div class="icon icon-box-danger">
+                        <span class="mdi mdi-arrow-top-right icon-item"></span>
+                    </div>
+                    </div>
+                </div>
+                <h6 class="text-muted font-weight-normal mt-2"> To review information 
+                    or details related to tasks and work
+                </h6>
+                </div>
+            </div>
+        </a>
+    </div> -->
+    <div class="col-xl-4 col-sm-12 grid-margin stretch-card">
+        <a href="{% url 'tl_allocateWorkView' %}" class="a-hover">
+            <div class="card">
+                <div class="card-body">
+                <div class="row">
+                    <div class="col-9">
+                    <div class="d-flex align-items-center align-self-start">
+                        <h4 class="mb-0">Work Allocate</h4>
+                        <!-- <p class="text-danger ml-2 mb-0 font-weight-medium">-2.4%</p> -->
+                    </div>
+                    </div>
+                    <div class="col-3">
+                    <div class="icon icon-box-success">
+                        <span class="mdi mdi-calendar-check  icon-item"></span>
+                    </div>
+                    </div>
+                </div>
+                <h6 class="text-muted font-weight-normal mt-2"> Assign  tasks or projects to specific individuals </h6>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="col-xl-4 col-sm-12 grid-margin stretch-card">
+        <a href="{% url 'tl_pending_works' %}" class="a-hover">
+            <div class="card">
+                <div class="card-body">
+                <div class="row">
+                    <div class="col-9">
+                    <div class="d-flex align-items-center align-self-start">
+                        <h4 class="mb-0">Pending Works</h4>
+                        <!-- <p class="text-danger ml-2 mb-0 font-weight-medium">-2.4%</p> -->
+                    </div>
+                    </div>
+                    <div class="col-3">
+                    <div class="icon icon-box-warning">
+                        <span class="mdi mdi-calendar-clock  icon-item"></span>
+                    </div>
+                    </div>
+                </div>
+                <h6 class="text-muted font-weight-normal mt-2">Works that are yet to be require further attention </h6>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-xl-4 col-sm-12 grid-margin stretch-card">
+        <a href="{% url 'tl_work_progress' %}" class="a-hover">
+            <div class="card">
+                <div class="card-body">
+                <div class="row">
+                    <div class="col-9">
+                    <div class="d-flex align-items-center align-self-start">
+                        <h4 class="mb-0">Work Progress</h4>
+                        <!-- <p class="text-success ml-2 mb-0 font-weight-medium">+3.5%</p> -->
+                    </div>
+                    </div>
+                    <div class="col-3">
+                    <div class="icon icon-box-warning ">
+                        <span class="mdi mdi-chart-line-variant icon-item"></span>
+                    </div>
+                    </div>
+                </div>
+                <h6 class="text-muted font-weight-normal mt-2">Track and monitor the development of tasks</h6>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-xl-4 col-sm-12 grid-margin stretch-card">
+        <a href="{% url 'tl_completed_works' %}" class="a-hover">
+            <div class="card">
+                <div class="card-body">
+                <div class="row">
+                    <div class="col-9">
+                    <div class="d-flex align-items-center align-self-start">
+                        <h4 class="mb-0">Completed Works</h4>
+                        <!-- <p class="text-danger ml-2 mb-0 font-weight-medium">-2.4%</p> -->
+                    </div>
+                    </div>
+                    <div class="col-3">
+                    <div class="icon icon-box-success">
+                        <span class="mdi mdi-calendar-multiple-check  icon-item"></span>
+                    </div>
+                    </div>
+                </div>
+                <h6 class="text-muted font-weight-normal mt-2"> Access works that have been successfully finished </h6>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-xl-4 col-sm-12 grid-margin stretch-card">
+        <a href="{% url 'tl_individualWorks_section' %}" class="a-hover">
+            <div class="card">
+                <div class="card-body">
+                <div class="row">
+                    <div class="col-9">
+                    <div class="d-flex align-items-center align-self-start">
+                        <h4 class="mb-0">Individual Works</h4>
+                        <!-- <p class="text-danger ml-2 mb-0 font-weight-medium">-2.4%</p> -->
+                    </div>
+                    </div>
+                    <div class="col-3">
+                    <div class="icon icon-box-success">
+                        <span class="mdi mdi-calendar-multiple-check  icon-item"></span>
+                    </div>
+                    </div>
+                </div>
+                <h6 class="text-muted font-weight-normal mt-2"> Access works that have been successfully finished </h6>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+
+</div>
+
+
+
+
+{% endblock %}

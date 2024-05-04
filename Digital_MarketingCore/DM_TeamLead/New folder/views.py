@@ -2800,35 +2800,64 @@ def tl_lead_file_upload(request,pk):
 
               
                 for _, row in df.iterrows():
-                    lead_data = {header: str(row[header]) for header in headers}
+                    lead_data = {header: row[header] for header in headers}
 
                     lead_exists = Leads.objects.filter(lead_email=lead_data['Email Id'],lead_category_id=lead_category).exists() or Leads.objects.filter(lead_contact=lead_data['Contact Number'],lead_category_id=lead_category).exists()
                     
-                    lead = Leads()
-
                     if lead_exists:
+                        lead = Leads()
+                        lead.lead_work_regId = works_obj
+                        lead.lead_taskAssignId = taskAs
+                        lead.lead_collect_Emp_id = dash_details
+                        lead.lead_category_id=lead_category
+
+                        lead.lead_name = lead_data['Full Name']
+                        lead.lead_email = lead_data['Email Id']
+                        lead.lead_source =lead_data['Lead Source']
+                        
+
+                        if 'Contact Number' in lead_data and not pd.isna(lead_data['Contact Number']):
+                            phno = str(lead_data['Contact Number'])
+
+                            # Validate phone number
+                            if not is_valid_phone_number(phno):
+                                lead.waste_data=1
+                          
+                        else:
+                            phno = None  # Or any other default value or action
+
+                        lead.lead_contact = phno
+                        
                         lead.repeated_status=1
+
                     else:
+                        lead = Leads()
+                        lead.lead_work_regId = works_obj
+                        lead.lead_taskAssignId = taskAs
+                        lead.lead_collect_Emp_id = dash_details
+                        lead.lead_category_id=lead_category
+
+                        lead.lead_name = lead_data['Full Name']
+                        lead.lead_email = lead_data['Email Id']
+                        lead.lead_source =lead_data['Lead Source']
+
+                        if 'Contact Number' in lead_data and not pd.isna(lead_data['Contact Number']):
+                            phno = str(lead_data['Contact Number'])
+
+                            # Validate phone number
+                            if not is_valid_phone_number(phno):
+                                lead.waste_data=1
+                          
+                        else:
+                            phno = None  # Or any other default value or action
+
+                        lead.lead_contact = phno
+                
                         lead.repeated_status=0
 
-                    lead.lead_work_regId = works_obj
-                    lead.lead_taskAssignId = taskAs
-                    lead.lead_collect_Emp_id = dash_details
-                    lead.lead_category_id=lead_category
-
-                    lead.lead_name = lead_data['Full Name']
-                    lead.lead_email = lead_data['Email Id']
-                    lead.lead_source =lead_data['Lead Source']
-                        
-                    phno = str(lead_data.get('Contact Number', ''))
-
-                    # Validate phone number
-                    if not is_valid_phone_number(phno):
-                        lead.waste_data=1
-                    lead.lead_contact = phno
-                       
                     lead.save()
 
+                    
                     for key, value in lead_data.items():
                         if key not in ('Full Name', 'Email Id', 'Contact Number'):
                             lead_details = lead_Details(leadId=lead, lead_field_name=key, lead_field_data=value)
@@ -2864,7 +2893,7 @@ def tl_lead_file_upload(request,pk):
         
         content = {**data_list, **content}
 
-        return render(request,'TL_ClientLead_datalist.html',content)
+        return render(request,'tl_ClientLead_datalist.html',content)
 
     else:
             return redirect('/')
@@ -2881,6 +2910,7 @@ def is_valid_phone_number(phone_number):
     # Check if the cleaned phone number has exactly 10 digits
     if len(cleaned_phone_number) == 10:
         return True
+        
 
     else:
         return False

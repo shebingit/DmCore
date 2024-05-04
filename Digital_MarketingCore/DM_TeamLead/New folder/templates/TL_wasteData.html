@@ -1,0 +1,43 @@
+{% extends 'TL_base.html' %}
+{% load static %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'tl_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Waste Data</li>
+        </ol>
+      </nav>
+</div>
+<div class="row">
+  {% for wd in waste_data  %}
+    <div class="col-xl-4 col-sm-12 grid-margin ">
+        <a href="{% url 'tl_waste_data_clientWise' wd.lead_work_regId.clientId.client_name %}" class="a-hover">
+            <div class="card pr-3">
+                <div class="card-body">
+                <div class="row">
+                    <div class="col-9">
+                    <div class="d-flex align-items-center align-self-start">
+                        <h4 class="mb-0">{{wd.lead_work_regId.clientId.client_name}}</h4>
+                        <!-- <p class="text-danger ml-2 mb-0 font-weight-medium">-2.4%</p> -->
+                    </div>
+                    </div>
+                    <div class="col-3">
+                    <div class="icon icon-box-primary">
+                        <span class="mdi mdi-calendar-check  icon-item"></span>
+                    </div>
+                    </div>
+                </div>
+                <!-- <h6 class="text-muted font-weight-normal mt-2"> Analyses of the weekly progress, and achievements pertaining to the ongoing projects and activities. </h6> -->
+                </div>
+            </div>
+        </a>
+    </div>
+    
+   {% endfor %}
+</div>
+
+
+
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends 'TL_base.html' %}
+{% load static %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'tl_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Task Schedule Edit</li>
+        </ol>
+      </nav>
+</div>
+
+<div class="row">
+
+    <div class="col-md-12 col-xl-12 col-sm-12 col-lg-12 grid-margin stretch-card">
+
+        <div class="card" id="take-action" >
+          <div class="card-body">
+            <div class="leave-form">
+              <h4 class="card-title mb-4"> Edit Schedule</h4>
+              <form action="{% url 'tl_edit_emp_schedule' scheduled_task.id  %}" method="post">
+                {% csrf_token %}
+                <div class="add-items d-flex ">
+                  <input type="time" class="form-control text-offwhite" name="stime" value="{{stime}}" required id="timePicker1">
+                  <input type="time" class="form-control ml-2  text-offwhite" name="etime"  value="{{etime}}" required id="timePicker2">  
+                  <button class=" btn btn-primary " type="submit">Update</button> 
+                </div>
+              <div class="d-flex add-items">
+              
+                  <input type="text" class="form-control text-offwhite" id="time1" readonly>
+                  <input type="text" class="form-control text-offwhite ml-2" id="time2" readonly>
+              </div>
+              <div class="form-group add-items">
+                <select class="form-control text-offwhite" name="employeeId" id="#" required>
+                <option value="{{scheduled_task.emp_id_id}}">{{scheduled_task.emp_id.emp_name}}</option>
+                {% for emp in employees%}
+                <option value="{{emp.id}}">{{emp.emp_name}}</option>
+                {% endfor %}
+                </select> 
+            </div>
+              <div class="form-group add-items">
+                  <input type="text" class="form-control  text-offwhite" name="task_head"  value="{{scheduled_task.schedule_head}}" required>  
+              </div>
+              <div class="form-group add-items">
+                  <textarea  class="to-do-textarea  text-offwhite" name="task_content" value="{{scheduled_task.todo_content}}">{{scheduled_task.todo_content}}</textarea>
+              </div>
+              </form>
+            </div>
+          </div>
+        </div>
+    
+      </div>
+
+</div>
+
+
+<!-- Time format script-->
+
+
+<script>
+  const timePicker = document.getElementById('timePicker1');
+  const timePicke2 = document.getElementById('timePicker2');
+
+  timePicker.addEventListener('change', () => {
+    // Get the selected time
+    const selectedTime = timePicker.value;
+    
+
+    // Split hours and minutes
+    const [hours, minutes] = selectedTime.split(':');
+
+    // Convert to 12-hour format
+    let formattedTime = `${(hours % 12) || 12}:${minutes} ${(hours >= 12) ? 'PM' : 'AM'}`;
+
+    // Update the input value with the formatted time
+    
+    document.getElementById('time1').value = formattedTime;
+
+  });
+
+  timePicker2.addEventListener('change', () => {
+      // Get the selected time
+      const selectedTime = timePicker2.value;
+      
+  
+      // Split hours and minutes
+      const [hours, minutes] = selectedTime.split(':');
+  
+      // Convert to 12-hour format
+      let formattedTime = `${(hours % 12) || 12}:${minutes} ${(hours >= 12) ? 'PM' : 'AM'}`;
+  
+      // Update the input value with the formatted time
+      
+      document.getElementById('time2').value = formattedTime;
+
+    });
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,275 @@
+{% extends 'TL_base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'tl_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Action Taken</li>
+        </ol>
+      </nav>
+</div>
+
+<div class="row">
+
+  <div class="col-md-12 col-xl-4 grid-margin stretch-card">
+      <div class="row">
+          
+          <div class="col-xl-12 col-sm-12 grid-margin stretch-card">
+            <div class="card" id="take-action-btn">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-9">
+                    <div class="d-flex align-items-center align-self-start">
+                      <h4 class="mb-0">Take Action </h4>
+                      <!-- <p class="text-success ml-2 mb-0 font-weight-medium">+11%</p> -->
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    <div class="icon icon-box-success">
+                      <span class="mdi mdi-arrow-top-right icon-item"></span>
+                    </div>
+                  </div>
+                </div>
+                <h6 class="text-muted font-weight-normal">Address team issues promptly.</h6>
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-12 col-sm-12 grid-margin stretch-card">
+            <div class="card" id="action-taken-btn">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-9">
+                    <div class="d-flex align-items-center align-self-start">
+                      <h4 class="mb-0">Actions Taken</h4>
+                      <!-- <p class="text-success ml-2 mb-0 font-weight-medium">+3.5%</p> -->
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    <div class="icon icon-box-success ">
+                      <span class="mdi mdi-arrow-top-right icon-item"></span>
+                    </div>
+                  </div>
+                </div>
+                <h6 class="text-muted font-weight-normal">Actions taken against your team.</h6>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-xl-12 col-sm-12 grid-margin stretch-card">
+            <div class="card" id="action-received-btn">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-9">
+                    <div class="d-flex align-items-center align-self-start">
+                      <h4 class="mb-0">Actions Received</h4>
+                      <!-- <p class="text-success ml-2 mb-0 font-weight-medium">+3.5%</p> -->
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    <div class="icon icon-box-success ">
+                      <span class="mdi mdi-arrow-top-right icon-item"></span>
+                    </div>
+                  </div>
+                </div>
+                <h6 class="text-muted font-weight-normal">View actions against to you.</h6>
+              </div>
+            </div>
+          </div>
+         
+          
+      </div>
+  </div>
+  <div class="col-md-12 col-xl-8 grid-margin stretch-card">
+
+    <div class="card" id="take-action" >
+      <div class="card-body">
+        <div class="leave-form">
+          <h4 class="card-title mb-4"> Take Actions  </h4>
+          <form action="{% url 'tl_action_taken_save' %}" method="post">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-sm-12 col-lg-6 col-md-6">
+                <div class="form-group">
+                  <label>select employee</label>
+                  <select class="form-control text-offwhite" name="action_employeeId" id="#" required>
+                    {% for emp in employees%}
+                    <option value="{{emp.id}}">{{emp.emp_name}}</option>
+                    {% endfor %}
+                  </select>                      
+                </div>
+              </div>
+              <div class="col-sm-12 col-lg-6 col-md-6">
+                <div class="form-group">
+                  <label>date</label>
+                  <input type="date" class="form-control text-offwhite" name="action_taken_date" id="#" required >                    
+                </div>
+              </div>
+              <div class="col-sm-12 col-lg-12 col-md-12">
+                <div class="form-group">
+                  <label>reason</label>
+                  <input type="text" class="form-control text-offwhite" name="reason_content_head" id="#" required >                    
+                </div>
+              </div>
+              <div class="col-sm-12 col-lg-12 col-md-12">
+                <div class="form-group add-items">
+                  <label>reason for action ? </label>
+                  <textarea  class="to-do-textarea  text-offwhite" name="reason_content" id="#" placeholder="enter text.."></textarea>
+                </div>
+              </div>
+              <div class="col-sm-12 col-lg-12 col-md-12">
+                <div class="form-group add-items">
+                  <label>what action taken ? </label>
+                  <textarea  class="to-do-textarea  text-offwhite" name="what_action_content" id="#" placeholder="enter text.."></textarea>
+                </div>
+              </div>
+              <div class="col-sm-12 col-lg-12 col-md-12 d-flex  justify-content-center  align-items-center">       
+                <button class=" btn btn-outline-primary " type="submit"><i class="mdi mdi-file-check mdi-18px"></i>Action</button> 
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="action-taken" >
+      <div class="card-body">
+        <h4 class="card-title mb-4"> Actions Taken </h4>
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>  Date </th>
+                <th> Reason for action  </th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for act in action_taken_data %}
+              <tr>
+                <td>
+                  <a href="{% url 'tl_action_taken_editPage' act.id %}" style="text-decoration: none;">
+                    <span class="mdi mdi-pencil mdi-18px text-primary"></span> {{act.action_date}}
+                  </a>
+                 </td>
+                <td class="#">
+                  <div class="preview-list">
+                    <div class="preview-item border-bottom">
+                      <div class="preview-thumbnail">
+                        <div class="preview-icon bg-danger">
+                          <i class="mdi mdi-file-document"></i>
+                        </div>
+                      </div>
+                      <div class="preview-item-content d-sm-flex flex-grow">
+                        <div class="flex-grow">
+                          <h6 class="preview-subject">{{act.act_head}} ({{act.act_emp_id.emp_name}})</h6>
+                          <p class="text-muted mb-0 justify-text">{{act.act_reason|tostr|split_into_paragraphs:75|safe}}</p>
+                        </div>
+                        
+                      </div>
+                    </div>
+                    
+                  </div>
+                  <div> 
+                    <h6 class="pt-3">Action</h6>
+                    <p class="mt-2">Taken by<span class="h6"> {{act.act_from_name}}</span> on ({{act.action_date|default:" "}})</p>
+                    <p class="mt-2 justify-text">{{act.act_content|tostr|split_into_paragraphs:85|safe}}</p>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+             
+              
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="action-received" >
+      <div class="card-body">
+        <h4 class="card-title mb-4"> Actions Received </h4>
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>  Date </th>
+                <th> Reason for action  </th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for act in tl_action_taken_data %}
+              <tr>
+                <td>
+                  
+                   {{act.action_date}}
+                 
+                 </td>
+                <td class="#">
+                  <div class="preview-list">
+                    <div class="preview-item border-bottom">
+                      <div class="preview-thumbnail">
+                        <div class="preview-icon bg-danger">
+                          <i class="mdi mdi-file-document"></i>
+                        </div>
+                      </div>
+                      <div class="preview-item-content d-sm-flex flex-grow">
+                        <div class="flex-grow">
+                          <h6 class="preview-subject">{{act.act_head}} ({{act.act_emp_id.emp_name}})</h6>
+                          <p class="text-muted mb-0">{{act.act_reason}}</p>
+                        </div>
+                        
+                      </div>
+                    </div>
+                    
+                  </div>
+                  <div> 
+                    <p class="mt-2">Action Taken by<span class="h6"> {{act.act_from_name}}</span> on ({{act.action_date|default:" "}})</p>
+                    <p class="mt-2">{{act.act_content}}</p>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+             
+              
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+     
+  </div>
+
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+  <script>
+    $(document).ready(function() {
+      $('#action-taken').hide();
+      $('#action-received').hide();
+
+      $('#take-action-btn').click(function() {
+        $('#take-action').show();
+        $('#action-taken').hide();
+        $('#action-received').hide();
+      });
+  
+      $('#action-taken-btn').click(function() {
+        $('#take-action').hide();
+        $('#action-taken').show();
+        $('#action-received').hide();
+      });
+
+      $('#action-received-btn').click(function() {
+        $('#take-action').hide();
+        $('#action-taken').hide();
+        $('#action-received').show();
+      });
+    });
+  </script>
+
+{% endblock %}

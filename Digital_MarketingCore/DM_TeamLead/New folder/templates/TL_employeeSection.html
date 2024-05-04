@@ -1,0 +1,219 @@
+{% extends 'TL_base.html' %}
+{% load static %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'tl_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Employee Section</li>
+        </ol>
+      </nav>
+</div>
+
+
+<div class="row">
+    <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+        <a href="{% url 'tl_view_employees' %}" class="a-hover">
+            <div class="card">
+                <div class="card-body">
+                <div class="row">
+                    <div class="col-9">
+                    <div class="d-flex align-items-center align-self-start">
+                        <h4 class="mb-0">View Employees</h4>
+                        <!-- <p class="text-success ml-2 mb-0 font-weight-medium">+3.5%</p> -->
+                    </div>
+                    </div>
+                    <div class="col-3">
+                    <div class="icon icon-box-success ">
+                        <span class="mdi mdi-account-multiple icon-item"></span>
+                    </div>
+                    </div>
+                </div>
+                <h6 class="text-muted font-weight-normal mt-2">To view all employees in diffrent department \ designations   </h6>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <!-- <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+        <a href="{% url 'tl_WorkProgress' %}" class="a-hover">
+            <div class="card">
+                <div class="card-body">
+                <div class="row">
+                    <div class="col-9">
+                    <div class="d-flex align-items-center align-self-start">
+                        <h4 class="mb-0">Performance</h4>
+                    </div>
+                    </div>
+                    <div class="col-3">
+                    <div class="icon icon-box-warning ">
+                        <span class="mdi mdi-chart-areaspline icon-item"></span>
+                    </div>
+                    </div>
+                </div>
+                <h6 class="text-muted font-weight-normal mt-2">To check the work Performance of employees </h6>
+                </div>
+            </div>
+        </a>
+    </div> -->
+    <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+        <a href="{% url 'tl_employee_leaves' %}" class="a-hover">
+            <div class="card">
+                <div class="card-body">
+                <div class="row">
+                    <div class="col-9">
+                    <div class="d-flex align-items-center align-self-start">
+                        <h4 class="mb-0">Leaves </h4>
+                        <!-- <p class="text-success ml-2 mb-0 font-weight-medium">+11%</p> -->
+                    </div>
+                    </div>
+                    <div class="col-3">
+                    <div class="icon icon-box-danger">
+                        <span class="mdi mdi-calendar-remove icon-item"></span>
+                    </div>
+                    </div>
+                </div>
+                <h6 class="text-muted font-weight-normal mt-2">The list of all employees's leave details</h6>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+        <a href="{% url 'tl_employee_schedules' %}" class="a-hover">
+            <div class="card">
+                <div class="card-body">
+                <div class="row">
+                    <div class="col-9">
+                    <div class="d-flex align-items-center align-self-start">
+                        <h4 class="mb-0">Schedules </h4>
+                        <!-- <p class="text-success ml-2 mb-0 font-weight-medium">+11%</p> -->
+                    </div>
+                    </div>
+                    <div class="col-3">
+                    <div class="icon icon-box-warning">
+                        <span class="mdi mdi-calendar-text icon-item"></span>
+                    </div>
+                    </div>
+                </div>
+                <h6 class="text-muted font-weight-normal mt-2">The list of all employees's schedules</h6>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+        <a href="{% url 'tl_employee_actionTaken' %}" class="a-hover">
+            <div class="card">
+                <div class="card-body">
+                <div class="row">
+                    <div class="col-9">
+                    <div class="d-flex align-items-center align-self-start">
+                        <h4 class="mb-0">Action Taken </h4>
+                        <!-- <p class="text-success ml-2 mb-0 font-weight-medium">+11%</p> -->
+                    </div>
+                    </div>
+                    <div class="col-3">
+                    <div class="icon icon-box-primary">
+                        <span class="mdi mdi-gesture-double-tap icon-item"></span>
+                    </div>
+                    </div>
+                </div>
+                <h6 class="text-muted font-weight-normal mt-2">The list of all employees's schedules</h6>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+        <a href="{% url 'tl_employee_feedback' %}" class="a-hover">
+            <div class="card">
+                <div class="card-body">
+                <div class="row">
+                    <div class="col-9">
+                    <div class="d-flex align-items-center align-self-start">
+                        <h4 class="mb-0">Feedback </h4>
+                        <!-- <p class="text-success ml-2 mb-0 font-weight-medium">+11%</p> -->
+                    </div>
+                    </div>
+                    <div class="col-3">
+                    <div class="icon icon-box-success">
+                        <span class="mdi mdi-message-text-outline icon-item"></span>
+                    </div>
+                    </div>
+                </div>
+                <h6 class="text-muted font-weight-normal mt-2">The list of all employees's Feedback</h6>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+        <a href="{% url 'tl_employee_complaints' %}" class="a-hover">
+            <div class="card">
+                <div class="card-body">
+                <div class="row">
+                    <div class="col-9">
+                    <div class="d-flex align-items-center align-self-start">
+                        <h4 class="mb-0">Complaints </h4>
+                        <!-- <p class="text-success ml-2 mb-0 font-weight-medium">+11%</p> -->
+                    </div>
+                    </div>
+                    <div class="col-3">
+                    <div class="icon icon-box-secondary">
+                        <span class="mdi mdi-account-alert icon-item"></span>
+                    </div>
+                    </div>
+                </div>
+                <h6 class="text-muted font-weight-normal mt-2">The list of all employees's complaints</h6>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+        <a href="{% url 'tl_employeesWork' %}" class="a-hover">
+            <div class="card">
+                <div class="card-body">
+                <div class="row">
+                    <div class="col-9">
+                    <div class="d-flex align-items-center align-self-start">
+                        <h4 class="mb-0">Works </h4>
+                        <!-- <p class="text-success ml-2 mb-0 font-weight-medium">+11%</p> -->
+                    </div>
+                    </div>
+                    <div class="col-3">
+                    <div class="icon icon-box-success">
+                        <span class="mdi mdi-briefcase-check icon-item"></span>
+                    </div>
+                    </div>
+                </div>
+                <h6 class="text-muted font-weight-normal mt-2">The list of all employees's complaints</h6>
+                </div>
+            </div>
+        </a>
+    </div>
+    <!-- <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+        <a href="#" class="a-hover">
+            <div class="card">
+                <div class="card-body">
+                <div class="row">
+                    <div class="col-9">
+                    <div class="d-flex align-items-center align-self-start">
+                        <h4 class="mb-0">Resigned </h4> -->
+                        <!-- <p class="text-success ml-2 mb-0 font-weight-medium">+11%</p> -->
+                    <!-- </div>
+                    </div>
+                    <div class="col-3">
+                    <div class="icon icon-box-danger">
+                        <span class="mdi mdi-account-multiple-minus icon-item"></span>
+                    </div>
+                    </div>
+                </div>
+                <h6 class="text-muted font-weight-normal mt-2">The list of employees who have resigned</h6>
+                </div>
+            </div>
+        </a>
+    </div> -->
+    
+    
+</div>
+
+
+{% endblock %}
