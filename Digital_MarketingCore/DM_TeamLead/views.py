@@ -15,6 +15,8 @@ from django.db.models import Sum, Avg
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 import re
+from Telecaller.models import Leads_assignto_tc
+from DataManager.models import  DataBank,FollowupStatus
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
@@ -2823,8 +2825,8 @@ def tl_lead_file_upload(request,pk):
                     phno = str(lead_data.get('Contact Number', ''))
 
                     # Validate phone number
-                    if not is_valid_phone_number(phno):
-                        lead.waste_data=1
+                    #if not is_valid_phone_number(phno):
+                    lead.waste_data=0
                     lead.lead_contact = phno
                        
                     lead.save()
@@ -3742,6 +3744,152 @@ def tl_lead_list(request):
 
 
 
+
+def tl_lead_tracker(request):
+    if 'emp_id' in request.session:
+        if request.session.has_key('emp_id'):
+            emp_id = request.session['emp_id']
+           
+        else:
+            return redirect('/')
+        
+        emp_dash = LogRegister_Details.objects.get(id=emp_id)
+        dash_details = EmployeeRegister_Details.objects.get(logreg_id=emp_dash)
+
+        # Notification-----------
+        notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
+
+        team = Allocation_Details.objects.filter(allocat_to=dash_details)
+        
+        team_ids = [t.allocatEmp_id_id for t in team]
+        team_ids.append(dash_details.id)
+
+        clients_objs = ClientTask_Register.objects.filter(task_name='Lead Collection',cTcompId__id=dash_details.emp_comp_id.id)
+        executive_data = EmployeeRegister_Details.objects.filter(Q(emp_designation_id__dashboard_id=2) | 
+                                                                 Q(emp_designation_id__dashboard_id=3),
+                                                                 emp_comp_id=dash_details.emp_comp_id,emp_active_status=1).exclude(Q(emp_designation_id__dashboard_id=1))
+        
+        telecaller_data = EmployeeRegister_Details.objects.filter(emp_designation_id__dashboard_id=4,
+                                                                  emp_comp_id=dash_details.emp_comp_id,
+                                                                  emp_active_status=1)
+        
+        leads_obj = DataBank.objects.filter(lead_Id__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id,
+                                            lead_Id__lead_transfer_status=1,lead_Id__lead_collect_Emp_id__in=team_ids).order_by('-Genarated_date')
+        
+        fs_obj=FollowupStatus.objects.filter(company_Id__id=dash_details.emp_comp_id.id)
+
+        Cl_ID = None
+        Ct_ID = None
+        d1 = None
+        d2 = None
+        d3 = None
+        d4 = None
+        emp = None
+        telecaller_emp = None
+        client_name = None
+        category_name = None
+        select_emp = None
+        select_telecaller_emp = None
+
+
+
+        if request.POST:
+            Cl_ID = request.POST['client_change']
+            Ct_ID = request.POST['category_name']
+            emp = request.POST['select_emp']
+            d1 = request.POST['sdate']
+            d2 = request.POST['edate']
+            d3 = request.POST['waste_sdate']
+            d4 = request.POST['waste_edate']
+            telecaller_emp = request.POST['select_telecaller_emp']
+            select_lead_ststus = request.POST['select_lead_ststus']
+            fs_status = request.POST['fs_status']
+            pg_num = request.POST['pgnum']
+
+        else :
+            Cl_ID = request.GET.get('Cl_ID')
+            Ct_ID = request.GET.get('Ct_ID')
+            emp = request.GET.get('employee')
+            d1 = request.GET.get('start_date')
+            d2 = request.GET.get('end_date')
+            d3 = request.GET.get('wsdate')
+            d4 = request.GET.get('wedate')
+            select_lead_ststus = request.GET.get('slstatus')
+            fs_status = request.GET.get('fs_lsta')
+            telecaller_emp = request.GET.get('telecaller')
+            pg_num = request.GET.get('pg_num')
+
+        if pg_num is None:
+            pg_num = 100
+            
+
+
+        if Cl_ID and Ct_ID:
+            leads_obj = leads_obj.filter(lead_Id__lead_work_regId__clientId__id=Cl_ID,lead_Id__lead_category_id__id=Ct_ID)
+            client_name = ClientRegister.objects.get(id=Cl_ID)
+            category_name = LeadCategory_Register.objects.get(id=Ct_ID)
+
+        if d1:
+          
+            leads_obj = leads_obj.filter(Genarated_date__gte=d1)
+        if d2:
+            leads_obj = leads_obj.filter(Genarated_date__lte=d2)
+
+        
+        if select_lead_ststus:
+            leads_obj = leads_obj.filter(lead_status=select_lead_ststus)
+
+         
+        if fs_status:
+            leads_obj = leads_obj.filter(current_status=fs_status)
+
+            
+        if emp:
+            leads_obj = leads_obj.filter(lead_Id__lead_collect_Emp_id__id=emp)
+            select_emp = EmployeeRegister_Details.objects.get(id=emp)
+
+        if telecaller_emp:
+            Leads_assignto_obj = Leads_assignto_tc.objects.filter(TC_Id__id=telecaller_emp).values('dataBank_ID')
+            leads_obj = leads_obj.filter(id__in=Leads_assignto_obj)
+            select_telecaller_emp = EmployeeRegister_Details.objects.get(id=telecaller_emp)
+
+        if d3:
+            Leads_assignto_obj = Leads_assignto_tc.objects.filter(Assign_Date__gte=d3).values('dataBank_ID')
+            leads_obj = leads_obj.filter(id__in=Leads_assignto_obj)
+
+        if d4:
+            Leads_assignto_obj = Leads_assignto_tc.objects.filter(Assign_Date__lte=d4).values('dataBank_ID')
+            leads_obj = leads_obj.filter(id__in=Leads_assignto_obj)
+
+
+        leads_obj_count = leads_obj.count()
+
+        paginator = Paginator(leads_obj, pg_num) 
+        
+        page_number = request.GET.get('page')
+       
+        leads = paginator.get_page(page_number)
+        
+        content = {'emp_dash':emp_dash,
+                    'dash_details':dash_details,
+                    'notifications':notifications,
+                    'leads_obj_count':leads_obj_count,
+                    'clients_objs':clients_objs,
+                    'executive_data':executive_data,
+                    'telecaller_data':telecaller_data,
+                    'leads':leads,
+                    'Cl_ID':Cl_ID,'Ct_ID':Ct_ID,'employee':emp,'start_date':d1,'end_date':d2,'pg_num':pg_num,
+                    'telecaller':telecaller_emp,'fs_obj':fs_obj,'fs_status':fs_status,
+                    'd3':d3,'d4':d4,'telecaller_emp':telecaller_emp,'select_telecaller_emp':select_telecaller_emp,
+                    'select_emp':select_emp,'client_name':client_name,'category_name':category_name,'select_lead_ststus':select_lead_ststus
+                    
+                    }
+
+
+        return render(request,'TL_lead_Tracker.html',content)
+
+    else:
+            return redirect('/')  
 
 
 

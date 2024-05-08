@@ -1,0 +1,134 @@
+{% extends 'HD_base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'head_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Employee Action Taken</li>
+        </ol>
+      </nav>
+</div>
+
+<div class="row ">
+  <div class="col-12 grid-margin">
+    <div class="card">
+      <div class="card-body">
+          <div class="d-flex">
+              <h4 class="card-title">Action Taken 
+                  {% if emp_obj %}
+                  
+                  - {{emp_obj.emp_name|default:" "}}
+                  {% endif %}
+              
+              </h4>
+              
+          </div>
+
+          <form action="{% url 'head_employee_actionTaken' %}" method="post">
+              {% csrf_token %}
+
+              <div class="row">
+                  
+                  <div class="col-sm-12 col-lg-5 col-md-5">
+                      <div class="form-group">
+                        <label> select employee</label>
+                        <select class="form-control text-offwhite" name="emp_name" id="#" required>
+                          <option value="0">----select employee----</option>
+                          {% for emp in employees %}
+                            <option value="{{emp.id}}">{{emp.emp_name}}</option>
+                          {% endfor %}
+                        </select>                        
+                      </div>
+                  </div>
+                 
+                 
+                  <div class="col-sm-12 col-lg-3 col-md-3">
+                      <div class="form-group">
+                        <label>from date</label>
+                        <input type="date" class="form-control text-offwhite" name="fDate" >                    
+                      </div>
+                  </div>
+                  <div class="col-sm-12 col-lg-3 col-md-3">
+                      <div class="form-group">
+                        <label>to date</label>
+                        <input type="date" class="form-control text-offwhite" name="toDate" >                       
+                      </div>
+                  </div>
+                  
+                  <div class="col-sm-12 col-lg-1 col-md-1 d-flex  justify-content-center  align-items-center">
+                     
+                    <button class=" btn btn-primary " type="submit"><i class="mdi mdi-magnify mdi-18px"></i></button> 
+
+                  </div>
+                  
+              </div>
+          </form>
+
+          <div class="row  mt-3">
+              <div class="col-12 grid-margin">
+                <div class="card">
+                  <div class="card-body">
+                    
+                    {% if actions_taken %}
+                    <div class="table-responsive">
+                      <table class="table">
+                        <thead>
+                          <tr>
+                            <th> No</th>
+                            <th> Date  </th>
+                            <th> Who take action </th>
+                            <th> To whom </th>
+                            <th>  </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for action in actions_taken %}
+                          <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ action.action_date }}</td>
+                            <td> {{ action.act_from_name }} </td>
+                            <th> {{ action.act_emp_id.emp_name }}</th>
+                            <td class="">
+                              <div class="row">
+                                <div class="col-md-12 col-xl-12 col-sm-12 grid-margin">
+                                  <h5> Reason </h5>
+                                  {{ action.act_reason|tostr|split_into_paragraphs:95|safe }}
+                                </div>
+                                <div class="col-md-12 col-xl-12 col-sm-12 grid-margin">
+                                  <h5> Action </h5>
+                                  <div>
+                                    <p class="font-weight-bolder"> {{ action.act_head }} </p> 
+                                    <p class="mt-1" >{{ action.act_content|tostr|split_into_paragraphs:95|safe }}</p>
+                                  </div>
+                                  
+                                </div>
+                              </div>
+                      
+                            </td>
+                          </tr>
+                          {% endfor %}
+                         
+                        </tbody>
+                      </table>
+                    </div>
+                    {% else %}
+                    <div class="d-flex justify-content-center">
+                      <img src="{% static 'images\file-icons\no-data-file.png' %}">
+                    </div>
+                    {% endif %}
+
+                  </div>
+                </div>
+              </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+{% endblock %}

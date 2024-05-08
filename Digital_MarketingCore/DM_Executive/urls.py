@@ -109,6 +109,8 @@ urlpatterns = [
 
     path('Executive-all-leads',views.executive_allleads,name='executive_allleads'),
     path('Executive-waste-leads',views.executive_wasteleads,name='executive_wasteleads'),
+    path('Executive-Lead-Tracker',views.executive_lead_tracker,name='executive_lead_tracker'),
+    
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

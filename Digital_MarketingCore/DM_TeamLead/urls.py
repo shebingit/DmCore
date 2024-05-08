@@ -153,6 +153,7 @@ urlpatterns = [
     # 17/04/24
     
     path('TL-Leads',views.tl_lead_list,name='tl_lead_list'),
+    path('TL_lead_tracker',views.tl_lead_tracker,name='tl_lead_tracker'),
 
 
 

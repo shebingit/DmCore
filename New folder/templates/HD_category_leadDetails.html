@@ -1,0 +1,74 @@
+{% extends 'HD_base.html' %}
+{% load static %}
+{% block body %}
+
+
+<style>
+    .details-box
+    {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        
+    }
+    .details-inner-box
+    {
+        text-align: start;
+    }
+</style>
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'head_lead_collected_data' leads_obj.lead_work_regId.id lcID  %}">Lead Collection</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page"> Lead Details </li>
+        </ol>
+      </nav>
+</div>
+
+
+<div class="row mt-1">
+    <div class="col-12 grid-margin">
+        <div class="card">
+            <div class="card-body">
+
+                <div class="text-center">
+                    <h6>Name : {{ leads_obj.lead_name }}</h6>
+                    <p> Email id : {{ leads_obj.lead_email }}</p>
+                    <p> Phone Number :{{ leads_obj.lead_contact }}</p>
+                </div>
+               
+                <div class="details-box">
+                    <div class="details-inner-box">
+                        {% for Details in lead_Details_obj %}
+
+
+                    <p class="mt-2">
+                        <div class="row" >
+                            <div class="col-lg-5 col-sm-12">
+                                <span class="mr-3" style="font-size: 14px;color:rgb(196, 196, 196)"> {{ Details.lead_field_name }} </span>
+                            </div>
+                            
+                            <div class="col-lg-5 col-sm-12">
+                                <span class="" style="font-size: 14px; color:rgb(219, 219, 215)"> {{ Details.lead_field_data }} </span>
+                            </div>
+                        </div>
+                        
+                        
+                    </p>   
+                {% endfor %}
+                    </div>              
+                
+            </div>
+              
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+
+

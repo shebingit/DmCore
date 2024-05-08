@@ -1,0 +1,283 @@
+{% extends 'HD_base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block body %}
+
+<style>
+
+    .search-form
+    {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 0.30rem;
+    }
+    .select-Box .select-tag,
+    .search-form .input-date
+    {
+        padding: 0.35rem .30rem;
+        background: transparent;
+        border: 1px solid #909090;
+        border-radius: 5px;
+        font-size: 12px;
+        color: #dedede;
+    }
+    .search-form .input-date
+    {
+        padding: 0.25rem .30rem;
+    }
+    
+    .select-Box .select-tag option
+    {
+        background: #0d0f14;
+    }
+    .custom-letter-spacing
+    {
+        color: #dbdbdb !important;
+        letter-spacing: 1px;
+        font-size: 14px;
+    }
+    .note-p
+    {
+        font-size: 12px;
+        color: #dbdbdb !important;
+        letter-spacing: 0.70px;
+    }
+    @media (max-width:732px)
+    {
+        .search-form
+        {
+            display: grid;
+            grid-template-columns: 1fr 1fr ;
+
+        }
+    }
+</style>
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'head_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Transfeered Leads </li>
+        </ol>
+      </nav>
+</div>
+
+<div class="row mt-1">
+    <div class="col-12 grid-margin">
+        <div class="card">
+            <div class="card-body">
+     
+
+                <div class="row">
+                    <div class="col-sm-12 col-lg-8 col-md-8 col-xl-9  grid-margin">
+                    <h5 class="card-title custom-letter-spacing"> Transferred Leads List 
+                        <span class="badge badge-pill badge-outline-success ml-2">
+                            <span id="check-count">{{ leads_obj_count }}</span>
+                        </span>
+                    </h5>
+                    </div>
+                    
+                    <div class="col-sm-12 col-lg-4 col-md-4 col-xl-3 d-flex justify-content-end  grid-margin">
+                        <div class="d-flex ">
+                            <input  class="form-control text-offwhite mr-1" name="#" id="search-data" placeholder="search here..">
+                            <span class="text-danger mdi mdi-close" id="closeBtn" type="button"></span> 
+                        </div>
+                    </div>
+                    
+                </div>
+               
+                <p class="note-p">Filter based on the lead transfer date to the data manager.</p>
+
+                  <form class="search-form" action="{% url 'head_transferred_lead' %}" method="post" >
+                    {% csrf_token %}
+                    <!-- <div class="select-Box">
+                        <select class="select-tag" name="pgnum" id="select-count">
+                            {% if pg_num %}
+                            <option value="{{ pg_num }}" selected>{{ pg_num }}</option>
+                            <option value="100">100</option>
+                            {% else %}
+                            <option value="100" selected>100</option>
+                            {% endif %}
+                            <option value="50">50</option>
+                            
+                            <option value="150">150</option>
+                            <option value="250">250</option>
+                            <option value="500">500</option>
+                            <option value="1000">1000</option>
+                           
+                        </select>
+                    </div> -->
+
+                   
+                    
+                    <div class="select-Box">
+                        <select class="select-tag" name="select_emp" id="select-emp">
+                            {% if emp %}
+                            <option value="{{ emp.id }}" selected>{{ emp.emp_name }}</option>
+                            {% else %}
+                            <option value="">Employee</option>
+                            {% endif %}
+                           
+                            {% for exe in executive_data %}
+                                <option value="{{ exe.id }}"> {{ exe.emp_name }} </option>
+                            {% endfor %}
+                            
+                        </select>
+                    </div>
+                    <div class="">
+                
+                        <input type="date" class="input-date" {% if date1 %} value="{{date1}}" {% endif %}  name="sdate">
+                    </div>
+                    <div class=" ">
+                        <input type="date" class="input-date" {% if date2 %} value="{{date2}}" {% endif %}  name="edate">
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-outline-primary">
+                            <span class="mdi mdi-magnify"></span>
+                        </button>
+                    </div>
+                    <div>
+                        <a href="{% url 'head_transferred_lead' %}" class="btn btn-outline-secondary">
+                            <span class="mdi mdi-rotate-right"></span>
+                        </a>
+                    </div>
+                </form>
+                <hr>
+        
+                         
+                {% if leads_obj %}
+                <div class="table-responsive">
+                    <table class="table" id="leads-data">
+                        <thead>
+                            <tr>
+                        
+                                <th>No </th>
+                                <th>Transfer Date</th>
+                                <th>Lead Full Name</th>
+                                <th>Email id  </th>
+                                <th>Contact No </th>
+                                <th>Client </th>
+                                <th>Lead Category </th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        {% for lead in leads_obj %}
+                            <tr>
+                        
+                                <td>
+                                    <span>{{ forloop.counter }}</span>
+                                
+                                </div>
+                                </td>
+                                <td>{{ lead.lead_add_date }}</td>
+                                <td>{{ lead.lead_name }}</td>
+                                <td>{{ lead.lead_email }}</td>
+                                <td>{{ lead.lead_contact }}</td>   
+                                <td>{{ lead.lead_work_regId.clientId.client_name }}</td>     
+                                <td>{{ lead.lead_category_id.lead_collection_for }}</td>                       
+                                
+                            </tr>
+                        {% endfor %}
+                        
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+            
+                <div class="d-flex justify-content-center">
+                <img src="{% static 'images\file-icons\no-data-file.png' %}">
+                </div>
+           
+            
+                {% endif %}
+           
+
+           
+                        
+                        
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+   
+    const inputField = document.getElementById('search-data');
+    const closeBtn = document.getElementById('closeBtn');
+    const empTable = document.getElementById('leads-data');
+    closeBtn.style.display = 'none';
+  
+    inputField.addEventListener('input', function() {
+        filterTable();
+    });
+  
+    function filterTable() {
+        const filterValue = inputField.value.toLowerCase();
+        const rows = empTable.getElementsByTagName('tr');
+  
+        for (let i = 1; i < rows.length; i++) {
+            const Cell1 = rows[i].getElementsByTagName('td')[1];
+            const Cell2 = rows[i].getElementsByTagName('td')[2];
+            const Cell3 = rows[i].getElementsByTagName('td')[3];
+            const Cell4 = rows[i].getElementsByTagName('td')[4];
+            const Cell5 = rows[i].getElementsByTagName('td')[5];
+            const Cell6 = rows[i].getElementsByTagName('td')[0];
+            const Cell7 = rows[i].getElementsByTagName('td')[6];
+
+
+            
+  
+            
+            if (Cell1 || Cell2 || Cell3 || Cell4|| Cell5 || Cell6 || Cell7) {
+  
+                const datacell1 = Cell1.textContent || Cell1.innerText;
+                const datacell2 = Cell2.textContent || Cell2.innerText;
+                const datacell3 = Cell3.textContent || Cell3.innerText;
+                const datacell4 = Cell4.textContent || Cell4.innerText;
+                const datacell5 = Cell5.textContent || Cell5.innerText;
+                const datacell6 = Cell6.textContent || Cell6.innerText;
+                const datacell7 = Cell7.textContent || Cell7.innerText;
+              
+                
+                
+  
+                if (datacell1.toLowerCase().includes(filterValue) ||
+                 datacell2.toLowerCase().includes(filterValue) || 
+                 datacell3.toLowerCase().includes(filterValue) ||
+                 datacell4.toLowerCase().includes(filterValue) || 
+                 datacell5.toLowerCase().includes(filterValue) ||
+                 datacell6.toLowerCase().includes(filterValue) ||
+                 datacell7.toLowerCase().includes(filterValue)) 
+                {
+                    rows[i].style.display = '';
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+        }
+    }
+  
+     // To display the close button and hide the close button based on the search input 
+    inputField.addEventListener('input', function() {
+    if (inputField.value == '') {
+        closeBtn.style.display = 'none';
+       
+    } else {
+        closeBtn.style.display = 'block';
+        
+    }
+    });
+  
+    closeBtn.addEventListener('click', function() {
+    inputField.value = '';
+    closeBtn.style.display = 'none';
+    filterTable(); // Display the full table data
+    });
+</script>
+
+{% endblock %}

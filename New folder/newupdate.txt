@@ -1,0 +1,244 @@
+
+
+Team Lead Module Views Update----------------------
+
+def tl_lead_file_upload(request,pk):
+    if 'emp_id' in request.session:
+        if request.session.has_key('emp_id'):
+            emp_id = request.session['emp_id']
+           
+        else:
+            return redirect('/')
+        
+        emp_dash = LogRegister_Details.objects.get(id=emp_id)
+        dash_details = EmployeeRegister_Details.objects.get(logreg_id=emp_dash)
+
+        # Notification-----------
+        notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
+
+        taskAs = TaskAssign.objects.get(id=pk)
+        works_obj = taskAs.ta_workAssignId.wa_work_regId
+
+        lcAssign = LeadCateogry_Assign.objects.get(ta_id=taskAs.id)
+        lcTeamAllocate = LeadCateogry_TeamAllocate.objects.get(id=lcAssign.lcta_id_id)
+        lead_category = LeadCategory_Register.objects.get(id=lcTeamAllocate.lc_id_id)
+        # works_obj = WorkRegister.objects.get(id=pk)
+        data_list = {}
+
+        if request.POST:
+
+
+            exfile = request.FILES.get('upload_File')
+
+            # Read the Excel file using pandas
+            df = pd.read_excel(exfile)
+
+            # Check if the DataFrame is empty
+            if df.empty:
+                return redirect('tl_lead_collected_data',pk)
+            
+            else:
+
+                # Create a list of column headers from the DataFrame
+                headers = df.columns.tolist()
+
+              
+                for _, row in df.iterrows():
+                    lead_data = {header: str(row[header]) for header in headers}
+
+                    lead_exists = Leads.objects.filter(lead_email=lead_data['Email Id'],lead_category_id=lead_category).exists() or Leads.objects.filter(lead_contact=lead_data['Contact Number'],lead_category_id=lead_category).exists()
+                    
+                    lead = Leads()
+
+                    if lead_exists:
+                        lead.repeated_status=1
+                    else:
+                        lead.repeated_status=0
+
+                    lead.lead_work_regId = works_obj
+                    lead.lead_taskAssignId = taskAs
+                    lead.lead_collect_Emp_id = dash_details
+                    lead.lead_category_id=lead_category
+
+                    lead.lead_name = lead_data['Full Name']
+                    lead.lead_email = lead_data['Email Id']
+                    lead.lead_source =lead_data['Lead Source']
+                        
+                    phno = str(lead_data.get('Contact Number', ''))
+
+                    # Validate phone number
+                    #if not is_valid_phone_number(phno):
+                    lead.waste_data=0
+                    lead.lead_contact = phno
+                       
+                    lead.save()
+
+                    for key, value in lead_data.items():
+                        if key not in ('Full Name', 'Email Id', 'Contact Number'):
+                            lead_details = lead_Details(leadId=lead, lead_field_name=key, lead_field_data=value)
+                            lead_details.leadId = lead
+                            lead_details.save()
+
+
+                success = True
+                success_text = 'File uploaded successfully.'
+                data_list = {'success':success,'success_text':success_text}
+
+
+    
+
+        lf_obj = LeadField_Register.objects.filter(field_work_regId=works_obj,field_lead_category=lead_category.id)
+        leads_obj = Leads.objects.filter(lead_work_regId=works_obj,lead_collect_Emp_id=dash_details,lead_category_id=lead_category,lead_add_date=date.today())
+        leads_obj_count = leads_obj.count()
+       
+
+        
+
+        content = {'emp_dash':emp_dash,
+                    'dash_details':dash_details,
+                    'notifications':notifications,
+                    'works_obj':works_obj,
+                    'lf_obj':lf_obj,
+                    'leads':leads_obj,
+                  
+                    'leads_obj_count':leads_obj_count,
+                    'taskAs':taskAs,
+                    'lead_category':lead_category,
+                    }
+        
+        content = {**data_list, **content}
+
+        return render(request,'TL_ClientLead_datalist.html',content)
+
+    else:
+            return redirect('/')
+
+
+
+
+
+
+
+Executive Module Views Update -------------
+
+def executive_lead_file_upload(request,pk,id):
+    if 'emp_id' in request.session:
+        if request.session.has_key('emp_id'):
+            emp_id = request.session['emp_id']
+           
+        else:
+            return redirect('/')
+        
+        emp_dash = LogRegister_Details.objects.get(id=emp_id)
+        dash_details = EmployeeRegister_Details.objects.get(logreg_id=emp_dash)
+
+        # Notification-----------
+        notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
+
+        task=TaskAssign.objects.get(id=pk)
+        work_id=(task.ta_workAssignId.wa_work_regId).id
+        works_obj = WorkRegister.objects.get(id=work_id)
+        today=date.today()
+        lead_category_assign=LeadCateogry_Assign.objects.get(executive_id=dash_details,id=id)
+
+        data_list = {}
+
+        if request.POST:
+
+
+            exfile = request.FILES.get('upload_File')
+
+            # Read the Excel file using pandas
+            df = pd.read_excel(exfile)
+
+            # Check if the DataFrame is empty
+            if df.empty:
+                return redirect('executive_lead_add_page', pk)
+            
+            else:
+
+                # Create a list of column headers from the DataFrame
+                headers = df.columns.tolist()
+
+                # Process and save the data to the Lead model (adjust as needed)
+                for _, row in df.iterrows():
+                    lead_data = {header: row[header] for header in headers}
+
+
+                    lead_exists = Leads.objects.filter(lead_email=lead_data['Email Id'],lead_category_id=lead_category_assign.lcta_id.lc_id).exists() or Leads.objects.filter(lead_contact=lead_data['Contact Number'],lead_category_id=lead_category_assign.lcta_id.lc_id).exists()
+                    
+                    lead = Leads()
+
+                    if lead_exists:
+                        lead.repeated_status=1
+                    else:
+                        lead.repeated_status=0
+
+                    lead.lead_work_regId = works_obj
+                    lead.lead_collect_Emp_id = dash_details
+                    lead.lead_name = lead_data['Full Name']
+                    lead.lead_email = lead_data['Email Id']
+                        
+                    lead.lead_source = lead_data['Lead Source']
+                    lead.lead_taskAssignId=task
+                    lead.lead_category_id=lead_category_assign.lcta_id.lc_id
+                        
+                        
+                    phno = str(lead_data.get('Contact Number', ''))
+
+                    # Validate phone number
+                    
+                    lead.waste_data=0
+                          
+                    lead.lead_contact = phno
+                    lead.save()
+                    
+
+                    for key, value in lead_data.items():
+                        if key not in ('Full Name', 'Email Id', 'Contact Number','Lead Source'):
+                            lead_details = lead_Details(leadId=lead, lead_field_name=key, lead_field_data=value)
+                            lead_details.leadId = lead
+                            lead_details.save()
+                        
+                    lead_category_assign.lca_target_achived = int(lead_category_assign.lca_target_achived) + 1
+                    lead_category_assign.save()
+
+
+                success = True
+                success_text = 'File uploaded successfully.'
+                data_list = {'success':success,'success_text':success_text}
+
+
+        
+        lf_obj = LeadField_Register.objects.filter(field_work_regId=works_obj)
+        leads_obj = Leads.objects.filter(lead_work_regId=works_obj,lead_collect_Emp_id=dash_details,lead_add_date=today).order_by('-lead_add_date','-lead_add_time')
+        leads_obj_count = Leads.objects.filter(lead_work_regId=works_obj,lead_collect_Emp_id=dash_details,lead_add_date=today).count()
+        lead_Details_obj = lead_Details.objects.filter(leadId__in=leads_obj)
+      
+
+
+        
+
+        content = {
+            'emp_dash':emp_dash,
+            'dash_details':dash_details,
+            'notifications':notifications,
+            'works_obj':works_obj,
+            'leads_obj':leads_obj,
+            'lead_Details_obj':lead_Details_obj,
+            'leads_obj_count':leads_obj_count,
+            'lf_obj':lf_obj,
+            'pk':pk,
+            'task':task,
+            'lead_category_assign':lead_category_assign,
+        }
+
+        
+        content = {**data_list, **content}
+
+        return render(request,'Executive_ongoingwork_dailyworkadd_leaddata.html',content)
+
+    else:
+            return redirect('/')      
+
+    
