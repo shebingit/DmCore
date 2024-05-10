@@ -1,0 +1,377 @@
+{% extends 'Executive_base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block body %}
+
+<style>
+    .bg-transparent
+    {
+        background: transparent;
+    }
+    /*Pagination Styling */
+    
+        div.dataTables_wrapper div.dataTables_paginate ul.pagination {
+            margin: 1rem 0.5rem;
+            white-space: nowrap;
+            justify-content: flex-end;
+        }
+        
+        div.dataTables_wrapper div.dataTables_paginate ul.pagination  li a
+        {
+            border: none !important;
+            color: #c9c9c9;
+            font-size: 13px;
+        }
+        
+        div.dataTables_wrapper div.dataTables_paginate ul.pagination li:hover a{
+            background: #dc1a1a  !important;
+            color: #f8f7f7;
+        }
+        
+        .top-section
+        {
+            margin-bottom: 1rem;
+        }
+        .top-boxCard
+        {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .top-boxCard div{
+            padding: 0.80rem 1.2rem;
+            box-shadow: rgba(73, 76, 78, 0.2) 0px 8px 24px;
+        }
+        .top-boxCard a{
+            color: #f8f7f7;
+            font-weight: 500;
+            font-size: 0.90rem;
+        }
+        
+      </style>
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'executive_leadcategory' pk %}">Lead Category</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Lead Collection </li>
+        </ol>
+    </nav>
+</div>
+
+
+<div class="row mt-1">
+    <div class="col-lg-12 cpl-md-12 col-sm-12 grid-margin">
+        <div class="card">
+            <div class="card-body">
+            
+            <style>
+               .error
+               {
+                color: #dc1a1a;
+               }
+               .info
+               {
+                color: #dcc21a;
+               }
+            </style>
+                <div class="row">
+                    <div class="col-sm-12 col-lg-6 col-md-6 col-xl-8  grid-margin">
+                    <h5 class="card-title custom-letter-spacing"> {{ works_obj.clientId.client_name }} -  Lead List </h5>
+                    
+                    </div>
+                    
+                  
+                    
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-lg-3 col-md-3 col-xl-2  grid-margin">
+                        <div class="badge badge-pill badge-outline-info">
+                            <span id="check-count">Leads -{{  leads_obj_count }}</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-3 col-md-3 col-xl-2  grid-margin">
+                        <a href="#">
+                            <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#singlLead">
+                                <span class="mdi mdi-arrow-expand-up mr-1"></span><span class="small">Data Form</span>
+                            </button>
+                        </a>
+                    </div>
+                    <div class="col-sm-6 col-lg-3 col-md-3 col-xl-2  grid-margin">
+                        <a href="{% url 'remove_duplicate_leads' task.id  lead_category_assign.id  %}">
+                            <button class="btn btn-outline-success" data-toggle="tooltip" title="To check duplicates data based on email and Contact number">
+                                <span class="mdi mdi-file-multiple mr-1"></span><span class="small">Remove Duplicates</span>
+                            </button>
+                        </a>
+                    </div>
+                    <div class="col-sm-6 col-lg-3 col-md-3 col-xl-2 grid-margin ">
+                        <a href="{% url 'download_excelfile' task.id lead_category_assign.id %}">
+                            <button class="btn btn-outline-danger" data-toggle="tooltip" title="Excel file format for data upload">
+                                <span class="mdi mdi-file-excel mr-1"></span><span class="small">File Download</span>
+                            </button>
+                        </a>
+                    </div>
+                    <div class="col-sm-6 col-lg-3 col-md-3 col-xl-2  grid-margin">
+                        <a href="#">
+                            <button class="btn btn-outline-primary" data-toggle="modal" data-target="#fileUpload">
+                                <span class="mdi mdi-arrow-expand-up mr-1"></span><span class="small">File Upload</span>
+                            </button>
+                        </a>
+                    </div>
+                </div>
+
+                {% if messages %}
+                <div class="messages d-flex  align-items-center justify-content-start  mb-2 p-1 w-50">
+                    
+                        {% for message in messages %}
+                        <p {% if message.tags %} class= "small  {{ message.tags }}"{% endif %}>
+                            {% if message.tags == 'error' %}
+                            <span class="mdi mdi-account-remove mr-1 mdi-18px"></span> 
+                            {% elif message.tags == 'info'  %}
+                            <span class="mdi mdi-exclamation mr-1 mdi-18px"></span> 
+                            {% endif %}
+                        {{ message }}<p>
+                        {% endfor %}
+                   
+                </div>
+                {% endif %}
+                
+        
+                <div class="table-responsive">
+                    <table class="table" id="leads-data">
+                        <thead>
+                            <tr>
+                            
+                                <th>No</th>
+                                <th>Action</th>
+                                <th>Collected Date</th>
+                                <th>Lead Full Name</th>
+                                <th>Email id  </th>
+                                <th>Contact No </th>
+                                <th>Lead Source</th>
+                                <th> Details  </th>
+                                <th> Status </th>
+                                <th> Repeated ? </th>
+                            
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for lead in leads_obj %}
+                            <tr>
+                            
+                            <td>{{ forloop.counter }}</td>
+                            <td><a href="{% url 'executive_collect_leadRemove' lead.id lead_category_assign.id %}"> <span class="mdi mdi-delete text-danger"></span></a></td>
+                            <td>{{ lead.lead_add_date }}</td>
+                            <td>{{ lead.lead_name }}</td>
+                            <td>{{ lead.lead_email }}</td>
+                            <td>{{ lead.lead_contact }}</td>
+                            <td>{{ lead.lead_source }}</td>
+                            <td>
+
+
+                                <a href="#">
+                                    <button class="btn btn-outline-primary" data-toggle="modal" data-target="#details{{lead.id}}">
+                                        <span class="mdi mdi-arrow-expand-up mr-1"></span><span class="small">Details</span>
+                                    </button>
+                                </a>
+                               
+                            
+                            </td>
+                            <td>
+                                {% if lead.lead_status == 1 %}
+                                <p class=" badge badge-outline-success "> Verified</p>
+                                {% else %}
+                                <p class="badge badge-outline-warning">Pending</p>
+                                {% endif %}
+                            
+                            </td>
+                            <td>{% if lead.repeated_status == 1 %} <span class="text-danger">Yes</span>{% endif %}</td>
+                            
+                            
+                            
+                            
+                            </tr>
+                            {% endfor %}
+                        
+                        </tbody>
+                    </table>
+                </div>
+
+           
+            
+                
+                        
+                        
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Multile Lead  Entry From Ecxel-->
+<div class="modal fade" id="fileUpload">
+    <div class="modal-dialog ">
+      <div class="modal-content">
+  
+        <div class="card">
+          <div class="card-head d-flex justify-content-between align-items-center mt-3 mb-0 ">
+            <h4 class="card-title mt-3 ml-3">Upload Data File </h4>
+            <span class="mdi mdi-close-box mdi-18px text-danger mr-2"  data-dismiss="modal"></span>
+          </div>
+          <p class="mt-1 ml-3"> * You can upload only excel file data here</p>
+          
+          <div class="card-body mt-0">
+  
+            <form action="{% url 'executive_lead_file_upload' task.id lead_category_assign.id %}" method="post"  enctype="multipart/form-data">
+             
+              {% csrf_token %}
+              <div class="form-group add-items mt-3">
+                <label>Upload Yor Data File Here..</label>
+                <input type="file" class="form-control text-offwhite" name="upload_File" accept=".xlsx" />  
+              </div>
+             
+              <div class="add-items d-flex justify-content-center ">
+                  <button class=" btn btn-outline-primary " type="submit">
+                    <span class="mdi mdi-arrow-expand-up mr-1"></span><span class="small">Upload</span>
+                </button> 
+              </div>
+          
+          </form>
+  
+          </div>
+  
+        </div>
+      
+      </div>
+    </div>
+</div>
+
+<!-- Details view -->
+
+ 
+
+{% for lead in leads_obj %}
+<div class="modal fade" id="details{{lead.id}}">
+    <div class="modal-dialog ">
+      <div class="modal-content">
+  
+        <div class="card">
+          <div class="card-head d-flex justify-content-between align-items-center mt-3 mb-0 ">
+            <h4 class="card-title mt-3 ml-3">Upload Data File </h4>
+            <span class="mdi mdi-close-box mdi-18px text-danger mr-2"  data-dismiss="modal"></span>
+          </div>
+          <p class="mt-1 ml-3"> * You can upload only excel file data here</p>
+          
+          <div class="card-body mt-0">
+  
+           <ol>
+            {% for Details in lead_Details_obj %}
+            {% if Details.leadId.id == lead.id %}
+                <li>
+                    <p>
+                        <span class="mr-1"> {{ Details.lead_field_name }} :</span>
+                        <span> {{ Details.lead_field_data }} </span>
+                    </p>
+                </li>
+            {% endif %}
+            {% endfor %}
+            </ol>
+  
+                                
+                                    
+          </div>
+  
+        </div>
+      
+      </div>
+    </div>
+</div>
+{% endfor %}
+
+
+<!--  Single  lead Entry-->
+<div class="modal fade" id="singlLead">
+    <div class="modal-dialog modal-md">
+      <div class="modal-content">
+  
+        <div class="card">
+          <div class="card-head d-flex justify-content-between align-items-center mt-3 mb-0 ">
+            <h4 class="card-title mt-3 ml-3">Lead Details Entry </h4>
+            <span class="mdi mdi-close-box mdi-18px text-danger mr-2"  data-dismiss="modal"></span>
+          </div>
+          <p class="mt-1 ml-3"> * You can add lead data here</p>
+          
+          <div class="card-body mt-0">
+  
+            <form action="{% url 'executive_lead_add' task.id lead_category_assign.id %}" method="post"  enctype="multipart/form-data">
+            
+              {% csrf_token %}
+              <div class="row">
+                <div class="col-xl-6 col-sm-12 col-md-6 col-lg-6 grid-margin">
+                    <div class="form-group add-items">
+                        <label>Full Name</label>
+                        <input type="text" class="form-control text-offwhite" name="leadName" accept=".xlsx" />  
+                    </div>
+                </div>
+                <div class="col-xl-6 col-sm-12 col-md-6 col-lg-6 grid-margin">
+                    <div class="form-group add-items ">
+                        <label>Email id</label>
+                        <input type="email" class="form-control text-offwhite bg-transparent"  name="leadEmail" required>  
+                    </div>
+                </div>
+                <div class="col-xl-6 col-sm-12 col-md-6 col-lg-6 grid-margin">
+                    <div class="form-group add-items">
+                        <label>Contact Number</label>
+                        <input type="tel" class="form-control text-offwhite bg-transparent" name="leadContact" pattern="[6789]\d{9}" title="Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9" required>  
+                    </div>
+                </div>
+                <div class="col-xl-6 col-sm-12 col-md-6 col-lg-6 grid-margin">
+                    <div class="form-group add-items">
+                        <label>Lead Source</label>
+                        <input type="text" class="form-control text-offwhite" name="leadsource">  
+                    </div>
+                </div>
+
+                {% for fieldname in lf_obj %}
+                <div class="col-xl-6 col-sm-12 col-md-6 col-lg-6 grid-margin">
+                    <div class="form-group add-items">
+                        <label>{{ fieldname.field_name  }}</label>
+                        <input type="text" class="form-control text-offwhite " name="leadfield">  
+                    </div>
+                </div>
+                {% endfor %}
+              </div>
+              
+                
+                <div class="add-items d-flex justify-content-center ">
+                    <button class=" btn btn-outline-primary " type="submit">
+                        <span class="mdi mdi-plus mr-1"></span><span class="small">ADD</span>
+                    </button> 
+                </div>
+
+            
+          
+            </form>
+  
+          </div>
+  
+        </div>
+      
+      </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    new DataTable('#leads-data');
+    
+});
+</script>
+
+  
+{% endblock %}

@@ -1155,19 +1155,27 @@ def head_transferred_lead(request):
         executive_data = EmployeeRegister_Details.objects.filter(Q(emp_designation_id__dashboard_id=1) | Q(emp_designation_id__dashboard_id=2) | Q(emp_designation_id__dashboard_id=3),emp_comp_id=dash_details.emp_comp_id,emp_active_status=1)
         works_obj = WorkRegister.objects.filter(wcompId=dash_details.emp_comp_id)
 
-        leads_obj = Leads.objects.filter(lead_work_regId__in=works_obj,lead_status=1,waste_data=0,lead_transfer_status=1,lead_transfer_date=date.today())
+        leads_obj = Leads.objects.filter(lead_work_regId__in=works_obj,
+                                         lead_status=1,
+                                         lead_transfer_status=1,
+                                         lead_transfer_date=date.today()).order_by('-lead_transfer_date')
+        
         leads_obj_count = leads_obj.count()
 
         date1 = None
         date2 = None
         emp = None
+        select_val = None
 
         if request.POST:
             date1 = request.POST['sdate']
             date2 = request.POST['edate']
             emp = request.POST['select_emp']
+            select_val = request.POST['select_val']
 
-            leads_obj = Leads.objects.filter(lead_work_regId__in=works_obj,lead_status=1,waste_data=0,lead_transfer_status=1)
+            if select_val == 'All':
+
+                leads_obj = Leads.objects.filter(lead_work_regId__in=works_obj,lead_status=1,waste_data=0,lead_transfer_status=1).order_by('-lead_transfer_date')
 
             if date1:
                 leads_obj = leads_obj.filter(lead_transfer_date__gte=date1)
@@ -1189,7 +1197,7 @@ def head_transferred_lead(request):
                     'leads_obj':leads_obj,
                     'leads_obj_count':leads_obj_count,
                      'executive_data':executive_data,
-                     'date1':date1,'date2':date2,'emp':emp
+                     'date1':date1,'date2':date2,'emp':emp,'select_val':select_val
                     }
 
         return render(request,'HD_TransferredLead.html',content)
@@ -1586,6 +1594,7 @@ def head_lead_collected_data(request,pk,lcID):
         works_obj = WorkRegister.objects.get(id=pk)
         lc_obj=LeadCategory_Register.objects.get(id=lcID)
         executive_data = EmployeeRegister_Details.objects.filter(Q(emp_designation_id__dashboard_id=1) | Q(emp_designation_id__dashboard_id=2) | Q(emp_designation_id__dashboard_id=3),emp_comp_id=dash_details.emp_comp_id,emp_active_status=1)
+        
         leads_obj = Leads.objects.filter(lead_work_regId=works_obj,
                                          lead_category_id__id=lcID,
                                          lead_transfer_status=0,
@@ -1594,6 +1603,33 @@ def head_lead_collected_data(request,pk,lcID):
                                          repeated_status=0).order_by('-lead_add_date')
         
         leads_obj_count = leads_obj.count()
+
+
+
+        # Day report ---------------------------
+
+
+        Total_lead = Leads.objects.filter(lead_work_regId=works_obj,
+                                        lead_category_id__id=lcID,lead_add_date=date.today())
+        
+        Total_lead_count = Total_lead.count()
+        
+        unverify_lead = Total_lead.filter(lead_status=0).count()
+        verify_lead = Total_lead.filter(lead_status=1).count()
+        repeated_lead = Total_lead.filter(repeated_status=1).count()
+        waste_lead = Total_lead.filter(waste_data=1).count()
+        unverify_exlcude = Total_lead.filter(lead_status=0,waste_data=0,repeated_status=0).count()
+
+
+        transfer_lead = Leads.objects.filter(lead_work_regId=works_obj,
+                                             lead_status=1,lead_transfer_status=1,
+                                        lead_category_id__id=lcID,lead_transfer_date=date.today()).count()
+     
+        pending_lead = Total_lead.filter(lead_status=1,lead_transfer_status=0).count()
+        
+
+    #-------------------------------------------------------------------
+
         
         d1= None
         d2= None
@@ -1632,80 +1668,64 @@ def head_lead_collected_data(request,pk,lcID):
                                          waste_data=0,
                                          lead_status=0,
                                          repeated_status=0).order_by('-lead_add_date')
-            leads_obj_count = leads_obj.count()
-
+            
         if d1:
 
                 leads_obj = leads_obj.filter(lead_add_date__gte=d1)
-                leads_obj_count = leads_obj.count()
+               
 
         if d2:
                 leads_obj = leads_obj.filter(lead_add_date__lte=d2)
-                leads_obj_count = leads_obj.count()
+                
             
         if emp_id :
 
                 leads_obj = leads_obj.filter(lead_collect_Emp_id__id=emp_id)
-                leads_obj_count = leads_obj.count()
-
-
-        if status_change == 'Exist':
-            lead_ids_list = []
-            count_val = 0
-            for lead in leads_obj:
                 
-                try:
-                    leads_obj_check = Leads.objects.get(id=lead.id)
-                    count_val = count_val + 1
-                    email_exists = DataBank.objects.filter(lead_Id__lead_category_id=leads_obj_check.lead_category_id,lead_Id__lead_email=leads_obj_check.lead_email).exists()
-                    phone_exists = DataBank.objects.filter(lead_Id__lead_category_id=leads_obj_check.lead_category_id,lead_Id__lead_contact=leads_obj_check.lead_contact).exists()
 
-                    if email_exists or phone_exists:
-                        lead_id = lead.id
-                        lead_ids_list.append(lead_id)
+
         
-                except Leads.DoesNotExist:
-                        continue
-            leads_obj = leads_obj.filter(id__in=lead_ids_list,waste_data=0)
-            leads_obj_count = leads_obj.count()
+        
+        if status_change == 'Verified':
+            status_val=1
+            leads_obj = leads_obj.filter(lead_status=status_val)
 
-            
-        else:
-            if status_change == 'Verified':
-                status_val=1
-                leads_obj = leads_obj.filter(lead_status=status_val)
-            if status_change == 'Unverified':
-                status_val=0
-                leads_obj = leads_obj.filter(lead_status=status_val,
+        if status_change == 'Unverified':
+            status_val=0
+            leads_obj = leads_obj.filter(lead_status=status_val,
                                              lead_transfer_status=0,
                                              waste_data=0,
                                              repeated_status=0)
-            if status_change == 'Waste':
-                status_val=1
-                leads_obj = leads_obj.filter(waste_data=status_val)
-            if status_change == 'Repeated':
+        if status_change == 'Waste':
+            status_val=1
+            leads_obj = leads_obj.filter(waste_data=status_val)
+
+        if status_change == 'Repeated':
                 status_val=1
                 leads_obj = leads_obj.filter(repeated_status=status_val)
-            if status_change == 'Incompleted':
+
+        if status_change == 'Incompleted':
                 status_val=1
                 leads_obj = leads_obj.filter(lead_incomplete_status=status_val)
-            if status_change == 'Transfer':
-                leads_obj = Leads.objects.filter(lead_work_regId=works_obj,lead_category_id__id=lcID,lead_transfer_status=1).order_by('-lead_add_date')
-                if d1:
 
-                    leads_obj = leads_obj.filter(lead_transfer_date__gte=d1)
-                    leads_obj_count = leads_obj.count()
-
-                if d2:
-                    leads_obj = leads_obj.filter(lead_transfer_date__lte=d2)
-                    leads_obj_count = leads_obj.count()
+        if status_change == 'Transfer':
+            leads_obj = Leads.objects.filter(lead_work_regId=works_obj,lead_category_id__id=lcID,lead_transfer_status=1).order_by('-lead_add_date')
             
-                if emp_id :
+            if d1:
 
-                    leads_obj = leads_obj.filter(lead_collect_Emp_id__id=emp_id)
-                    leads_obj_count = leads_obj.count()
+                leads_obj = leads_obj.filter(lead_transfer_date__gte=d1)
+                
 
-            leads_obj_count = leads_obj.count()
+            if d2:
+                leads_obj = leads_obj.filter(lead_transfer_date__lte=d2)
+               
+
+            if emp_id :
+
+                leads_obj = leads_obj.filter(lead_collect_Emp_id__id=emp_id)
+
+                
+        leads_obj_count = leads_obj.count()
 
        
 
@@ -1729,7 +1749,17 @@ def head_lead_collected_data(request,pk,lcID):
                      'leads_obj':leads_obj,
                      'status_change':status_change,
                      'leads': leads, 'status': status_change, 'employee': emp_id, 'start_date': d1, 'end_date': d2,
-                     'pg_num':pg_num
+                     'pg_num':pg_num,
+                     'Total_lead_count':Total_lead_count,
+                     'unverify_lead':unverify_lead,
+                        'verify_lead':verify_lead,
+                        'transfer_lead':transfer_lead,
+                        'pending_lead':pending_lead,
+                        'repeated_lead':repeated_lead,
+                        'waste_lead':waste_lead,
+                        'today_date':date.today(),
+                        'unverify_exlcude':unverify_exlcude
+
                     }
 
         return render(request,'HD_ClientLead_datalist.html',content)
@@ -5584,6 +5614,23 @@ def leadActivity_Tracker(request,lead_id):
     }
     return render(request, 'leadTrack_content.html', context)
 
+
+
+
+def leadrepeated_data(request,rlead_id):
+
+    try:
+        lead_obj = Leads.objects.get(id=rlead_id) 
+        repeated_leads = Leads.objects.filter(Q(lead_email=lead_obj.lead_email) | Q(lead_contact=lead_obj.lead_contact)) 
+    
+    except lead_obj.DoesNotExist:
+
+        return redirect('head_lead_collected_data')
+
+    context = {
+        'repeated_leads':repeated_leads
+    }
+    return render(request, 'repeated_leads.html', context)
             
 
 

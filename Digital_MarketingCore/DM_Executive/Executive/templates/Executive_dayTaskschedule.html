@@ -1,0 +1,275 @@
+{% extends 'Executive_base.html' %}
+{% load static %}
+{% block body %}
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'executive_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Day Schedule</li>
+        </ol>
+      </nav>
+</div>
+
+
+<div class="row">
+
+    <div class="col-md-12 col-xl-12 grid-margin stretch-card">
+       
+            <div class="card" id="schedule-add" style="display: none;" >
+                <div class="card-body">
+                    <h4 class="card-title">Schedule your day</h4>
+                    <form action="{% url 'executive_schedule_save' %}" method="post" >
+
+                        {% csrf_token %}
+                        
+                        <div class="add-items d-flex ">
+                            <input type="date" class="form-control text-offwhite" name="date" id="date">
+                        </div>
+                        
+                        <div class="add-items d-flex ">
+                            
+                            <input type="time" class="form-control text-offwhite" name="stime" placeholder="start time.." required id="timePicker1">
+                            <input type="time" class="form-control ml-2  text-offwhite" name="etime"  placeholder="end time.." required id="timePicker2">  
+                            <button class=" btn btn-primary " type="submit">Add</button> 
+                        </div>
+                        <div class="d-flex add-items">
+                        
+                            <input type="text" class="form-control text-offwhite" id="time1" readonly>
+                            <input type="text" class="form-control text-offwhite ml-2" id="time2" readonly>
+                            <input type="hidden" value="{{scheduleid.id}}" name="scheduleId" id="scheduleId">
+                        </div>
+                        <div class="form-group add-items">
+                            <input type="text" class="form-control  text-offwhite" name="task_head" id="task_head" placeholder="enter task head.." required>  
+                        </div>
+                        <div class="form-group add-items">
+                            <textarea  class="to-do-textarea  text-offwhite" name="task_content" id="task_content" placeholder="enter task.."></textarea>
+                        
+                        </div>
+                    
+                    </form>
+                    
+                </div>
+            </div>
+        
+    </div>
+
+    <div class="col-md-12 col-xl-4 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2 ">
+                    <h4 class="card-title">My Days List</h4>
+                    <button class="add btn btn-outline-primary mb-2"  id="schedule-btn">
+                        <span class="mdi mdi-plus-circle-outline mdi-18px"></span>
+                    </button> 
+                </div>
+                <div class="day-wrapper">
+                    {% for schedule_day in schedule_days %}
+                    <div class="card-schedule d-flex  justify-content-between">
+                        <h6>{{ schedule_day.schedule_date|date:"l" }}</h6>
+                        <p>{{schedule_day.schedule_date}}</p>
+                    </div>
+                    {% endfor %}
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12 col-xl-8 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">My Schedule List</h4>
+                <div class="schedule-task-wrapper">
+                    {% for schedule in schedules %}
+                    <div class="sechedule-task d-flex" >
+                        <div class="left-date-time">
+                            {% if schedule.schedule_status == 1 %}
+                            <p class="schedule-date text-lineon" id="schedule-date{{ schedule.id }}">{{schedule.schedule_date}}</p>
+
+                            {% else %}
+                            
+                            <p class="schedule-date" id="schedule-date{{ schedule.id }}">{{schedule.schedule_date}}</p>
+                            {% endif %}
+                            <div class="form-check form-check-primary">
+                                 <label class="form-check-label">
+                                {% if schedule.schedule_status == 1 %}
+                                <input class="checkbox " id="taskCheck_Uncheck_{{schedule.id}}" type="checkbox" checked> Time - {{schedule.start_time}} to {{schedule.end_time}}
+                                {% else %}
+                                <input class="checkbox" id="taskCheck_Uncheck_{{schedule.id}}" type="checkbox"> Time - {{schedule.start_time}} to {{schedule.end_time}}
+                                {% endif %}
+                            </label>
+                            </div>
+                        </div>
+                        <div class="right-scheduletask d-flex">
+                            <div class="inner-schedule-content">
+                                {% if schedule.schedule_status == 1 %}
+                                <h6 class="text-lineon" id="schedule-head{{ schedule.id }}">{{schedule.schedule_head}}</h6>
+                                <p class="text-lineon" id="schedule-task{{ schedule.id }}">{{schedule.todo_content}}</p>
+                                {% else %}
+                                <h6 id="schedule-head{{ schedule.id }}">{{schedule.schedule_head}}</h6>
+                                <p id="schedule-task{{ schedule.id }}">{{schedule.todo_content}}</p>
+                                {% endif %}
+                            </div>
+                            <div class="schedule-change">
+                                <a href="#"  class="test-primary schedule-edit-link" id="scheduleEdit{{ schedule.id }}" data-schedule-id="{{ schedule.id }}"><i class=" mdi mdi-pencil"></i></a>
+                                <a href="{% url 'executive_scheduleRemove' schedule.id %}" class="text-danger"><i class=" mdi mdi-close-box"></i></a>
+                            </div>
+                           
+
+                        </div>
+                    </div>
+                    {% endfor %}
+                
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $("#schedule-btn").click(function() {
+            // Toggle the card visibility
+            $("#schedule-add").toggle();
+
+            // Change the icon
+            $(this).find('span').toggleClass('mdi-plus-circle-outline mdi-minus-circle-outline');
+
+            // Toggle the btn-outline-danger class
+            $(this).toggleClass('btn-outline-primary btn-outline-danger');
+        });
+    });
+
+
+
+    $(document).ready(function() {
+        // Listen for clicks on any element with the class 'schedule-edit-link'
+        $(document).on('click', '.schedule-edit-link', function(e) {
+            e.preventDefault();
+            // Extract the schedule ID from the clicked link's data attribute
+            var scheduleId = $(this).data('schedule-id');
+            
+            $.ajax({
+                url: "{% url 'ScheduleEdit' %}",  // Replace with the actual URL to fetch data
+                type: 'GET',
+                data: {
+                    scheduleid: scheduleId,
+                },
+                success: function(data) {
+                    // Populate the form fields with the fetched data
+                    $('#scheduleId').val(data.scheduleid);
+                    $('#timePicker1').val(data.start_time);
+                    $('#timePicker2').val(data.end_time);
+                    $('#task_head').val(data.task_head);
+                    $('#task_content').val(data.task_content);
+                    $('#date').val(data.schedule_date);
+                    // Show/hide the form based on its current visibility
+                    $("#schedule-add").toggle();
+                    // Change the icon
+                    $("#schedule-btn").find('span').toggleClass('mdi-plus-circle-outline mdi-minus-circle-outline');
+    
+                    // Toggle the btn-outline-danger class
+                    $("#schedule-btn").toggleClass('btn-outline-primary btn-outline-danger');
+    
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', error);
+                }
+            });
+        });
+    });
+
+</script>
+
+
+<!-- Time format script-->
+
+
+<script>
+    const timePicker = document.getElementById('timePicker1');
+    const timePicke2 = document.getElementById('timePicker2');
+  
+    timePicker.addEventListener('change', () => {
+      // Get the selected time
+      const selectedTime = timePicker.value;
+      
+  
+      // Split hours and minutes
+      const [hours, minutes] = selectedTime.split(':');
+  
+      // Convert to 12-hour format
+      let formattedTime = `${(hours % 12) || 12}:${minutes} ${(hours >= 12) ? 'PM' : 'AM'}`;
+  
+      // Update the input value with the formatted time
+      
+      document.getElementById('time1').value = formattedTime;
+
+    });
+
+    timePicker2.addEventListener('change', () => {
+        // Get the selected time
+        const selectedTime = timePicker2.value;
+        
+    
+        // Split hours and minutes
+        const [hours, minutes] = selectedTime.split(':');
+    
+        // Convert to 12-hour format
+        let formattedTime = `${(hours % 12) || 12}:${minutes} ${(hours >= 12) ? 'PM' : 'AM'}`;
+    
+        // Update the input value with the formatted time
+        
+        document.getElementById('time2').value = formattedTime;
+
+      });
+</script>
+
+  <script>
+    
+    $(document).ready(function() {
+        // Listen for changes in any checkbox with class 'checkbox'
+        $('.checkbox').change(function() {
+            var scheduleId = $(this).attr('id').split('_')[2]; // Extract schedule ID
+            var isChecked = $(this).is(':checked');
+            
+            // Toggle the 'line-through' text decoration based on checkbox state
+                if (isChecked) {
+                    $('#schedule-date' + scheduleId + ', #schedule-task' + scheduleId + ', #schedule-head' + scheduleId).css('text-decoration', 'line-through');
+                } else {
+                    $('#schedule-date' + scheduleId + ', #schedule-task' + scheduleId + ', #schedule-head' + scheduleId).css('text-decoration', 'none');
+                }
+    
+            // Make an AJAX call to update the server
+            csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+            $.ajax({
+                url: "{% url 'update_schedule_status' %}",  
+                type: 'POST',
+                headers: { "X-CSRFToken": csrftoken }, 
+                data: {
+                    schedule_id: scheduleId,
+                    checked: isChecked
+                },
+                success: function(response) {
+                    // Handle success response if needed
+                    console.log('AJAX call successful:', response);
+                },
+                error: function(xhr, status, error) {
+                    // Handle error if needed
+                    console.error('AJAX call error:', error);
+                }
+            });
+        });
+    });
+    
+    
+  </script>
+
+  
+{% endblock %}
+

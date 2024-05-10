@@ -220,7 +220,7 @@ urlpatterns = [
     path('leadActivity_Tracker/<int:lead_id>/', views.leadActivity_Tracker, name='leadActivity_Tracker'),
     
     
-    
+    path('leadrepeated_data/<int:rlead_id>/', views.leadrepeated_data, name='leadrepeated_data'),
     
 
 ]

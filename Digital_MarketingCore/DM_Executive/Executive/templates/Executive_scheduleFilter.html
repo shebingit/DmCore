@@ -1,0 +1,289 @@
+{% extends 'Executive_base.html' %}
+{% load static %}
+{% block body %}
+
+<style>
+    .schedule-list
+    {
+        border:1px solid rgba(24, 23, 23, 0.523);
+    }
+</style>
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'executive_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Scheduled Task</li>
+        </ol>
+      </nav>
+</div>
+
+<!--  Mail section -->
+<div class="row">
+
+    <div class="col-md-12 col-xl-12 grid-margin stretch-card">
+       
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title mb-5">Scheduled Task List</h4>
+                <div class="serach-schedule mt-3 mb-2">
+                    <form action="#" method="post">
+                      {% csrf_token %}
+
+                      <div class="row">
+                          
+                          
+                          
+                        <div class="col-sm-12 col-lg-3 col-md-3">
+                            <div class="form-group">
+                              <label>from date</label>
+                              <input type="date" class="form-control text-offwhite" name="frmdate" id="frmdate" >                    
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-lg-3 col-md-2">
+                            <div class="form-group">
+                              <label>to date</label>
+                              <input type="date" class="form-control text-offwhite" name="todate" id="todate" >                       
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-lg-1 col-md-1 d-flex  justify-content-center  align-items-center">
+                            
+                            <button class=" btn btn-primary " id="schedulefilter_button" type="button"><i class="mdi mdi-magnify mdi-18px"></i></button> 
+
+                        </div>
+                        <div class="col-sm-12 col-lg-2 col-md-2"></div>
+                        <div class="col-sm-12 col-lg-3 col-md-3">
+                            <div class="form-group">
+                              <label></span>filter by schedule </label>
+                              <select class="form-control text-offwhite" name="fltschedule" id="fltschedule" >
+                                  
+                                  <option value="All">All</option>
+                                  <option value="Upcoming schedules">Upcoming schedules</option>
+                                  <option value="Completed schedules">Completed schedules</option>
+                              </select>
+                              
+                            </div>
+                        </div>
+                          
+                          
+                      </div>
+                    </form>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <h4 class="card-title">Schedules ({{name}})</h4>
+                        <div class="table-responsive">
+                            <table class="table" id="filtertable">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Scheduled Task</th>
+                                        <th>Task Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for i in schedules %}
+                                    <tr>
+                                        <td>
+                                            <p>{{i.schedule_date|date:"Y-m-d" }}</p>    
+                                        </td>
+                                        <td><p>{{i.start_time}} to {{i.end_time}}</p></td>
+                                        <td>
+                                            <h5>{{i.schedule_head}}</h5>
+                                            <p>{{i.todo_content}}</p>
+                                        </td>
+                                        {% if i.schedule_status %}
+                                        <td>Completed</td>
+                                        {% else %}
+                                        <td>Not finished</td>
+                                        {% endif %}
+                                        
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<!-- ajax function to filter Schedules -->
+
+<!-- Include jQuery library -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+  function formatTime(time) {
+    // Function to format time from 24-hour format to AM/PM format
+    var [hours, minutes] = time.split(':');
+    hours = parseInt(hours);
+    var period = hours < 12 ? 'a.m.' : 'p.m.';
+    if (hours > 12) {
+    hours -= 12;
+    }
+    return hours + ':' + minutes + ' ' + period;
+  }
+  $(document).ready(function() {
+    $("#schedulefilter_button").click(function() {
+      // Get the selected dates from the date inputs
+      var from_date = $("#frmdate").val();
+      var to_date = $("#todate").val();
+
+      // Perform an AJAX request to your Django view
+      $.ajax({
+        url: '{% url "executive_scheduleFilterday" %}',  // Replace with the actual URL
+        method: 'GET',
+        data: {
+          'from_date': from_date,
+          'to_date': to_date,
+        },
+        success: function(data) {
+          // Get a reference to the table body
+          var tableBody = $("#filtertable tbody");
+
+          // Clear existing table rows
+          tableBody.empty();
+
+          // Iterate through the filtered data and add rows to the table
+          $.each(data.schedules, function(index, item) {
+            var startTime = formatTime(item.start_time);
+            var endTime = formatTime(item.end_time);
+
+            var row = '<tr>' +
+              '<td>' + item.schedule_date + '</td>' +
+              '<td>' + startTime + ' to ' + endTime +  '</td>' +
+              '<td>' +
+                '<h5>' + item.schedule_head + '</h5>' +
+                '<p>' + item.todo_content + '</p>' +
+              '</td>' +
+              '<td>' + (item.schedule_status ? 'Completed' : 'Not finished') + '</td>' +
+              '</tr>';
+            tableBody.append(row);
+          });
+        },
+        error: function() {
+          // Handle errors
+          console.log('Error in AJAX request');
+        }
+      });
+    });
+  });
+</script>
+  
+<!-- AJAX Function -->
+<script>
+  function formatTime(time) {
+    // Function to format time from 24-hour format to AM/PM format
+    var [hours, minutes] = time.split(':');
+    hours = parseInt(hours);
+    var period = hours < 12 ? 'a.m.' : 'p.m.';
+    if (hours > 12) {
+      hours -= 12;
+    }
+    return hours + ':' + minutes + ' ' + period;
+  }
+
+  $(document).ready(function() {
+    $("#fltschedule").on("change", function() {
+      var selectedOption = $(this).val();
+      $.ajax({
+        url: "{% url 'filter_schedules' %}",
+        data: { option: selectedOption },
+        dataType: "json",
+        success: function(data) {
+          var table = $("#filtertable tbody");
+          table.empty();
+
+          $.each(data.schedules, function(index, item) {
+            var startTime = formatTime(item.start_time);
+            var endTime = formatTime(item.end_time);
+
+            var row = '<tr>' +
+              '<td>' + item.schedule_date + '</td>' +
+              '<td>' + startTime + ' to ' + endTime + '</td>' +
+              '<td>' +
+              '<h5>' + item.schedule_head + '</h5>' +
+              '<p>' + item.todo_content + '</p>' +
+              '</td>' +
+              '<td>' + (item.schedule_status ? 'Finished' : 'Not finished') + '</td>' +
+              '</tr>';
+
+            table.append(row);
+          });
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          // Handle the error, e.g., display an error message to the user.
+          console.error("AJAX Request Error: " + errorThrown);
+        }
+      });
+    });
+  });
+</script>
+
+
+
+
+{% endblock %}
+
+
+                <!-- <div class="row  mt-3">
+                    <div class="col-12 grid-margin">
+                      <div class="card">
+                        <div class="card-body">
+                          <h4 class="card-title">Schedules ({{name}})</h4>
+                          <div class="table-responsive">
+                            <table class="table">
+                              <thead>
+                                <tr>
+                                  <th>Day and Date </th>
+                                  <th > Schedule Task </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {% for i in schedules %}
+                                <tr>
+                                    <td>
+                                        <div class="left-date-time">
+                                            <p class="schedule-date">1{{i.schedule_date}}</p>
+                                            <div class="form-check form-check-primary">
+                                                <label class="form-check-label">
+                                                    <input class="checkbox" type="checkbox"> Time -{{i.start_time}} to {{i.end_time}}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="#">
+                                        <div class="sechedule-task d-flex">
+                                            
+                                            <div class="right-scheduletask d-flex">
+                                                <div class="inner-schedule-content">
+                                                    <h6>{{i.schedule_head}}</h6>
+                                                    <p>{{i.todo_content}}</p>
+                                                </div>
+                                                <div class="schedule-change">
+                                                    <a href="#" class="test-primary"><i class=" mdi mdi-pencil"></i></a>
+                                                    <a href="#" class="text-danger"><i class=" mdi mdi-close-box"></i></a>
+                                                </div>
+                                            
+                    
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </div> -->

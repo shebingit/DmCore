@@ -1,0 +1,1036 @@
+{% extends 'Executive_base.html' %}
+{% load static %}
+{% block body %}
+
+
+<link href="https://cdn.datatables.net/2.0.3/css/dataTables.dataTables.css"  rel="stylesheet" >
+
+<!-- Other Styling -->
+<style>
+    
+   .filter-values
+   {
+    font-size: 12px;
+    line-height: 1.6rem;
+    color: #d8d8d8;
+   }
+   #leadsData p{
+    margin-bottom: 0.10rem;
+   }
+   .table th, .jsgrid .jsgrid-table th, .table td, .jsgrid .jsgrid-table td {
+    padding: 0.4375rem;
+    }
+    .top-h4
+    {
+        color: #bababa;
+        font-size: 17px;
+        letter-spacing: 1px;
+    }
+    .g-1
+    {
+        gap: 1rem;
+    }
+
+.div-icon
+{
+  height: 40px;
+  width: 40px;
+}
+.links-div
+{
+  padding: 0.80rem .60rem;
+  display: flex;
+  flex-direction: column;
+  box-shadow: rgba(17, 17, 26, 0.1) 0px 0px 16px;
+  background: rgba(17, 17, 26);
+  gap: 0.90rem;
+  margin-top: 0.30rem;
+  margin-left: 2rem;
+  font-size: 12px;
+  position: relative;
+  color: #e0e0e0;
+}
+.links-div a{
+    text-decoration: none;
+    color:#c4c2c2 ;
+}
+.links-div a:hover{
+    text-decoration: none;
+    color:#7e7e7e ;
+}
+.closeBtn 
+{
+color: #e02e2ef9;
+}
+.closeBtn:hover
+{
+  color: #d32626f9; 
+}
+.leadDetails
+{
+    display: none;
+    position: fixed;
+    z-index: 100;
+    top: 4.5rem;
+    right: 0;
+    width: 500px; /* Adjust width as needed */
+    background-color: #15171f; /* Adjust background color as needed */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Adjust box-shadow as needed */
+    height:600px;
+
+}
+
+.leadDetails.show {
+    display: block;
+    animation: fade-in 3s forwards;
+}
+
+@keyframes fade-in {
+  100% {
+    opacity: 1;
+  }
+}
+.leadDetails-Top
+{
+    display: grid;
+    grid-template-columns: 1fr 32px;
+   
+}
+.leadDetails-Top h6{
+    padding: 1.3rem;
+    letter-spacing: 1px;
+    font-weight:500 ;
+    color: #dedede;
+}
+.close-x
+{
+    text-align: end;
+    height: 30px;
+    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #dc1a1a;
+    color: #fbfbfb;
+    padding: 1px;
+}
+.Basic-Details
+{
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #e9e9e9;
+    padding-bottom: 0.50rem;
+}
+.Basic-Details .h6,
+.More-Deails .h6{
+    padding-left: 1.3rem;
+    color: #dedede;
+    font-size: 14px;
+    margin-top: 0.30rem;
+}
+.bd-innerBox
+{
+    padding-left: 1.3rem;
+    color: #c9c9c9;
+    display: grid;
+    grid-template-columns:1fr 1fr;
+    gap: 0.90rem;
+
+}
+.statusBox
+{
+    padding-left: 1.3rem;
+    color: #c9c9c9;
+    display: grid;
+    margin-top: 0.875rem;
+    font-size: 14px;
+    grid-template-columns:1fr 1fr 1fr;
+}
+.md-innerBox
+{
+    padding-left: 1.3rem;
+    color: #c9c9c9;
+    font-size: 13px;
+    height: 300px;
+    overflow-y: scroll;
+ 
+}
+.md-subinner
+{
+margin-top: .875rem;
+display: grid;
+grid-template-columns: 1fr 1fr;
+}
+.md-innerBox::-webkit-scrollbar {
+    width: 2px;
+}
+
+/* For WebKit browsers (Chrome, Safari) */
+.md-innerBox::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* For WebKit browsers (Chrome, Safari) */
+.md-innerBox::-webkit-scrollbar-thumb {
+    background: #888; /* Adjust scrollbar thumb color as needed */
+}
+
+    
+      @media(max-width:768px)
+      {
+        .pagination-box
+      {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      .leadDetails
+        {
+            width: calc(100% - 1%);
+        }
+      }
+</style>
+
+<!-- Data Table  Search -->
+<style>
+    #checkbox-values
+    {
+        opacity: 0;
+    }
+    /*   Data Table   */
+
+    .dt-search label
+    {
+     display: none;
+
+    }
+    div.dt-container .dt-search input {
+        border: 1px solid #707070;
+        border-radius: 3px;
+        padding: 5px;
+        background-color: transparent;
+        color: #a5a5a5;
+        margin-left: 3px;
+        font-size: 13px;
+    }
+
+    div.dt-container select.dt-input {
+        padding: 4px 10px;
+        border: 1px solid #707070;
+        color: #a5a5a5;
+        font-size: 13px;
+        background-color: transparent;
+        width: 100px;
+    }
+    div.dt-container select option{
+        background-color: #15171f; 
+    }
+    div.dt-container .dt-length label
+    {
+        display: none;
+    }
+    div.dt-container .dt-info
+    {
+        color: #a5a5a5;
+        font-size: 13px ;
+    }
+
+
+
+    #lead-data .lead-topBox
+    {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    #lead-data .heading h6{
+        font-size: 14px;
+        color: #c4c2c2;
+        letter-spacing: 0.90px;
+    }
+    .convertion-Box
+    {
+        display: grid;
+        grid-template-columns:1fr 1fr  ;
+        gap: 0.50rem;
+    }
+    .lead-section2
+    {
+        margin-top: 0.897rem;
+        padding: .785rem;
+        border-top: 1px solid #747373cd;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .statusChange
+    {
+        letter-spacing: 1px;
+        color: #c4c2c2;
+    }
+    .search-section2_2,
+    .search-form
+    {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 0.30rem;
+    }
+    .select-Box .select-tag,
+    .search-form .input-date
+    {
+        padding: 0.35rem .30rem;
+        background: transparent;
+        border: 1px solid #909090;
+        border-radius: 5px;
+        font-size: 12px;
+        color: #dedede;
+    }
+    .search-form .input-date
+    {
+        padding: 0.25rem .30rem;
+    }
+    
+    .select-Box .select-tag option
+    {
+        background: #0d0f14;
+    }
+    .table-responsive
+    {
+        border: 1px solid rgba(86, 85, 85, 0.827); 
+        padding: 1rem;
+    }
+    #waste-data thead tr th{
+        text-align: center;
+        font-size: 13.75px;
+        font-weight: 500;
+    }
+    #waste-data tbody tr td{
+        font-size: 12px;
+        font-weight: 400;
+
+    }
+    
+   
+</style>
+
+<!-- Pagination -->
+<style>
+    .paginationBox-scroll
+    {
+        width: 100%;
+    }
+    .paginationBox
+    {
+        display: flex;
+        align-items: center;
+        justify-content: end;
+        margin-top: 1rem;
+        gap: 0.30rem;
+    }
+    .pagination li
+    {
+        margin: 0.10rem;
+      
+    }
+    .pagination .active
+    {
+        border:1px solid #e3e2e2 ;
+    }
+    .pagination li a{
+        padding: .70rem;
+    }
+    .section2_2::-webkit-scrollbar {
+        width: 1px !important; /* Set the width of the scrollbar */
+    }
+    
+    /* Track */
+    .section2_2::-webkit-scrollbar-track {
+        background: transparent; /* Set the background color of the track */
+    }
+    
+    /* Handle */
+    .section2_2::-webkit-scrollbar-thumb {
+        background: #2c2828; /* Set the color of the scrollbar handle */
+    }
+    
+    /* Handle on hover */
+    .section2_2::-webkit-scrollbar-thumb:hover {
+        background: #555; /* Set the color of the scrollbar handle when hovered */
+    }
+@media (max-width:732px)
+{
+    .paginationBox-scroll
+    {
+        width:calc(100% - 1%);
+        overflow-y:scroll;
+    }
+}
+</style>
+
+<!--- At Media -->
+<style>
+@media (max-width:1280px)
+{
+
+    .lead-section2
+{
+    display: grid;
+    grid-template-columns: 1fr;
+    row-gap: 0.90rem;
+}
+.search-section2_1
+{
+    display: flex;
+    justify-content: space-between;
+}
+
+#leads-data .col-12
+{
+    padding-right: 0.05rem; 
+    padding-left: 0.05rem; 
+}
+#leads-data .lead-topBox {
+    display: grid;
+    grid-template-columns: 1fr;
+}
+#leads-data .heading h6 {
+    font-size: 13px;
+    margin-bottom: 0.90rem;
+    letter-spacing: 0.80px;
+
+}
+.lead-section2
+{
+    display: grid;
+    grid-template-columns: 1fr;
+    row-gap: 0.70rem;
+}
+.search-section2_1
+{
+    gap: 0.50rem;
+    margin-bottom: 0.875rem;
+}
+#downloadFile
+{
+   
+    content: 'Download';
+}
+.search-section2_2
+{
+    display: inline-flex;
+    width: calc(100% - 1%);
+    overflow-x: scroll;
+    padding-bottom: 1rem;
+}
+    .paginationBox
+    {
+        justify-content: center;
+    }
+}
+
+    .activityBox
+    {
+        background-color: #21272dfb;
+    }
+    .activityBox .modal-title
+    {
+        font-size: 14px;
+        letter-spacing: 1px;
+        font-weight: 400;
+        color: #c0c0c0;
+    }
+    .activity-MainBox
+    {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 0.50rem;
+    }
+    .activity-MainBox .basic-details
+    {
+        border-bottom: 1px solid rgb(201, 201, 201); 
+        margin-bottom: 1rem;
+    }
+    .activity-leftBox h6,
+    .activity-rightBox h6
+   {
+        font-size: 13.8px;
+        letter-spacing: 1px;
+        color: #c0c0c0;
+    }
+    .activity-leftBox p{
+        color: #979797;
+    }
+    .activity-panel
+    {
+        border-top: 1px solid rgb(201, 201, 201); 
+        display: grid;
+        grid-template-columns: 2.5fr 1fr;
+    }
+    .collect-history
+    {
+        padding-left: 0.80rem;
+    }
+    .activity-history h5,
+    .collect-history h5{
+        font-size: 12.7px;
+        letter-spacing: 1px;
+        color: #d1d1d1;
+        margin-top: 1rem;
+    }
+    .lead-more-details
+    {
+        height: 200px;
+        overflow-y: scroll;
+    }
+    .Collected-details p{
+        font-size: 12px;
+        color: #b3b3b3;
+    }
+    .history-track
+    {
+        height: 320px;
+        overflow-y: scroll;
+    }
+    .waste-reason p{
+        font-size: 12.5px;
+        color: #bdbdbd;
+    }
+    .lead-more-details::-webkit-scrollbar,
+    .history-track::-webkit-scrollbar
+     {
+        width: 1px; /* Set the width of the scrollbar */
+    }
+    
+    /* For webkit browsers */
+    .lead-more-details::-webkit-scrollbar-track,
+    .history-track::-webkit-scrollbar-track {
+        background: transparent; /* Set the background color of the track */
+    }
+    
+    /* For webkit browsers */
+    .lead-more-details::-webkit-scrollbar-thumb,
+    .history-track::-webkit-scrollbar-thumb {
+        background: #888; /* Set the color of the scrollbar thumb */
+        border-radius: 10px; /* Set the border radius of the scrollbar thumb */
+    }
+    .lead-more-details .more-details
+    {
+        display: grid;
+        grid-template-columns: 1fr 10px 1fr;
+    }
+    .followup-details
+    {
+        border-bottom: 1px solid rgb(165, 165, 165); 
+       
+        margin-top: 0.40rem;
+       
+    }
+    .followup-details p,
+    .followup-history p{
+        font-size: 12.5px;
+        color: #d5d5d5;
+    }
+    .followup-details .top-details,
+    .followup-history .top-details
+    {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+    .waste-reason-ststus
+    {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+    .history-div
+    {
+        border-bottom: 1px solid rgb(150, 150, 150);
+        padding: 10px 5px; 
+    }
+   
+    @media (max-width:1032px)
+    {
+        .activity-MainBox
+        {
+            grid-template-columns: 1fr;
+           
+        }
+    }
+    @media (max-width:632px)
+    {
+    .activity-panel {
+        
+        grid-template-columns:1fr;
+    }
+    .waste-reason-ststus
+    {
+        grid-template-columns:1fr;
+    }
+    .modal-footer {
+        flex-wrap: nowrap
+    }
+    #lead-data .lead-topBox
+    {
+        flex-direction: column;
+        justify-content: start;
+    }
+    .card .card-body {
+        padding: 1.75rem .9625rem; 
+        }
+}
+</style>
+
+<div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'tl_dashboard' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active text-md" aria-current="page">Leads </li>
+        </ol>
+      </nav>
+</div>
+
+
+
+<div class="row" id="lead-data">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+
+                <!------- Lead Document Section ----->
+                <div class="lead-topBox">
+                    <div class="heading">
+                        <h6> Leads List ( {{ leads_obj_count }} ) </h6>
+                    </div>
+                    <!-- <div class="convertion-Box">
+                        
+                        <button type="button" class="btn  btn-dark" title="Covert leads to excel">
+                            <span class="mdi mdi-file-excel"></span>
+                            <span class="small mr-1">Excel</span>
+                        </button>
+                        <button type="button" class="btn  btn-dark" title="Covert leads to PDF">
+                            <span class="mdi mdi-file-pdf text-danger"></span>
+                            <span class="small mr-1">PDF</span>
+                        </button>
+                        
+
+                    </div> -->
+
+                </div>
+
+                <!----- Search Section ------>
+                <div class="lead-section2">
+                    
+                    <div class="search-section2_2" id="search-section2_2">
+                        
+                        <form class="search-form" action="#" method="post" >
+                            {% csrf_token %}
+                            <div class="select-Box">
+                                <select class="select-tag" name="pgnum" id="select-count">
+                                    {% if pg_num %}
+                                    <option value="{{ pg_num }}" selected>{{ pg_num }}</option>   
+                                    {% endif %}
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                    <option value="150">150</option>
+                                    <option value="250">250</option>
+                                    <option value="500">500</option>
+                                    <option value="1000">1000</option>
+                                   
+                                </select>
+                            </div>
+                            
+                            <div class="select-Box">
+                                <select class="select-tag"  id="client-change" name="client_change">
+                                    <option value="">Client</option>
+                                    {% for client in clients_objs %}
+                                        <option value="{{ client.id }}"> {{ client.client_name }}</option>
+                                    {% endfor %}
+                                    
+                                </select>
+                            </div>
+                            <!-- <div class="select-Box">
+                                <select class="select-tag" id="lead-category" name="category_name">
+                                    <option value="">Category</option>
+                                    
+                                </select>
+
+                            </div> -->
+                           
+                           
+                            
+                            <div class="">
+                                <input type="date" class="input-date"  name="sdate" title="Lead collected from ">
+                            </div>
+                            <div class=" ">
+                                <input type="date" class="input-date"  name="edate" title="Lead collected to ">
+                            </div>
+                           
+                            <div>
+                                <button type="submit" class="btn btn-outline-primary">
+                                    <span class="mdi mdi-magnify"></span>
+                                </button>
+                            </div>
+                        </form>
+                        
+                    </div>
+                </div>
+                <div>
+                    <p class="filter-values mt-2">
+                        {% if client_name %}  {{ client_name.client_name }} -  {% endif %}
+                        {% if category_name %} ( {{ category_name.lead_collection_for }} )  {% endif %}
+                        {% if select_emp %} &nbsp; {{ select_emp.emp_name }}   {% endif %}
+                        {% if start_date %} - ( {{ start_date }} ) {% endif %}
+                        {% if end_date %} ( {{ end_date}} ){% endif %}
+                       
+                        
+                    </p>
+    
+                </div>
+
+                <!-------- Table Section ----->
+
+                {% if leads %}
+
+                <form action="" method="post">
+                    {% csrf_token %}
+                    
+                    <div class="table-responsive">
+                
+                        <table class="table table-bordered" id="leadsData">
+                            <thead>
+                                <tr class="table-active">
+                                    <th>
+                                        <div class="d-flex justify-content-center">
+                                            <div class="form-check form-check-primary m-0 p-0">
+                                            <label class="form-check-label">
+                                                <input type="checkbox" class="form-check-input check-all">
+                                                
+                                            </label>
+                                            </div>
+                                            
+                                        </div>
+                                    </th>
+                                    <th>Collected By | Created On</th>
+                                    <th>Name</th> 
+                                    <th>Email</th>    
+                                    <th>Contact</th>
+                                    <th>Status</th>
+                                    <th> Qucik Action </th>                           
+                                    
+                                </tr>
+                            </thead>
+                        
+                            <tbody>
+                               
+                               
+                                {% for lead in leads %}
+                                    <tr>
+
+                                        <td >
+                                            <div class="d-flex justify-content-center">
+                                                <div class="form-check form-check-primary ">
+                                                    <label class="form-check-label ">
+                                                        <input class="checkbox check-single" name="lead_check" value="{{ lead.id }}" id="" type="checkbox">
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <p>
+                                                <span class="mdi mdi-account "> 
+                                                </span>{{ lead.lead_collect_Emp_id.emp_name }}
+                                                ( {{ lead.lead_add_date|date:'d-m-y' }} | {{ lead.lead_add_time|date:"H:i:s" }} )
+                                                </span>
+                                            </p>
+                                        
+                                        </td>
+                                        <td><p> <span class="mdi mdi-account "> </span> {{ lead.lead_name }} </p></td>
+                                        <td><p><span class="mdi mdi-email"> </span> {{ lead.lead_email }}</p>      </td>
+                                        <td><p><span class="mdi mdi-phone "> </span> {{ lead.lead_contact }} </p></td>
+                                        <td>
+                                            {% if lead.lead_status == 1 %}
+                                            <p class="badge badge-pill badge-success"><span class="mdi mdi-check-all small"> Verifird</span></p>
+                                            {% else %}
+                                            <p class="badge badge-pill badge-info"><span class="mdi mdi-check-circle small"> New</span></p>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a class="small ml-2 detailsBox-icon btn btn-sm btn-outline-info" data-lead-id="{{ lead.id }}" title="Basic Details of Lead">
+                                                <span class="mdi mdi-plus mdi-18px ">  </span> 
+                                            </a>
+                                            <a class="small ml-2  fetch-lead-details btn btn-sm btn-outline-secondary" data-flead-id="{{ lead.id }}" title="Follow Up Details">
+                                                <span class="mdi mdi-file-document mdi-18px ">  </span> 
+                                            </a>
+                                        </td>
+                                     
+                                    </tr>
+                                {% endfor %}
+                           
+                            
+                            </tbody>
+                        </table>
+                    </div>
+
+                   
+
+                    <div class=" paginationBox ">
+                        <ul class="pagination">
+                            {% if leads.has_previous %}
+                            <li><a href="?page=1{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-double-left"></span></a></li>
+                            <li><a href="?page={{ leads.previous_page_number }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-left"></span></a></li>
+                            {% endif %}
+                            {% for num in leads.paginator.page_range %}
+                                {% if num <= 4 or num == leads.paginator.num_pages or leads.number == num %}
+                                    <li {% if leads.number == num %} class="active" {% endif %}>
+                                        <a href="?page={{ num }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span>{{ num }}</span></a></li>
+                                {% endif %}
+                               
+                            {% endfor %}
+                            {% if leads.has_next %}
+                            <li><a href="?page={{ leads.next_page_number }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-right"></span></a></li>
+                            <li><a href="?page={{ leads.paginator.num_pages }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-double-right"></span></a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+
+                </form>
+
+                    
+
+                {% else %}
+        
+                    <div class="d-flex justify-content-center">
+                        <img src="{% static 'images\file-icons\no-data-file.png' %}">
+                    </div>
+        
+                {% endif %}
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class=" leadDetails">
+    <div class="leadDetails-Top">
+        <h6>Lead Details </h6>
+        <div class="close-x"><span class="mdi mdi-close"></span> </div>
+    </div>
+
+    <div class="Basic-Details">
+        <div class="h6">Basic Details</div>
+        <div class="bd-innerBox">
+            <span class="mdi mdi-account small"><span class="ml-1" id="leadName"></span></span> 
+            <span class="mdi mdi-phone small"><span class="ml-1"  id="leadPhone"></span></span>
+            <span class="mdi mdi-email small"><span class="ml-1"  id="leadEmail"></span></span>
+            
+        </div>
+
+        <div class="statusBox">
+            <span class="mdi small" id="un-verify-icon"><span class="ml-1" id="verify"></span></span> 
+            <span class="mdi mdi-delete-sweep small"><span class="ml-1" id="waste"></span></span> 
+            <span class="mdi mdi-alert small"><span class="ml-1" id="incomplete"></span></span> 
+        </div>
+    </div>
+    <div class="More-Deails">
+        <div class="h6">More Details</div>
+        <div class="md-innerBox">
+            
+        </div>
+    </div>
+       
+</div>
+
+
+
+<!-- Modal Follow up Details  -->
+<div class="modal fade" id="activityPanel" tabindex="-1" aria-labelledby="activityPanelLable" aria-hidden="true">
+    <div class="modal-dialog modal-xl" id="activityBox" >
+      
+    </div>
+</div>
+
+<!------------------------Script Section--------------------------->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
+
+
+<script>
+    $(document).ready(function() {
+       new DataTable('#leadsData', {
+           search: {
+            enable: true 
+           },
+           columnDefs: [
+           {
+               orderable: false,
+               className: 'check-single',
+               targets: 0,
+           }
+       ],
+       paging: false 
+       
+   });
+  
+});
+</script>
+
+<script>
+    $(document).ready(function() {
+        $(document).on("click", ".detailsBox-icon", function() {
+            $(".leadDetails").toggleClass("show");
+        });
+        $(".close-x").click(function() {
+            $(".leadDetails").toggleClass("show");
+        });
+    });
+    
+</script>
+
+<script>
+    $(document).ready(function() {
+        $(document).on("click", ".detailsBox-icon", function() {
+            var leadId = $(this).data('lead-id');
+         
+            $.ajax({
+                url: "{% url 'HD_featchLeadDetails' %}",
+                type: 'GET', 
+                data: {
+                    lead_id: leadId
+                },
+                success: function(response) {
+                    if (response.hasOwnProperty('lead_basic')) {
+                        console.log('success')
+                        var leadBasic = response.lead_basic;
+                        
+                        // Update basic lead details
+                        $("#leadName").text(leadBasic.name);
+                        $("#leadEmail").text(leadBasic.email);
+                        $("#leadPhone").text(leadBasic.phone);
+                      
+                        $("#verify").text(leadBasic.verify);
+                        if ($("#verify").text().trim() == "Verified") {
+                            $("#un-verify-icon").removeClass("mdi-close-circle-outline text-danger");
+                            $("#un-verify-icon").addClass("mdi-check-circle text-success");
+                        }
+                        else{
+                            $("#un-verify-icon").removeClass("mdi-check-circle text-success");
+                            $("#un-verify-icon").addClass("mdi-close-circle-outline text-danger");
+                            
+                            }
+                        
+                        $("#waste").text(leadBasic.waste);
+                        $("#incomplete").text(leadBasic.incomplete);
+    
+                        // Update additional lead details
+                        var leadDetails = response.lead_details;
+                        var mdInnerBox = $(".md-innerBox");
+                        mdInnerBox.empty(); // Clear existing content
+
+                        var subInner = $("<div>").addClass("md-subinner");
+                            var span1 = $("<span>").text('Source' );
+                            var span2 = $("<span>").text( ":  " + leadBasic.source);
+                            subInner.append(span1, span2);
+                            mdInnerBox.append(subInner);
+                        
+                        $.each(leadDetails, function(lead_field_name, lead_field_data) {
+                            var subInner = $("<div>").addClass("md-subinner");
+                            var span1 = $("<span>").text(lead_field_name );
+                            var span2 = $("<span>").text( ":  " + lead_field_data);
+                            subInner.append(span1, span2);
+                            mdInnerBox.append(subInner);
+                        });
+                    } else {
+                        console.error('Error: Lead basic details not found in response');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching lead details:', error);
+                }
+            });
+        });
+    });
+</script>
+
+
+<script>
+    $(document).ready(function () {
+        
+    $("#client-change").on("change", function () {
+        
+        var selectedClientId = $(this).val();
+      
+        
+        $.ajax({
+            url: "{% url 'leadCategories' %}",
+            type: 'GET',
+            dataType: 'json',
+            data: {
+                client_id: selectedClientId
+            },
+            success: function (data) {
+              
+                if (data.success) {
+                    
+                    var leadCategorySelect = $("#lead-category");
+                  
+                    leadCategorySelect.empty(); 
+      
+                    var option = '<option value="">' + 'Select Category' + '</option>';
+                    leadCategorySelect.append(option);
+                    data.lead_categories.forEach(function (category) {
+                        var option = '<option value="' + category.id + '">' + category.name + '</option>';
+                        leadCategorySelect.append(option);
+                    });
+
+                    
+                    updateTable(data.leads_data);
+                    
+                } else {
+                    
+                    console.error('Error: ' + data.message);
+                }
+               
+            },
+            error: function (xhr, status, error) {
+                // Handle Ajax errors (optional)
+                console.error('Ajax Error: ' + status + ' - ' + error);
+            }
+        });
+      });
+
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        $(document).on("click", ".fetch-lead-details", function(e) {
+       
+            e.preventDefault();
+            var leadId = $(this).data('flead-id');
+            console.log(leadId)
+            fetchLeadDetails(leadId);
+        });
+
+        function fetchLeadDetails(leadId) {
+            $.ajax({
+                url: '/leadFollwup_data/' + leadId + '/',  // URL to fetch lead data
+                type: 'GET',
+                success: function(response) {
+                    $('#activityBox').html(response);  // Place the result in activityBox
+                    $('#activityPanel').modal('show');  // Show the modal
+                },
+                error: function(xhr, errmsg, err) {
+                    console.log(xhr.status + ": " + xhr.responseText);
+                }
+            });
+        }
+    });
+
+</script>
+
+
+
+{% endblock %}
