@@ -3276,9 +3276,25 @@ def lead_track(request,dbid):
         # Notification-----------
         notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
 
+        try:
+            db = DataBank.objects.get(id=dbid) 
+            wl_lead = Waste_Leads.objects.filter(leadId=db.lead_Id).last()
+            fd_objs = FollowupDetails.objects.filter(lead_Id=db.lead_Id).order_by('-id')
+            fl_history = FollowupHistory.objects.filter(hs_lead_Id=db.lead_Id).order_by('-id')
+            fields_obj = lead_Details.objects.filter(leadId=db.lead_Id)
+       
+    
+        except Waste_Leads.DoesNotExist:
+            return redirect('DAM_Dashboard_databank')
+
         content = {'emp_dash':emp_dash,
                    'dash_details':dash_details,
                    'notifications':notifications,
+                   'db': db,
+                    'fd_objs':fd_objs,  
+                    'fl_history':fl_history,
+                    'fields_obj':fields_obj,
+                    'wl_lead':wl_lead
                    
                    }
         

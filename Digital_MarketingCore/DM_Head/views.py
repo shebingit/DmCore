@@ -14,14 +14,15 @@ from django.utils.decorators import method_decorator
 from django.db.models import Count
 from datetime import date
 
-import random
-import base64
 from django.conf import settings
 import os
 import pandas as pd
 from openpyxl.workbook import Workbook
-from openpyxl.utils.dataframe import dataframe_to_rows
+
 from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from django.contrib import messages
 
 #---------new-------
 
@@ -1804,12 +1805,14 @@ def lead_status_change(request):
                     continue
 
             if selected_value == 'Verified':
-                            status_val=1
-                            leads_obj.lead_status=status_val
+                status_val=1
+                leads_obj.lead_status=status_val
+                leads_obj.repeated_status=0
+                leads_obj.waste_data=0
 
             if selected_value == 'Unverified':
-                            status_val=0
-                            leads_obj.lead_status=status_val
+                status_val=0
+                leads_obj.lead_status=status_val
                 
             if selected_value == 'Waste':
                             status_val=1
@@ -2149,24 +2152,25 @@ def head_all_leadTransfer(request):
                 leads_obj = Leads.objects.filter(id__in=leadChecked,lead_status=1,waste_data=0,lead_transfer_status=0)
 
                 for l in leads_obj:
-                    lead_ids_list = []
+                    #lead_ids_list = []
                    
 
                     try:
-                        leads_obj_check = Leads.objects.get(id=l.id)
-                        count_val = count_val + 1
-                        email_exists = DataBank.objects.filter(lead_Id__lead_category_id=leads_obj_check.lead_category_id,lead_Id__lead_email=leads_obj_check.lead_email).exists()
-                        phone_exists = DataBank.objects.filter(lead_Id__lead_category_id=leads_obj_check.lead_category_id,lead_Id__lead_contact=leads_obj_check.lead_contact).exists()
+                        #leads_obj_check = Leads.objects.get(id=l.id)
+                            count_val = count_val + 1
 
-                        if email_exists or phone_exists:
-                            lead_id = l.id
-                            l.repeated_status = 1
-                            l.waste_data = 1
-                            l.waste_data_reason = 'The email id or contact number already exist.'
-                            l.save()
-                            lead_ids_list.append(lead_id)
+                        # email_exists = DataBank.objects.filter(lead_Id__lead_category_id=leads_obj_check.lead_category_id,lead_Id__lead_email=leads_obj_check.lead_email).exists()
+                        # phone_exists = DataBank.objects.filter(lead_Id__lead_category_id=leads_obj_check.lead_category_id,lead_Id__lead_contact=leads_obj_check.lead_contact).exists()
 
-                        else:
+                        # if email_exists or phone_exists:
+                        #     lead_id = l.id
+                        #     l.repeated_status = 1
+                        #     l.waste_data = 1
+                        #     l.waste_data_reason = 'The email id or contact number already exist.'
+                        #     l.save()
+                        #     lead_ids_list.append(lead_id)
+
+                        # else:
  
                             l.lead_transfer_status = 1
                             l.lead_transfer_date = date.today()
@@ -2279,12 +2283,14 @@ def head_allocateWorkView(request):
         tl_list = EmployeeRegister_Details.objects.filter(emp_department_id=dash_details.emp_department_id,
                                                           emp_designation_id__dashboard_id=2)
         
+        
         client_task = ClientTask_Register.objects.all()
         
         content = {'emp_dash':emp_dash,
                    'dash_details':dash_details,
                    'notifications':notifications,
                    'works':works,'tl_list':tl_list,
+                  
                    'client_task':client_task}
 
         return render(request,'HD_workAllocate.html',content)
@@ -3341,10 +3347,12 @@ def head_viewEmployees(request):
 
         log_obj = LogRegister_Details.objects.filter(active_status=1)
         employees = EmployeeRegister_Details.objects.filter(logreg_id__in=log_obj,emp_comp_id=dash_details.emp_comp_id)
+
+        designation_objs = DesignationRegister_details.objects.all()
         
         content = {'emp_dash':emp_dash,
                    'dash_details':dash_details,
-                   'notifications':notifications,'employees':employees}
+                   'notifications':notifications,'employees':employees,'designation_objs':designation_objs}
 
         return render(request,'HD_employeeView.html',content)
 
@@ -3444,7 +3452,8 @@ def head_employeeAllocated_list(request):
         Team_leads = EmployeeRegister_Details.objects.filter(emp_designation_id=Team_leads_desig_obj)
         TeamLead_emp_ids = [leads.id for leads in Team_leads]
         
-        allocated_employees = Allocation_Details.objects.filter(allocat_to__in=TeamLead_emp_ids).order_by('allocat_to')
+        allocated_employees = Allocation_Details.objects.filter(allocat_to__in=TeamLead_emp_ids,
+                                                                allocatEmp_id__emp_designation_id__dashboard_id=3).order_by('allocat_to')
 
         content = {'emp_dash':emp_dash,
                    'dash_details':dash_details,
@@ -3462,7 +3471,21 @@ def head_employeeAllocated_list(request):
 def head_reallocate_teamLead(request):
 
     if request.POST:
-        Pad = Previos_Allocation_Details()
+       
+        selected_ids = request.POST.getlist('emp_check')
+        tl_id = request.POST['alocated_to']
+        emp = EmployeeRegister_Details.objects.get(id=tl_id)
+        
+
+        for empid in selected_ids:
+            try:
+                Ad_obj = Allocation_Details.objects.get(allocatEmp_id__id=int(empid))
+                Ad_obj.allocat_to = EmployeeRegister_Details.objects.get(id=tl_id)
+                Ad_obj.save()
+            except Allocation_Details.DoesNotExist:
+                print(f"No Allocation_Details found for empid {empid}")
+            except EmployeeRegister_Details.DoesNotExist:
+                print(f"No EmployeeRegister_Details found for tl_id {tl_id}")
 
     return redirect('head_employeeAllocated_list')
 
@@ -5599,7 +5622,7 @@ def leadActivity_Tracker(request,lead_id):
         fd_objs = FollowupDetails.objects.filter(lead_Id=db.lead_Id).order_by('-id')
         fl_history = FollowupHistory.objects.filter(hs_lead_Id=db.lead_Id).order_by('-id')
         fields_obj = lead_Details.objects.filter(leadId=db.lead_Id)
-       
+
     
     except Waste_Leads.DoesNotExist:
 
@@ -5632,6 +5655,189 @@ def leadrepeated_data(request,rlead_id):
     }
     return render(request, 'repeated_leads.html', context)
             
+
+
+
+def waste_leadPDF_preview(request,pdf_id):
+
+    try:
+        wl_lead = Waste_Leads.objects.get(id=pdf_id) 
+        fd_objs = FollowupDetails.objects.filter(lead_Id=wl_lead.leadId).order_by('-id')
+        fl_history = FollowupHistory.objects.filter(hs_lead_Id=wl_lead.leadId).order_by('-id')
+        fields_obj = lead_Details.objects.filter(leadId=wl_lead.leadId)
+    
+    except Waste_Leads.DoesNotExist:
+
+        return redirect('datamanager_wasteLead')
+
+    context = {
+        'wl_lead': wl_lead,
+        'fd_objs':fd_objs,  
+        'fl_history':fl_history,
+        'fields_obj':fields_obj,
+    }
+    return render(request, 'waste_leadPDF.html', context)
+
+
+
+
+def hd_employeeDesignationEdit(request):
+    if 'emp_id' in request.session:
+        if request.session.has_key('emp_id'):
+            emp_id = request.session['emp_id']
+           
+        else:
+            return redirect('/')
+    
+
+        emp_id = request.POST['empid']
+        desig_id =DesignationRegister_details.objects.get(id=request.POST['desigantion_name'])
+
+        employees = EmployeeRegister_Details.objects.get(id=emp_id)
+        employees.emp_department_id = desig_id.dept_id
+        employees.emp_designation_id = desig_id
+        employees.save()
+        messages.success(request, f'{employees.emp_name} Designation Changed to {desig_id.desig_name}')
+     
+
+        return redirect('head_viewEmployees')
+        
+       
+
+    else:
+            return redirect('/') 
+
+
+
+
+
+#Executive Task Allocate-----
+
+
+def head_allocate_task_to_executive(request):
+    if 'emp_id' in request.session:
+        if request.session.has_key('emp_id'):
+            emp_id = request.session['emp_id']
+           
+        else:
+            return redirect('/')
+        
+        emp_dash = LogRegister_Details.objects.get(id=emp_id)
+        dash_details = EmployeeRegister_Details.objects.get(logreg_id=emp_dash)
+
+        # Notification-----------
+        notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
+
+        tl_list = EmployeeRegister_Details.objects.filter(emp_department_id=dash_details.emp_department_id,
+                                                          emp_designation_id__dashboard_id=2)
+        tls = tl_list.values('id')
+
+        work_assign = WorkAssign.objects.filter(wa_work_allocate__in=tls,wa_type=0).order_by('-id')
+        lc_team = LeadCateogry_TeamAllocate.objects.filter(wa_id__in=work_assign)
+        team = Allocation_Details.objects.filter(allocat_to__in=tls,).exclude(allocatEmp_id__emp_active_status=2)
+        team = team.exclude(allocatEmp_id__emp_designation_id__dashboard_id=2)
+        team_ids = [t.allocatEmp_id_id for t in team]
+
+        task_assign = TaskAssign.objects.filter(ta_workerId_id__in=team_ids).order_by('-id') 
+        lc_assign = LeadCateogry_Assign.objects.filter(executive_id_id__in=team_ids).order_by('-id') 
+        
+
+        success = True
+        success_text= 'Task add successful.'            
+        
+        content = {'emp_dash':emp_dash,
+                   'dash_details':dash_details,
+                   'notifications':notifications,
+                   'work_assign':work_assign,
+                   'task_assign':task_assign,
+                   'team':team,
+                   'lc_team':lc_team,
+                   'lc_assign':lc_assign,
+                #    'success':success,
+                #    'success_text':success_text,
+        }
+        return render(request,'HD_ExecutiveTaskAllocate.html',content)
+
+    else:
+            return redirect('/')
+
+
+
+def head_TaskkAssign_Executive(request):
+    if 'emp_id' in request.session:
+        if request.session.has_key('emp_id'):
+            emp_id = request.session['emp_id']
+           
+        else:
+            return redirect('/')
+        
+        emp_dash = LogRegister_Details.objects.get(id=emp_id)
+        dash_details = EmployeeRegister_Details.objects.get(logreg_id=emp_dash)
+
+        
+        if request.POST:
+             
+            workAs = WorkAssign.objects.get(id=int(request.POST['Workassign_id']))
+            seletedTask = ClientTask_Register.objects.get(id=int(request.POST['selected_task']))
+            selected_emp_list = request.POST.getlist('emp')
+
+
+            sdate = request.POST['fDate']
+            duedate = request.POST['dueDate']
+            target = request.POST.get('target', None)
+            discription = request.POST['discription_data']
+            any_file = request.FILES.get('wFile')
+            if target is None or target == '':
+                target = 0
+
+            for emp_id in selected_emp_list:
+                employee = EmployeeRegister_Details.objects.get(id=int(emp_id))
+                workAs.allocated_exemp.add(employee)
+            workAs.save()
+
+            for emp_id in selected_emp_list:
+                taskAs = TaskAssign()
+                taskAs.ta_workAssignId = workAs
+                taskAs.ta_workerId = EmployeeRegister_Details.objects.get(id=int(emp_id))
+                taskAs.ta_taskId = seletedTask
+                taskAs.ta_discription = discription
+                taskAs.ta_file = any_file
+                taskAs.ta_allocate_date = date.today()
+                taskAs.ta_start_date = sdate
+                taskAs.ta_due_date = duedate
+                taskAs.ta_target = target
+                taskAs.ta_status = 1
+                taskAs.save()
+
+                if seletedTask.task_name == 'Lead Collection':
+                     categoryId = request.POST['selected_category']
+                    
+                     LeadCategoryTA = LeadCateogry_TeamAllocate.objects.get(lc_id_id=categoryId,wa_id=workAs,Tl_id=workAs.wa_work_allocate)
+                     lcAssign = LeadCateogry_Assign()
+                     lcAssign.executive_id=EmployeeRegister_Details.objects.get(id=int(emp_id))
+                     lcAssign.lcta_id=LeadCategoryTA
+                     lcAssign.ta_id=taskAs
+                     lcAssign.lca_discription=discription
+                     lcAssign.lca_from_date=sdate
+                     lcAssign.lca_due_date=duedate
+                     lcAssign.lca_target=target
+                     lcAssign.lca_file=any_file
+                     lcAssign.lca_status=1
+                     lcAssign.save()
+
+                notification_obj = Notification()
+                notification_obj.emp_id = employee  
+                notification_obj.notific_head = "Work Assigned" 
+                notification_obj.notific_content = "A new task has been assigned to you. " 
+                notification_obj.save()
+
+            # messages.success(request, 'Work assigned successfully...')
+           
+        return redirect('head_allocate_task_to_executive')
+
+    else:
+        return redirect('/')
+
 
 
 def head_logout(request):

@@ -1,4 +1,4 @@
-{% extends 'TL_base.html' %}
+{% extends 'HD_base.html' %}
 {% load static %}
 {% block body %}
 
@@ -57,8 +57,8 @@
                 <th> Client Name </th>
                 <th> Start Date </th>
                 <th> Due Date </th>
+                <th> Team Lead </th>
                 <th> Task Details </th>
-                <th> Progress </th>
                 <th> Tasks </th>
                 <th> Action </th>
                
@@ -77,31 +77,11 @@
                 </td>
                 <td> {{ wa.wa_from_date }} </td>
                 <td> {{ wa.wa_due_date }} </td>
+                <td> {{ wa.wa_work_allocate.emp_name }} </td>
                 <td> 
                   <div class="btn btn-outline-primary" data-toggle="modal" data-target="#taskDetails{{wa.id}}">View</div>
                 </td>
-                <td> 
-                  {% if wa.work_assign_progress <= 10 %}
-                      <div class="progress progress-sm">
-                          <div class="progress-bar bg-danger progress-bar-animated progress-bar-striped" role="progressbar" aria-valuenow="{{ wa.work_assign_progress }}" style="width: {{ wa.work_assign_progress }}%" aria-valuemin="0" aria-valuemax="100">
-                              {{ wa.work_assign_progress }}%
-                          </div>
-                      </div>
-                  {% elif wa.work_assign_progress >= 10 and wa.work_assign_progress <= 80 %}
-                      <div class="progress progress-sm">
-                          <div class="progress-bar bg-warning progress-bar-animated progress-bar-striped" role="progressbar" aria-valuenow="{{ wa.work_assign_progress }}" style="width: {{ wa.work_assign_progress }}%" aria-valuemin="0" aria-valuemax="100">
-                              {{ wa.work_assign_progress }}%
-                          </div>
-                      </div>
-                  {% else %}
-                      <div class="progress progress-sm">
-                          <div class="progress-bar bg-success progress-bar-animated progress-bar-striped" role="progressbar" aria-valuenow="{{ wa.work_assign_progress }}" style="width: {{ wa.work_assign_progress }}%" aria-valuemin="0" aria-valuemax="100">
-                              {{ wa.work_assign_progress }}%
-                          </div>
-                      </div>
-                  {% endif %}
-
-                </td>
+                
                 <td> 
                   <ul >
                     {% for task in wa.wa_tasksId.all %}
@@ -229,25 +209,7 @@
                     </div>
                     {% endif %}
                     
-                    <!-- {% if ta.ta_target %}
-                    <div class="row mb-3">
-                        <div class="col-sm-12 col-lg-6 col-md-6">
-                            <div class="form-group">
-                              <label>Target</label>
-                              <h6 class="form-control">{{ta.ta_target}}</h6>
-                              
-                            </div>
-                        </div>
-                        <div class="col-sm-12 col-lg-6 col-md-6">
-                          <div class="form-group">
-                            <label>Achieved Target</label>
-                            <h6 class="form-control">{{ta.ta_target_achived}}</h6>
-                            
-                          </div>
-                      </div>
-                        
-                    </div>
-                    {% endif %} -->
+                   
                     <div class="row mb-3">
                       {% if wa.wa_file %}
                         <label  class="col-sm-2 col-form-label">File</label>
@@ -294,7 +256,7 @@
         
         <div class="card-body mt-0">
 
-          <form action="{% url 'tl_workAssign' %}" method="post"  enctype="multipart/form-data">
+          <form action="{% url 'head_TaskkAssign_Executive' %}" method="post"  enctype="multipart/form-data">
            
             {% csrf_token %}
             <div class="row">
@@ -325,6 +287,7 @@
                             <div class="row">
                                 
                                 {% for tm in team %}
+                                {% if wa.wa_work_allocate == tm.allocat_to %}
                                 <div class="col-xl-6 col-sm-12 grid-margin ">
                                    
                                     <div class="form-check ">
@@ -333,6 +296,7 @@
                                         </label>
                                     </div>
                                 </div>
+                                {% endif %}
                                 {% endfor %}
                             </div>
                             

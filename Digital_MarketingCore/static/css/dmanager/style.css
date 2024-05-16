@@ -180,3 +180,24 @@
     #followupStatus p{
       font-size: 12px;
     }
+
+
+    @media (max-width:632px)
+    {
+      .form-section
+    {
+     
+      grid-template-columns: 1fr;
+      
+    }
+    .search-form
+    {
+      display: grid;
+      grid-template-columns: 1fr;
+      
+    }
+    .input-groupBox input, .input-groupBox select 
+      {
+        width:100%;
+      }
+  }

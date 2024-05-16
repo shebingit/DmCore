@@ -148,11 +148,18 @@
         
         </div>
         <div class="modal-footer">
+            <a href="{% url 'waste_leadPDF_preview' wl_lead.id %}" class="btn btn-info ">
+                <span class="mdi mdi-file-pdf"></span>
+                <span class="small">PDF Preview</span>
+                
+            </a>
+            
         <button type="button" class="btn btn-secondary " data-dismiss="modal">
             <span class="mdi mdi-close"></span>
             <span class="small">Close</span>
             
         </button>
+       
        
         <button type="submit"   class="btn btn-success">
             <span class="mdi mdi-checkbox-marked-circle-outline"></span>

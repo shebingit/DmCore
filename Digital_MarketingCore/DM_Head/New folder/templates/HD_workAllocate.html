@@ -1,6 +1,19 @@
 {% extends 'HD_base.html' %}
 {% load static %}
 {% block body %}
+<style>
+  .text-sm
+  {
+    font-size: 12.6px;
+  }
+  .assign-btnBox
+  {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+  }
+</style>
 
 <div>
     <nav aria-label="breadcrumb">
@@ -9,6 +22,13 @@
           <li class="breadcrumb-item active text-md" aria-current="page">Work Allocate View</li>
         </ol>
       </nav>
+</div>
+
+<div class="assign-btnBox">
+  <a href="{% url 'head_allocate_task_to_executive' %}" class="btn btn-outline-info small" >
+    <span class="mdi mdi-plus-circle-outline"></span>
+    <span class="text-sm"> Assign To Executive</span> 
+  </a>
 </div>
 
 
@@ -113,6 +133,8 @@
     </div>
   </div>
 </div>
+
+
 
 
 

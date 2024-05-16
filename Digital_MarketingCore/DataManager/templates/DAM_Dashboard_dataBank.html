@@ -358,6 +358,34 @@
 </script>
 
 
+<script>
+  $(document).ready(function() {
+      $(document).on("click", ".fetch-lead-details", function(e) {
+     
+          e.preventDefault();
+          var leadId = $(this).data('lead-id');
+          fetchLeadDetails(leadId);
+      });
+
+      function fetchLeadDetails(leadId) {
+          $.ajax({
+              url: '/leadActivity_Tracker/' + leadId + '/',  // URL to fetch lead data
+              type: 'GET',
+              success: function(response) {
+                  $('#activityBox').html(response);  // Place the result in activityBox
+                  $('#activityPanel').modal('show');  // Show the modal
+              },
+              error: function(xhr, errmsg, err) {
+                  console.log(xhr.status + ": " + xhr.responseText);
+              }
+          });
+      }
+  });
+
+</script>
+
+
+
 {% endblock %}
 
 

@@ -2,6 +2,49 @@
 {% load static %}
 {% block body %}
 
+<style>
+    .text-sm 
+    {
+        font-size: 12px;
+        padding: 0.70rem .90rem;
+    }
+    .table th, .jsgrid .jsgrid-table th
+     {
+        padding: 0.7375rem;
+        }
+      
+
+    .table td, .jsgrid .jsgrid-table td {
+        padding: 0.5375rem;
+        }
+      
+    .card-title
+    {
+        font-size: 15px;
+        color: rgba(227, 227, 227, 0.921) !important;
+        letter-spacing: 0.04rem;
+    }
+    .reallocate-Box
+    {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+        column-gap: 0.50rem;
+        margin-bottom: 1rem;
+
+    }
+    .select-boxForm
+    {
+        width: 100%;
+        padding: 0.70rem .70rem;
+        background-color: rgba(15, 19, 28, 0.804);
+        color: rgb(224, 224, 224);
+        font-size: 13px;
+        border-radius: 35px;
+        border: 1px solid #a8a8a8c5;
+    }
+</style>
+
 <div>
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -20,57 +63,67 @@
                 
             </div>
 
-            <div class="add-items d-flex ">
-                
-                <input  class="form-control text-offwhite" name="#" id="search-data" placeholder="search here..">
-                <button class="btn btn-outline-danger mdi mdi-close" id="closeBtn" type="button"></button> 
-            </div>
+            <form action="{% url 'head_reallocate_teamLead'  %}" method="post" >
+        
+                {% csrf_token %}
 
-            <div class="row"></div>
-            <div class="add-items  ">
+           
+            <div class="reallocate-Box">
+                <div>
+                    <select class="select-boxForm" name="alocated_to" id="#" required>
+                        <option value="" selected> select team lead  </option>
+                    {% for team in Team_leads %}
+                    <option value="{{team.id}}"> 
+                        {{team.emp_name}}
+                        </option>
+                    {% endfor %}
+                    </select>       
+                </div>
                         
-                <select class=" form-control text-offwhite" name="alocated_to" id="#" required>
-                    <option value="" selected>--- select team lead --- </option>
-                {% for team in Team_leads %}
-                <option value="{{team.id}}"> 
-                    {{team.emp_name}}
-                    </option>
-                {% endfor %}
-                </select>                        
+                <div>
+                    <button class=" btn btn-outline-primary rounded-pill text-sm " type="submit">Re-allocate</button> 
+                </div>       
             
-            <button class=" btn btn-outline-primary " type="submit">Re-allocate</button> 
+                
             </div>
             
             
             <div class="table-responsive">
                 <table class="table" id="employee-allocated">
-                <thead>
+                <thead class="thead-dark">
                     <tr>
-                    <th> No </th>
+                        <th>
+                            <div class="d-flex ">
+                                <div class="form-check form-check-primary m-0 p-0">
+                                <label class="form-check-label">
+                                    <input type="checkbox" class="form-check-input check-all">
+                                    
+                                </label>
+                                </div>
+                                
+                            </div>
+                        </th>
+                 
+                  
+                    <th> Executive </th>
                     <th> Team Lead  </th>
-                    <th> Employees Name </th>
                     
                     </tr>
                 </thead>
                 <tbody>
                     {% for emp in allocated_employees %}
-                    <form action="{% url 'head_reallocate_teamLead'  %}" method="post" >
-        
-                        {% csrf_token %}
+                   
             
                         <tr>
-                            <td>
-                                {{forloop.counter}}
+                            <td >
+                                <div class="d-flex ">
+                                    <div class="form-check form-check-primary ">
+                                        <label class="form-check-label ">
+                                            <input class="checkbox check-single" name="emp_check" value="{{ emp.allocatEmp_id.id }}" id="" type="checkbox">
+                                        </label>
+                                    </div>
+                                </div>
                             </td>
-                            
-                            <td>
-                                {% if emp.allocat_to.emp_profile %}
-                                <img src="{{emp.allocat_to.emp_profile.url}}" alt="Profile-image" />
-                                {% else %}
-                                <img src="{% static 'images/faces/profile-icon.png' %}" alt="Profile-image" />
-                                {% endif %}
-                                <span class="pl-2">{{emp.allocat_to.emp_name}}</span>
-                            </td> 
                             <td>
                                 {% if emp.allocatEmp_id.emp_profile %}
                                 <img src="{{emp.allocatEmp_id.emp_profile.url}}" alt="Profile-image" />
@@ -80,78 +133,57 @@
                                 <span class="pl-2">{{emp.allocatEmp_id.emp_name}}</span>
                             </td>
                            
+                            
+                            <td>
+                                {% if emp.allocat_to.emp_profile %}
+                                <img src="{{emp.allocat_to.emp_profile.url}}" alt="Profile-image" />
+                                {% else %}
+                                <img src="{% static 'images/faces/profile-icon.png' %}" alt="Profile-image" />
+                                {% endif %}
+                                <span class="pl-2">{{emp.allocat_to.emp_name}}</span>
+                            </td> 
+                            
                         
                         </tr>
-                    </form>
+                   
                 {% endfor %}
                 </tbody>
                 </table>
             </div>
-           
+        </form>
         </div>
         </div>
     </div>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-   
-    const inputField = document.getElementById('search-data');
-    const closeBtn = document.getElementById('closeBtn');
-    const empTable = document.getElementById('employee-allocated');
-    closeBtn.style.display = 'none';
-    console.log(inputField)
-
-    inputField.addEventListener('input', function() {
-        filterTable();
-    });
-
-    function filterTable() {
-        const filterValue = inputField.value.toLowerCase();
-        console.log('trigerd')
-        const rows = empTable.getElementsByTagName('tr');
-
-        for (let i = 1; i < rows.length; i++) {
-           
-            const Cell1 = rows[i].getElementsByTagName('td')[1];
-            const Cell2 = rows[i].getElementsByTagName('td')[2];
-            
-            
-          
-
-            if ( Cell2 || Cell1 ) {
-
-                const datacell2 = Cell2.textContent || Cell2.innerText;
-                const datacell1 = Cell1.textContent || Cell1.innerText;
-               
-               
-               
-
-                if (datacell1.toLowerCase().includes(filterValue)|| datacell2.toLowerCase().includes(filterValue) ) 
-                {
-                    rows[i].style.display = '';
-                } else {
-                    rows[i].style.display = 'none';
-                }
+    $(document).ready(function () {
+        // Check All checkbox change event
+        $('.check-all').change(function () {
+            if ($(this).is(':checked')) {
+                // Check all the individual checkboxes
+                $('.check-single').prop('checked', true);
+            } else {
+                // Uncheck all the individual checkboxes
+                $('.check-single').prop('checked', false);
             }
-        }
-    }
-
-     // To display the close button and hide the close button based on the search input 
-    inputField.addEventListener('input', function() {
-    if (inputField.value == '') {
-        closeBtn.style.display = 'none';
-       
-    } else {
-        closeBtn.style.display = 'block';
+  
+            // Update the count of checked checkboxes
+            var checkedCount = $('.check-single:checked').length;
+            $('#check-count').text(checkedCount);
+        });
         
-    }
+        // Individual checkbox change event
+        $('.check-single').change(function () {
+            // Update the count of checked checkboxes
+            var checkedCount = $('.check-single:checked').length;
+            $('#check-count').text(checkedCount);
+        });
     });
 
-    closeBtn.addEventListener('click', function() {
-    inputField.value = '';
-    closeBtn.style.display = 'none';
-    filterTable(); // Display the full table data
-    });
+
 </script>
+
 
 {% endblock %}

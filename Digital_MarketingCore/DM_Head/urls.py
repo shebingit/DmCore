@@ -113,6 +113,8 @@ urlpatterns = [
     path('Employees/Allocated-List',views.head_employeeAllocated_list,name='head_employeeAllocated_list'),
     path('Employees/Re-Allocate',views.head_reallocate_teamLead,name='head_reallocate_teamLead'),
 
+    path('hd_employeeDesignationEdit/',views.hd_employeeDesignationEdit,name='hd_employeeDesignationEdit'),
+
     #leave ----------
     path('Employees/Employees-Leave',views.head_employee_leaves,name='head_employee_leaves'),
 
@@ -221,6 +223,15 @@ urlpatterns = [
     
     
     path('leadrepeated_data/<int:rlead_id>/', views.leadrepeated_data, name='leadrepeated_data'),
+    path('waste_leadPDF_preview/<int:pdf_id>/', views.waste_leadPDF_preview, name='waste_leadPDF_preview'), 
+    
+
+
+    #Executive Task allocate ----------------
+
+    path('Head/Task-Allocate/',views.head_allocate_task_to_executive,name='head_allocate_task_to_executive'),
+    path('Head/Task-Assign/',views.head_TaskkAssign_Executive,name='head_TaskkAssign_Executive'),
+    
     
 
 ]

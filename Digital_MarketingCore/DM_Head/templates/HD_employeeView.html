@@ -1,57 +1,191 @@
+
 {% extends 'HD_base.html' %}
 {% load static %}
+{% load custom_filters %}
 {% block body %}
 
+<link rel="stylesheet" href="https://cdn.datatables.net/2.0.3/css/dataTables.dataTables.css">
+
+
+
+<!-- Other Styling -->
+<style>
+  .custom-message-Box
+  {
+    width: calc(100% - 55%);
+
+  }
+  .custom-message-Box ul li{
+    font-size: 12px;
+    list-style: none;
+    font-weight: 400;
+    letter-spacing: 0.01rem;
+  
+  }
+  .custom-message-Box p 
+  {
+
+    margin-bottom: 0.35rem !important;
+  }
+  .custom-message-Box ul li .text-message
+  {
+    padding-left: 1rem;
+  }
+  .custom-message-Box .success
+  {
+    padding: 0.50rem;
+    border: 0.012rem solid #0eff16a8;
+    color: #ececec;
+    background: #0f111897;
+  }
+    
+  .flex-d
+  {
+    display: flex;
+    justify-content: space-between;
+  }
+   
+  
+  .table th, .jsgrid .jsgrid-table th, .table td, .jsgrid .jsgrid-table td {
+   padding: 0.4375rem;
+   }
+ 
+   .g-1
+   {
+       gap: 1rem;
+   }
+   #checkbox-values
+   {
+       opacity: 0;
+   }
+   /*   Data Table   */
+
+   .dt-search label
+   {
+    display: none;
+
+   }
+   div.dt-container .dt-search input {
+       border: 1px solid #707070;
+       border-radius: 3px;
+       padding: 5px;
+       background-color: transparent;
+       color: #a5a5a5;
+       margin-left: 3px;
+       font-size: 13px;
+   }
+
+   div.dt-container select.dt-input {
+       padding: 4px 10px;
+       border: 1px solid #707070;
+       color: #a5a5a5;
+       font-size: 13px;
+       background-color: transparent;
+       width: 100px;
+   }
+   div.dt-container select option{
+       background-color: #15171f; 
+   }
+   div.dt-container .dt-length label
+   {
+       display: none;
+   }
+   div.dt-container .dt-info
+   {
+       color: #a5a5a5;
+       font-size: 13px ;
+   }
+
+
+
+   
+  
+</style>
+
+<style>
+  .employeeDetails
+{
+    display: none;
+    position: fixed;
+    z-index: 100;
+    top: 4.4rem;
+    right: 0;
+    width: 500px; /* Adjust width as needed */
+    background-color: #15171f; /* Adjust background color as needed */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Adjust box-shadow as needed */
+    height:calc(100% - 2%)
+
+}
+
+    
+      @media(max-width:768px)
+      {
+     
+      .employeeDetails
+        {
+            width: calc(100% - 1%);
+        }
+      }
+
+</style>
+
+
+
+
+
 <div>
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'head_dashboard' %}">Dashboard</a></li>
-          <li class="breadcrumb-item active text-md" aria-current="page">Employees List</li>
-        </ol>
-      </nav>
+  <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a class="text-underline-remove" href="{% url 'head_dashboard' %}">Dashboard</a></li>
+        <li class="breadcrumb-item active text-md" aria-current="page"> Employees List</li>
+      </ol>
+    </nav>
 </div>
+
+
+
+
 
 
 <div class="row ">
     <div class="col-12 grid-margin">
       <div class="card">
         <div class="card-body">
-            <div class="d-flex">
-                <h4 class="card-title">Employees</h4>
-                
-            </div>
-
-            <div class="add-items d-flex ">
-              
-              <input  class="form-control text-offwhite" name="#" id="search-data" placeholder="search here..">
-              <button class="btn btn-outline-danger mdi mdi-close" id="closeBtn" type="button"></button> 
-            </div>
+          {% if messages %}
+          <div class="custom-message-Box">
             
-    
+            <ul class="messages">
+                {% for message in messages %}
+                <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>
+                    <p>  <span class="mdi mdi-check-circle-outline ml-2"></span>  {{ message.tags }}</p>
+                   <span class="text-message">{{ message }}</span>
+                 
+                  
+                </li>
+                {% endfor %}
+            </ul>
+           
+          </div>
+          {% endif %}
+           
           <div class="table-responsive">
-            <table class="table" id="employee-details">
+            <table class="table table-bordered" id="employee-details">
               <thead>
                 <tr>
-                  <th> No </th>
+                
                   <th> Employees Id </th>
-                  <th> Employees Name </th>
-                  <th> Email </th>
-                  <th> Phone </th>
-                  <th> Register Date </th>
+                  <th>  Name </th>
+                  <th> Desigantion </th>
                   <th> Department </th>
-                  <th> Designation </th>
-                  <th> Active Status </th>
-                  <th> Account status </th>
-                 
+                  <th> Contact </th>
+                  
                  
                 </tr>
               </thead>
               <tbody>
                 {% for emp in employees %}
                 <tr>
-                  <td>
-                    {{forloop.counter}}
-                  </td>
+                
                   <td>
                     {% if emp.emp_regId %}
                     {{emp.emp_regId }}
@@ -59,35 +193,32 @@
                     EMP0000 
                     {% endif %}
                   </td> 
-                  <td>
-                    {% if emp.emp_profile %}
-                    <img src="{{emp.emp_profile.url}}" alt="Profile-image" />
-                    {% else %}
-                    <img src="{% static 'images/faces/profile-icon.png' %}" alt="Profile-image" />
-                    {% endif %}
-                    <span class="pl-2">{{emp.emp_name}}</span>
-                  </td>
-                  <td> {{emp.emp_email}} </td>
-                  <td> {{emp.emp_contact_no}} </td>
-                  <td> {{emp.emp_reg_date}} </td>
-                  <td> {{emp.emp_department_id.dept_name}} </td>
-                  <td> {{emp.emp_designation_id.desig_name}} </td>
-                  <td>
-                     {% if emp.emp_active_status == 1 %}
-                      <span class="mdi mdi-check-circle-outline text-success mdi-18px"></span>
-                    {% else %}
-                    <span class="mdi mdi-close-circle-outline text-danger  mdi-18px"></span>
-                    {% endif %}
-                  </td>
-                  <td>
-                    {% if emp.emp_verify_status == 1 %}
-                     <span class="mdi mdi-account-check text-success  mdi-18px"></span>
-                   {% else %}
-                   <span class="mdi mdi-account-remove text-danger  mdi-18px"></span>
-                   {% endif %}
-                 </td>
-                
                  
+                  <td>
+                   
+                        {% if emp.emp_profile %}
+                      <img src="{{emp.emp_profile.url}}" alt="Profile-image" />
+                      {% else %}
+                      <img src="{% static 'images/faces/profile-icon.png' %}" alt="Profile-image" />
+                      {% endif %}
+                     
+                        <span class="pl-2 ">{{emp.emp_name}}</span>
+                        
+                      
+                  </td>
+                  <td class="flex-d">
+                    <p class="pl-2">{{emp.emp_designation_id.desig_name}}</p>
+                    <button  class="btn btn-sm btn-outline-primary desig-box" data-empID="{{emp.id}}" title="Edit Employee Designation" data-toggle="modal" data-target="#designation_ChangeModal">
+                      <span class="mdi mdi-pencil"></span>
+                    </button>
+                  </td>
+                  
+                  <td> {{emp.emp_department_id.dept_name}} </td>
+                  <td>
+                    <p><span class="mdi mdi-phone pr-1"></span>  {{emp.emp_contact_no}}</p>
+                  </td>
+                
+              
                 </tr>
                {% endfor %}
               </tbody>
@@ -99,74 +230,105 @@
 </div>
 
 
+<style>
+
+
+.modal-content {
+ 
+    background-color: #0c0e13ee;
+    border: none;
+    box-shadow: rgba(12, 17, 20, 0.223) 0px 4px 12px;
+}
+.modal-title
+{
+  font-size: 15px;
+  color: #d7d7d7;
+  letter-spacing: 0.05rem;
+}
+</style>
+
+<div class="modal fade" id="designation_ChangeModal" tabindex="-1" aria-labelledby="designation_ChangeModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="{% url 'hd_employeeDesignationEdit' %}" method="post">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="designation_ChangeModalLabel">Employee Designation Change </h5>
+          <button type="button" class="close text-danger" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      <div class="modal-body">
+        
+         
+          <input type="hidden" id="emp_id" name="empid">
+          <div class="form-group">
+            <label>select Designation</label>
+            <select class="form-control" name="desigantion_name" style="color: rgb(201, 201, 201);" >
+              {% for desig in designation_objs %}
+              <option value="{{desig.id}}">{{ desig.desig_name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+         
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary small" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-success small">Save changes</button>
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
+
+
+
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script>
-   
-    const inputField = document.getElementById('search-data');
-    const closeBtn = document.getElementById('closeBtn');
-    const empTable = document.getElementById('employee-details');
-    closeBtn.style.display = 'none';
-
-    inputField.addEventListener('input', function() {
-        filterTable();
-    });
-
-    function filterTable() {
-        const filterValue = inputField.value.toLowerCase();
-        const rows = empTable.getElementsByTagName('tr');
-
-        for (let i = 1; i < rows.length; i++) {
-            const Cell1 = rows[i].getElementsByTagName('td')[1];
-            const Cell2 = rows[i].getElementsByTagName('td')[2];
-            const Cell3 = rows[i].getElementsByTagName('td')[3];
-            const Cell4 = rows[i].getElementsByTagName('td')[4];
-            const Cell5 = rows[i].getElementsByTagName('td')[5];
-            const Cell6 = rows[i].getElementsByTagName('td')[6];
-            const Cell7 = rows[i].getElementsByTagName('td')[7];
-            const Cell8 = rows[i].getElementsByTagName('td')[8];
-
-            if (Cell1 || Cell2 || Cell3 || Cell4|| Cell5 || Cell6 || Cell7 || Cell8) {
-
-                const datacell1 = Cell1.textContent || Cell1.innerText;
-                const datacell2 = Cell2.textContent || Cell2.innerText;
-                const datacell3 = Cell3.textContent || Cell3.innerText;
-                const datacell4 = Cell4.textContent || Cell4.innerText;
-                const datacell5 = Cell5.textContent || Cell5.innerText;
-                const datacell6 = Cell6.textContent || Cell6.innerText;
-                const datacell7 = Cell7.textContent || Cell7.innerText;
-                const datacell8 = Cell7.textContent || Cell8.innerText;
-                
-
-                if (datacell1.toLowerCase().includes(filterValue) || datacell2.toLowerCase().includes(filterValue) || datacell3.toLowerCase().includes(filterValue)
-                || datacell4.toLowerCase().includes(filterValue) || datacell5.toLowerCase().includes(filterValue) || datacell6.toLowerCase().includes(filterValue) 
-                || datacell7.toLowerCase().includes(filterValue) || datacell8.toLowerCase().includes(filterValue) ) 
-                {
-                    rows[i].style.display = '';
-                } else {
-                    rows[i].style.display = 'none';
-                }
-            }
-        }
-    }
-
-     // To display the close button and hide the close button based on the search input 
-    inputField.addEventListener('input', function() {
-    if (inputField.value == '') {
-        closeBtn.style.display = 'none';
+    $(document).ready(function() {
+       new DataTable('#employee-details', {
+           search: {
+            enable: true 
+           },
+           columnDefs: [
+           {
+               orderable: false,
+               targets: 0,
+           }
+       ],
+       paging: true 
        
-    } else {
-        closeBtn.style.display = 'block';
-        
-    }
-    });
+   });
+  
+});
 
-    closeBtn.addEventListener('click', function() {
-    inputField.value = '';
-    closeBtn.style.display = 'none';
-    filterTable(); // Display the full table data
-    });
+
+$(document).ready(function() {
+  $(document).on("click", ".desig-box", function(e) {
+      // Get the emp.id from data-empID attribute
+      var empId = $(this).data('empid');
+      
+      // Set the emp.id value to the input field inside the modal
+      $('#emp_id').val(empId);
+  });
+});
+
+
+$(document).ready(function() {
+  
+  var messageBox = $(".custom-message-Box");
+  
+  // Hide the message box after 3 seconds
+  setTimeout(function() {
+      messageBox.hide(); // Hide the message box
+  }, 3000); // 3000 milliseconds = 3 seconds
+});
 </script>
 
 
-
 {% endblock %}
+

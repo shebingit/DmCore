@@ -1788,9 +1788,7 @@ def tl_workAssign(request):
         emp_dash = LogRegister_Details.objects.get(id=emp_id)
         dash_details = EmployeeRegister_Details.objects.get(logreg_id=emp_dash)
 
-        # Notification-----------
-        notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
-
+        
 
         if request.POST:
              
@@ -1815,7 +1813,7 @@ def tl_workAssign(request):
             for emp_id in selected_emp_list:
                 taskAs = TaskAssign()
                 taskAs.ta_workAssignId = workAs
-                taskAs.ta_workerId_id = emp_id
+                taskAs.ta_workerId = EmployeeRegister_Details.objects.get(id=int(emp_id))
                 taskAs.ta_taskId = seletedTask
                 taskAs.ta_discription = discription
                 taskAs.ta_file = any_file
@@ -1828,10 +1826,10 @@ def tl_workAssign(request):
 
                 if seletedTask.task_name == 'Lead Collection':
                      categoryId = request.POST['selected_category']
-                     print(categoryId)
+                   
                      LeadCategoryTA = LeadCateogry_TeamAllocate.objects.get(lc_id_id=categoryId,wa_id=workAs,Tl_id=dash_details)
                      lcAssign = LeadCateogry_Assign()
-                     lcAssign.executive_id_id=emp_id
+                     lcAssign.executive_id=EmployeeRegister_Details.objects.get(id=int(emp_id))
                      lcAssign.lcta_id=LeadCategoryTA
                      lcAssign.ta_id=taskAs
                      lcAssign.lca_discription=discription
@@ -1843,7 +1841,7 @@ def tl_workAssign(request):
                      lcAssign.save()
 
                 notification_obj = Notification()
-                notification_obj.emp_id_id = employee.id  
+                notification_obj.emp_id = employee
                 notification_obj.notific_head = "Work Assigned" 
                 notification_obj.notific_content = "A new task has been assigned to you. " 
                 notification_obj.save()
