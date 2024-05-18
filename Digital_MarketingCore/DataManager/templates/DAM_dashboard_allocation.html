@@ -53,6 +53,21 @@
                         
                       </select>
                     </div>
+                    <div class="input-groupBox">
+                        <select name="client_id" id="client-change">
+                          <option value="">select client</option>
+                          {% for client in clients_objs %}
+                          <option value="{{ client.client_Id.id }}"> {{ client.client_Id.client_name }}</option>
+                          {% endfor %}
+                    
+                        </select>
+                      </div>
+  
+                      <div class="input-groupBox">
+                        <select name="category" id="lead-category">
+                          <option value="">select category</option> 
+                        </select>
+                      </div>
                    
                     <div class="input-groupBox">
                       <select name="executive_id" id="">
@@ -241,6 +256,53 @@
     });
 </script>
 
+
+<script>
+    $(document).ready(function() {
+  
+    $("#client-change").on("change", function () {
+      // Get the selected client ID
+      var selectedClientId = $(this).val();
+    
+      
+      $.ajax({
+          url: "{% url 'fetch_lead_categories' %}",
+          type: 'GET',
+          dataType: 'json',
+          data: {
+              client_id: selectedClientId
+          },
+          success: function (data) {
+            
+              if (data.success) {
+                  
+                  var leadCategorySelect = $("#lead-category");
+                
+                  leadCategorySelect.empty(); 
+    
+                  var option = '<option value="">' + 'select category' + '</option>';
+                  leadCategorySelect.append(option);
+                  data.lead_categories.forEach(function (category) {
+                      var option = '<option value="' + category.id + '">' + category.name + '</option>';
+                      leadCategorySelect.append(option);
+                  });
+                  
+                  
+              } else {
+                  
+                  console.error('Error: ' + data.message);
+              }
+             
+          },
+          error: function (xhr, status, error) {
+              // Handle Ajax errors (optional)
+              console.error('Ajax Error: ' + status + ' - ' + error);
+          }
+      });
+    });
+  
+  });
+  </script>
 
 
 {% endblock %}

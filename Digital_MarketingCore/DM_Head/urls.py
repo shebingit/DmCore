@@ -215,8 +215,6 @@ urlpatterns = [
     
     path('leadFollwup_data/<int:lead_id>/', views.leadFollwup_data, name='leadFollwup_data'),
 
-    path('Repeated-Lead/',views.head_repeated_lead,name='head_repeated_lead'),
-    path('Repeated-DeleteLead/',views.lead_repeat_delete,name='lead_repeat_delete'),
 
     path('Lead/Tracker-Data',views.head_lead_tracker,name='head_lead_tracker'),
     path('leadActivity_Tracker/<int:lead_id>/', views.leadActivity_Tracker, name='leadActivity_Tracker'),
@@ -232,7 +230,8 @@ urlpatterns = [
     path('Head/Task-Allocate/',views.head_allocate_task_to_executive,name='head_allocate_task_to_executive'),
     path('Head/Task-Assign/',views.head_TaskkAssign_Executive,name='head_TaskkAssign_Executive'),
     
-    
+    path('download_pdf/', views.generate_pdf, name='download_pdf'),
+   
 
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)

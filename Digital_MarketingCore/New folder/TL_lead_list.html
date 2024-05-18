@@ -6,6 +6,7 @@
 
 <!-- Other Styling -->
 <style>
+   
     
    .filter-values
    {
@@ -16,6 +17,7 @@
    #leadsData p{
     margin-bottom: 0.10rem;
    }
+  
    .table th, .jsgrid .jsgrid-table th, .table td, .jsgrid .jsgrid-table td {
     padding: 0.4375rem;
     }
@@ -24,6 +26,13 @@
         color: #bababa;
         font-size: 17px;
         letter-spacing: 1px;
+    }
+    .table th
+    {
+        padding-top: 0.9375rem;
+        padding-bottom: 0.9375rem;
+        font-size: 12px;
+        text-align: center;
     }
     .g-1
     {
@@ -545,7 +554,20 @@ grid-template-columns: 1fr 1fr;
         border-bottom: 1px solid rgb(150, 150, 150);
         padding: 10px 5px; 
     }
-   
+    #repeatedBox .modal-content
+    {
+        background-color: rgb(11, 15, 23) !important;
+        padding: 10px;
+        border: none;
+        outline: none;
+    }
+    #repeatedBox .modal-title
+    {
+        font-size: 13.2px;
+        padding: .35rem .30rem;
+         color: #9e9e9e;
+         letter-spacing: 0.06rem;
+    }
     @media (max-width:1032px)
     {
         .activity-MainBox
@@ -556,6 +578,10 @@ grid-template-columns: 1fr 1fr;
     }
     @media (max-width:632px)
     {
+        .content-wrapper {
+            background: #000000;
+            padding: 0.875rem 0.75rem;
+        }
     .activity-panel {
         
         grid-template-columns:1fr;
@@ -577,6 +603,11 @@ grid-template-columns: 1fr 1fr;
         }
 }
 </style>
+
+
+
+
+
 
 <div>
     <nav aria-label="breadcrumb">
@@ -622,7 +653,12 @@ grid-template-columns: 1fr 1fr;
                         
                         <form class="search-form" action="{% url 'tl_lead_list' %}" method="post" >
                             {% csrf_token %}
-                            <div class="select-Box">
+                            <div class=""  data-toggle="tooltip"  data-placement="top" title="User guide ">
+                                <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#user-guideModal">
+                                    <span class="mdi mdi-book-open-variant"></span>
+                                </button>
+                            </div>
+                            <div class="select-Box" data-toggle="tooltip" data-placement="top" title="Number of data per page">
                                 <select class="select-tag" name="pgnum" id="select-count">
                                     {% if pg_num %}
                                     <option value="{{ pg_num }}" selected>{{ pg_num }}</option>   
@@ -638,7 +674,7 @@ grid-template-columns: 1fr 1fr;
                                 </select>
                             </div>
                             
-                            <div class="select-Box">
+                            <div class="select-Box" data-toggle="tooltip" data-placement="top" title="Client Name">
                                 <select class="select-tag"  id="client-change" name="client_change">
                                     <option value="">Client</option>
                                     {% for client in clients_objs %}
@@ -647,15 +683,16 @@ grid-template-columns: 1fr 1fr;
                                     
                                 </select>
                             </div>
-                            <div class="select-Box">
-                                <select class="select-tag" id="lead-category" name="category_name">
+                            <div class="select-Box" data-toggle="tooltip" data-placement="top" title="Lead collected category  ">
+                                <select class="select-tag" id="lead-category" name="category_name" >
                                     <option value="">Category</option>
                                     
                                 </select>
 
                             </div>
                            
-                            <div class="select-Box">
+                            
+                            <div class="select-Box" data-toggle="tooltip" data-placement="top" title="Lead collected executives  ">
                                 <select class="select-tag" name="select_emp" id="select-emp">
                                     <option value="">Executive</option>
                                     {% for exe in employees %}
@@ -665,12 +702,24 @@ grid-template-columns: 1fr 1fr;
                                 </select>
 
                             </div>
-                            
-                            <div class="">
-                                <input type="date" class="input-date"  name="sdate" title="Lead collected from ">
+                            <div class="select-Box" data-toggle="tooltip" data-placement="top" title="Lead status  ">
+                                <select class="select-tag" name="select_status">
+                                    <option value="">Lead status</option>
+                                    <option value="Unverify"> Unverify </option>
+                                    <option value="Reapted"> Reapted </option>
+                                    <option value="Transfered"> Transfered </option>
+                                    <option value="Waste"> Waste </option>
+                                    <!-- <option value="Incompleted"> Incompleted </option> -->
+                                    
+                                </select>
+
                             </div>
-                            <div class=" ">
-                                <input type="date" class="input-date"  name="edate" title="Lead collected to ">
+                            
+                            <div class="" data-toggle="tooltip" data-placement="top" title="Lead collected  from   ">
+                                <input type="date" class="input-date"  name="sdate" >
+                            </div>
+                            <div class=" " data-toggle="tooltip" data-placement="top" title="Lead collected  to ">
+                                <input type="date" class="input-date"  name="edate">
                             </div>
                            
                             <div>
@@ -686,6 +735,8 @@ grid-template-columns: 1fr 1fr;
                     <p class="filter-values mt-2">
                         {% if client_name %}  {{ client_name.client_name }} -  {% endif %}
                         {% if category_name %} ( {{ category_name.lead_collection_for }} )  {% endif %}
+                        &nbsp;
+                        {% if select_val %} {{ select_val}} - Lead List {% endif %}
                         {% if select_emp %} &nbsp; {{ select_emp.emp_name }}   {% endif %}
                         {% if start_date %} - ( {{ start_date }} ) {% endif %}
                         {% if end_date %} ( {{ end_date}} ){% endif %}
@@ -707,17 +758,7 @@ grid-template-columns: 1fr 1fr;
                         <table class="table table-bordered" id="leadsData">
                             <thead>
                                 <tr class="table-active">
-                                    <th>
-                                        <div class="d-flex justify-content-center">
-                                            <div class="form-check form-check-primary m-0 p-0">
-                                            <label class="form-check-label">
-                                                <input type="checkbox" class="form-check-input check-all">
-                                                
-                                            </label>
-                                            </div>
-                                            
-                                        </div>
-                                    </th>
+                                    <th>No </th>
                                     <th>Collected By | Created On</th>
                                     <th>Name</th> 
                                     <th>Email</th>    
@@ -735,13 +776,7 @@ grid-template-columns: 1fr 1fr;
                                     <tr>
 
                                         <td >
-                                            <div class="d-flex justify-content-center">
-                                                <div class="form-check form-check-primary ">
-                                                    <label class="form-check-label ">
-                                                        <input class="checkbox check-single" name="lead_check" value="{{ lead.id }}" id="" type="checkbox">
-                                                    </label>
-                                                </div>
-                                            </div>
+                                            {{forloop.counter}}
                                         </td>
                                         <td>
                                             <p>
@@ -752,15 +787,36 @@ grid-template-columns: 1fr 1fr;
                                             </p>
                                         
                                         </td>
-                                        <td><p> <span class="mdi mdi-account "> </span> {{ lead.lead_name }} </p></td>
+                                        <td><p> <span class="mdi mdi-account "> </span> {{ lead.lead_name }}   </p></td>
                                         <td><p><span class="mdi mdi-email"> </span> {{ lead.lead_email }}</p>      </td>
                                         <td><p><span class="mdi mdi-phone "> </span> {{ lead.lead_contact }} </p></td>
                                         <td>
-                                            {% if lead.lead_status == 1 %}
-                                            <p class="badge badge-pill badge-success"><span class="mdi mdi-check-all small"> Verifird</span></p>
-                                            {% else %}
-                                            <p class="badge badge-pill badge-info"><span class="mdi mdi-check-circle small"> New</span></p>
+                                           
+                                            <p class="badge badge-pill
+                                            {% if select_val == 'Transfered' or lead.lead_transfer_status == 1 %}  badge-success
+                                            {% elif select_val == 'Reapted'  or lead.repeated_status == 1 %}  badge-info
+                                            {% elif select_val == 'Waste' or lead.waste_data == 1  %}  badge-danger
+                                            {% elif select_val == 'Unverify' or lead.lead_status == 0 %} badge-primary 
+                                            {% endif %}">
+                                            {% if select_val %}
+                                            <span class="small">{{ select_val }}</span>
+                                            {% elif lead.waste_data == 1  %}
+                                                <span class="small"> Waste </span>
+                                            {% elif lead.lead_status == 0  %}
+                                                <span class="small"> Unverify </span>
+                                            {% elif lead.lead_transfer_status == 1  %}
+                                                <span class="small"> Transfered </span>
                                             {% endif %}
+                                        </p>
+                                      
+                                        {% if lead.repeated_status == 1 and select_val == 'Reapted' %}
+                                            <button type="button" class="btn btn-danger rounded-pill fetch-reapeted-lead-details"  data-reptlead-id="{{ lead.id }}">
+                                                <span class="mdi mdi-file-document small"> list </span>
+                                            </button>
+                                          
+                                              
+                                        {% endif %}
+                                            
                                         </td>
                                         <td>
                                             <a class="small ml-2 detailsBox-icon btn btn-sm btn-outline-info" data-lead-id="{{ lead.id }}" title="Basic Details of Lead">
@@ -784,19 +840,19 @@ grid-template-columns: 1fr 1fr;
                     <div class=" paginationBox ">
                         <ul class="pagination">
                             {% if leads.has_previous %}
-                            <li><a href="?page=1{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-double-left"></span></a></li>
-                            <li><a href="?page={{ leads.previous_page_number }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-left"></span></a></li>
+                            <li><a href="?page=1{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}{% if select_val %}&sele_val={{ select_val }}{% endif %}"  class="btn btn-dark"><span class="mdi mdi-chevron-double-left"></span></a></li>
+                            <li><a href="?page={{ leads.previous_page_number }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}{% if select_val %}&sele_val={{ select_val }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-left"></span></a></li>
                             {% endif %}
                             {% for num in leads.paginator.page_range %}
                                 {% if num <= 4 or num == leads.paginator.num_pages or leads.number == num %}
                                     <li {% if leads.number == num %} class="active" {% endif %}>
-                                        <a href="?page={{ num }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span>{{ num }}</span></a></li>
+                                        <a href="?page={{ num }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}{% if select_val %}&sele_val={{ select_val }}{% endif %}" class="btn btn-dark"><span>{{ num }}</span></a></li>
                                 {% endif %}
                                
                             {% endfor %}
                             {% if leads.has_next %}
-                            <li><a href="?page={{ leads.next_page_number }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-right"></span></a></li>
-                            <li><a href="?page={{ leads.paginator.num_pages }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-double-right"></span></a></li>
+                            <li><a href="?page={{ leads.next_page_number }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}{% if select_val %}&sele_val={{ select_val }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-right"></span></a></li>
+                            <li><a href="?page={{ leads.paginator.num_pages }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if Ct_ID %}&Ct_ID={{ Ct_ID }}{% endif %}{% if employee %}&employee={{ employee }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}{% if select_val %}&sele_val={{ select_val }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-double-right"></span></a></li>
                             {% endif %}
                         </ul>
                     </div>
@@ -859,9 +915,138 @@ grid-template-columns: 1fr 1fr;
     </div>
 </div>
 
+<!-- Modal repeated up Details  -->
+<!-- Modal -->
+<div class="modal fade" id="repeatedPanel" tabindex="-1" aria-labelledby="repeatedPanelLable" aria-hidden="true">
+    <div class="modal-dialog modal-xl" id="repeatedBox" >
+      
+    </div>
+</div>
+
+
+<!--- User Guide Modal Document -->
+
+
+<style>
+ #user-guideModal .modal-content
+ {
+    border: none;
+    background-color:#0d0f14;
+ }
+ #user-guideModal .modal-title
+ {
+    font-size: 14px;
+    color: #a7a7a7;
+    letter-spacing: 0.02rem;
+ }
+ #user-guideModal .modal-body h5{
+    font-size: 13.8px;
+    color: #b0b0b0;
+    letter-spacing: 0.02rem;
+    margin-bottom: 0.90rem;
+    text-decoration-line: underline;
+    text-decoration-color: #7fedd9;
+ }
+ #user-guideModal .modal-body p,
+ #user-guideModal .modal-body ul li{
+    font-size: 12.3px;
+    color: #b0b0b0;
+    letter-spacing: 0.02rem;
+    line-height: 1.2rem;
+ }
+
+ .bold
+ {
+    font-weight: 600;
+ }
+</style>
+
+<div class="modal fade" id="user-guideModal" tabindex="-1" aria-labelledby="user-guideModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="user-guideModalLabel">User Guide</h5>
+          <button type="button" class="close text-danger" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+         <div class="">
+            <h5>How to use filter options ?</h5>
+           
+            <p class="bold">Purpose of the "Number of Data per Page" Select Box </p>
+            <p>
+            The "Number of Data per Page" select box is a user interface element designed to 
+            allow users to control how many data entries are displayed on each page of a 
+            paginated list. This functionality is particularly useful when viewing large datasets, 
+            as it provides flexibility and control over the amount of data presented at one time.</p>
+            <p class="bold">How to Use the Select Box</p>
+            <p>
+                Locate the Select Box: The select box is labeled with a 
+                tooltip that reads "Number of data per page". It is typically 
+                found at the top or bottom of a data table or list.
+            </p>
+            <p>
+                Current Selection: If you have previously chosen a number, that number will be selected and displayed as the current selection. 
+                For example, if you previously selected 50, you will see "50" as the selected option.
+            </p>
+            <p>
+                Default Options: The select box provides several predefined options for 
+                the number of data entries to display per page. The available options are:
+            </p>
+
+            <ul>
+                <li>20</li>
+                <li>50</li>
+                <li>100</li>
+                <li>150</li>
+                <li>250</li>
+                <li>500</li>
+                <li>1000</li>
+            </ul>
+                
+            <p>
+
+           
+                Selecting an Option:
+                <ul>
+
+                    <li>
+                    Click on the select box to view the dropdown list of options.
+                    </li>
+                    <li>
+                    Click on your preferred option. For instance, if you want to see 100 data entries per page, select "100".
+                    </li>
+                    <li>
+                    Effect of Selection: Once you make a selection, 
+                    the data table or list will automatically update to show the specified number of entries per 
+                    page. This helps in managing the data view and improves navigation through large datasets.
+                    
+                    </li>
+                </ul>
+            </p>
+              
+                <p>
+                    Use Case Scenarios:
+                </p>
+                <p>
+                Minimal Data View: If you prefer to see fewer data entries at a time for quicker loading times or easier viewing, you might choose 20 or 50.
+                Comprehensive Data View: If you need to view more data entries at once without navigating through multiple pages, you might choose 250, 500, or even 1000.
+                Tooltip Information: Hover over the select box to see a tooltip with additional information about its purpose ("Number of data per page").</p>
+         </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+
+
+
 <!------------------------Script Section--------------------------->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
 
 
@@ -1013,6 +1198,11 @@ grid-template-columns: 1fr 1fr;
 </script>
 
 <script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+      })
+
+
     $(document).ready(function() {
         $(document).on("click", ".fetch-lead-details", function(e) {
        
@@ -1039,6 +1229,31 @@ grid-template-columns: 1fr 1fr;
 
 </script>
 
+<script>
+    $(document).ready(function() {
+        $(document).on("click", ".fetch-reapeted-lead-details", function(e) {
+       
+            e.preventDefault();
+            var leadId = $(this).data('reptlead-id');
+            console.log(leadId)
+            fetchLeadDetails(leadId);
+        });
 
+        function fetchLeadDetails(leadId) {
+            $.ajax({
+                url: '/leadrepeated_data/' + leadId + '/',  // URL to fetch lead data
+                type: 'GET',
+                success: function(response) {
+                    $('#repeatedBox').html(response);  // Place the result in activityBox
+                    $('#repeatedPanel').modal('show');  // Show the modal
+                },
+                error: function(xhr, errmsg, err) {
+                    console.log(xhr.status + ": " + xhr.responseText);
+                }
+            });
+        }
+    });
+
+</script>
 
 {% endblock %}

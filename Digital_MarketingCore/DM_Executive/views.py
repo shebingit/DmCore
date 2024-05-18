@@ -2381,18 +2381,21 @@ def executive_allleads(request):
         d1 = None
         d2 = None
         client_name = None
+        category_name = None
+        select_val = None
 
         if request.POST:
             Cl_ID = request.POST['client_change']
-            # Ct_ID = request.POST['category_name']
+            Ct_ID = request.POST['category_name']
             d1 = request.POST['sdate']
             d2 = request.POST['edate']
+            select_val = request.POST['select_status']
             pg_num = request.POST['pgnum']
 
         else :
             Cl_ID = request.GET.get('Cl_ID')
-            # Ct_ID = request.GET.get('Ct_ID')
-            emp = request.GET.get('employee')
+            Ct_ID = request.GET.get('Ct_ID')
+            select_val = request.GET.get('sele_val')
             d1 = request.GET.get('start_date')
             d2 = request.GET.get('end_date')
             pg_num = request.GET.get('pg_num')
@@ -2404,12 +2407,28 @@ def executive_allleads(request):
         if Cl_ID :
             leads_obj = leads_obj.filter(lead_work_regId__clientId__id=Cl_ID)
             client_name = ClientRegister.objects.get(id=Cl_ID)
-            # category_name = LeadCategory_Register.objects.get(id=Ct_ID)
+            category_name = LeadCategory_Register.objects.get(id=Ct_ID)
             
         if d1:
             leads_obj = leads_obj.filter(lead_add_date__gte=d1)
         if d2:
             leads_obj = leads_obj.filter(lead_add_date__lte=d2)
+
+        if select_val:
+            if select_val == 'Unverify':
+                leads_obj = leads_obj.filter(lead_status=0,waste_data=0,repeated_status=0 )
+            
+            if select_val == 'Reapted':
+                leads_obj = leads_obj.filter(repeated_status=1)
+            
+            if select_val == 'Transfered':
+                leads_obj = leads_obj.filter(lead_transfer_status=1)
+
+            if select_val == 'Waste':
+                leads_obj = leads_obj.filter(waste_data=1)
+
+            # if select_val == 'Incompleted':
+            #     leads_obj = leads_obj.filter(lead_incomplete_status=1)
 
             
 
@@ -2431,6 +2450,8 @@ def executive_allleads(request):
                    'clients_objs':clients,
                    'leads_obj_count':leads_obj_count,
                  'client_name':client_name,
+                   'select_val':select_val,
+                   'category_name':category_name,
                 'Cl_ID':Cl_ID,'Ct_ID':Ct_ID,'start_date':d1,'end_date':d2,'pg_num':pg_num
             
             

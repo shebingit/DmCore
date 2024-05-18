@@ -3490,7 +3490,7 @@ def tl_waste_data(request):
 
         if emp:
             select_emp = EmployeeRegister_Details.objects.get(id=emp)
-            waste_data = waste_data.filter(lead_collect_Emp_id=emp)
+            waste_data = waste_data.filter(lead_collect_Emp_id=select_emp)
             
         if d1:
             waste_data = waste_data.filter(lead_add_date__gte=d1)
@@ -3664,7 +3664,7 @@ def tl_lead_list(request):
         
         Work_Assign = WorkAssign.objects.filter(wa_work_allocate=dash_details).values('wa_clientId')
         clients = ClientRegister.objects.filter(id__in=Work_Assign)
-        employees = EmployeeRegister_Details.objects.filter(id__in=team_ids)
+        employees = EmployeeRegister_Details.objects.filter(id__in=team_ids,emp_active_status=1)
 
         # Notification-----------
         notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
@@ -3680,11 +3680,13 @@ def tl_lead_list(request):
         client_name = None
         category_name = None
         select_emp = None
+        select_val = None
 
         if request.POST:
             Cl_ID = request.POST['client_change']
             Ct_ID = request.POST['category_name']
             emp = request.POST['select_emp']
+            select_val = request.POST['select_status']
             d1 = request.POST['sdate']
             d2 = request.POST['edate']
             pg_num = request.POST['pgnum']
@@ -3695,6 +3697,7 @@ def tl_lead_list(request):
             emp = request.GET.get('employee')
             d1 = request.GET.get('start_date')
             d2 = request.GET.get('end_date')
+            select_val = request.GET.get('sele_val')
             pg_num = request.GET.get('pg_num')
 
         if pg_num is None:
@@ -3714,6 +3717,23 @@ def tl_lead_list(request):
             leads_obj = leads_obj.filter(lead_collect_Emp_id__id=emp)
             select_emp = EmployeeRegister_Details.objects.get(id=emp)
 
+        if select_val:
+            if select_val == 'Unverify':
+                leads_obj = leads_obj.filter(lead_status=0,waste_data=0,repeated_status=0 )
+            
+            if select_val == 'Reapted':
+                leads_obj = leads_obj.filter(repeated_status=1)
+            
+            if select_val == 'Transfered':
+                leads_obj = leads_obj.filter(lead_transfer_status=1)
+
+            if select_val == 'Waste':
+                leads_obj = leads_obj.filter(waste_data=1)
+
+            # if select_val == 'Incompleted':
+            #     leads_obj = leads_obj.filter(lead_incomplete_status=1)
+        
+
         leads_obj_count = leads_obj.count()
 
         paginator = Paginator(leads_obj, pg_num)  
@@ -3731,6 +3751,7 @@ def tl_lead_list(request):
                    'employees':employees,
                    'leads_obj_count':leads_obj_count,
                    'select_emp':select_emp,'client_name':client_name,'category_name':category_name,
+                   'select_val':select_val,
                     'Cl_ID':Cl_ID,'Ct_ID':Ct_ID,'employee':emp,'start_date':d1,'end_date':d2,'pg_num':pg_num
                    }
 

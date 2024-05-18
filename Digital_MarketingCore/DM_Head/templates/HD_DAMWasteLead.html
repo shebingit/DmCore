@@ -103,29 +103,31 @@
         display: flex;
         align-items: center;
         justify-content: flex-start;
-        gap: 0.30rem;
+        width: 100%;
+        gap: 0.60rem;
     }
     .search-section2_2
     {
         display: inline-flex;
-        width: calc(100% - 1%);
-        overflow-x: scroll;
         margin: 0;
         padding-bottom: 0.30rem;
     }
     .select-Box .select-tag,
     .search-form .input-date
     {
-        padding: 0.35rem .30rem;
+        width:100%;
+        padding: 0.40rem .50rem;
         background: transparent;
         border: 1px solid #909090;
         border-radius: 5px;
         font-size: 12px;
         color: #dedede;
+    
     }
     .search-form .input-date
     {
-        padding: 0.25rem .30rem;
+        padding: 0.33rem .70rem;
+        width:100%;
     }
     
     .select-Box .select-tag option
@@ -385,6 +387,16 @@
            
         }
     }
+    @media (max-width:932px)
+    {
+    .search-form
+    {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        width: 100%;
+        gap: 0.60rem;
+    }
+}
     @media (max-width:632px)
     {
     .activity-panel {
@@ -394,6 +406,30 @@
     .waste-reason-ststus
     {
         grid-template-columns:1fr;
+    }
+    .search-form
+    {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        width: 100%;
+        gap: 0.60rem;
+    }
+    .select-Box .select-tag,
+    .search-form .input-date
+    {
+        
+        padding: 0.35rem .35rem;
+        
+    }
+    .lead-section2
+    {
+        padding: 0;
+        padding-top: 0.50rem;
+    }
+    #waste-data .lead-topBox 
+    {
+        display: grid;
+        grid-template-columns: 1fr;
     }
     .modal-footer {
         flex-wrap: nowrap
@@ -428,7 +464,7 @@
                             <span class="mdi mdi-file-excel"></span>
                             <span class="small mr-1">Excel</span>
                         </button>
-                        <button type="button" class="btn  btn-dark" title="Covert leads to PDF">
+                        <button type="button" class="btn  btn-dark" id="download-pdf" title="Covert leads to PDF">
                             <span class="mdi mdi-file-pdf text-danger"></span>
                             <span class="small mr-1">PDF</span>
                         </button>
@@ -443,13 +479,14 @@
                     
                     <div class="search-section2_2" id="search-section2_2">
                         
-                        <form class="search-form" action="#" method="post" >
+                        <form class="search-form" action="{% url 'datamanager_wasteLead' %}" method="post" >
                             {% csrf_token %}
-                            <div class="select-Box">
+                            <div class="select-Box" >
                                 <select class="select-tag" name="pgnum" id="select-count">
                                     {% if pg_num %}
                                     <option value="{{ pg_num }}" selected>{{ pg_num }}</option>   
                                     {% endif %}
+                                    
                                     <option value="20">20</option>
                                     <option value="50">50</option>
                                     <option value="100">100</option>
@@ -479,7 +516,7 @@
                             </div>
                            
                             <div class="select-Box">
-                                <select class="select-tag" name="select_emp" id="select-emp">
+                                <select class="select-tag" data-toggle="tooltip" data-placement="bottom" title="Select executive " name="select_emp" id="select-emp">
                                     <option value="">Executive</option>
                                     {% for exe in executive_data %}
                                         <option value="{{ exe.id }}"> {{ exe.emp_name }} </option>
@@ -490,10 +527,11 @@
                             </div>
                             
                             <div class="">
-                                <input type="date" class="input-date"  name="sdate" title="Lead collected from ">
+                               
+                                <input type="date" class="input-date"  name="sdate" data-toggle="tooltip" data-placement="bottom" title="Lead collected from">
                             </div>
                             <div class=" ">
-                                <input type="date" class="input-date"  name="edate" title="Lead collected to ">
+                                <input type="date" class="input-date"  name="edate"  data-toggle="tooltip" data-placement="bottom" title="Lead collected to">
                             </div>
 
                             <!-- Telecaller -->
@@ -536,6 +574,15 @@
                         {% if d4 %} ( {{ d4}} ) {% endif %}
                         
                     </p>
+                    
+                    <input type="hidden" id="client_id" value="{{ client_name.id }}">
+                    <input type="hidden" id="category_id" value="{{ category_name.id }}">
+                    <input type="hidden" id="employee_id" value="{{ select_emp.id }}">
+                    <input type="hidden" id="start_date" value="{{ start_date }}">
+                    <input type="hidden" id="end_date" value="{{ end_date }}">
+                    <input type="hidden" id="telecaller_emp_id" value="{{ select_telecaller_emp.id }}">
+                    <input type="hidden" id="wsdate" value="{{ d3 }}">
+                    <input type="hidden" id="wedate" value="{{ d4 }}">
     
                 </div>
 
@@ -640,6 +687,10 @@
 
 
 
+
+
+
+
 <!-- Modal -->
 <div class="modal fade" id="activityPanel" tabindex="-1" aria-labelledby="activityPanelLable" aria-hidden="true">
     <div class="modal-dialog modal-xl" id="activityBox" >
@@ -654,6 +705,13 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.js"></script>  
 <script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
+
+
+<script>
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip();
+    });
+  </script>
 
 <script>
     $(document).ready(function() {
@@ -754,5 +812,61 @@
 
 
 
+<script>
+    $(document).ready(function() {
+        
+        
+        $('#download-pdf').click(function() {
+
+            var client_id = $('#client_id').val();
+            var category_id = $('#category_id').val();
+            var employee_id = $('#employee_id').val();
+            var start_date = $('#start_date').val();
+            var end_date = $('#end_date').val();
+            var telecaller_emp_id = $('#telecaller_emp_id').val();
+            var wsdate = $('#wsdate').val();
+            var wedate = $('#wedate').val();
+    
+            var wasteData = {
+                cl_ID: client_id,
+                ct_ID: category_id,
+                employee: employee_id,
+                start_date: start_date,
+                end_date: end_date,
+                telecaller: telecaller_emp_id,
+                wsdate: wsdate,
+                wedate: wedate,
+            };
+            console.log('success',wasteData)
+            $.ajax({
+                url: '/download_pdf/',
+                method: 'GET',
+                data: wasteData,
+                xhrFields: {
+                    responseType: 'blob' // Set the response type to blob
+                },
+                success: function(response) {
+                    // Create a blob from the response
+                    var blob = new Blob([response], { type: 'application/pdf' });
+    
+                    // Create a temporary anchor element
+                    var link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = 'leads.pdf'; // Set the file name for download
+    
+                    // Trigger the click event on the anchor element
+                    link.click();
+    
+                    // Clean up
+                    window.URL.revokeObjectURL(link.href);
+                },
+                error: function(xhr, status, error) {
+                    console.error('PDF Download Error:', error);
+                }
+            });
+        });
+    });
+    
+</script>
 
 {% endblock %}

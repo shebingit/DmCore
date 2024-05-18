@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>DIgitala Marketing Core | Lead PDF</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+</head>
+<body >
+
+
+    <div>
+        <h4  style="font-size: 14px;">Digital Marketing Core | Waste Lead Report </h4>
+        <p >
+            {% if client_name %}  {{ client_name.client_name }} -  {% endif %}
+            {% if category_name %} ( {{ category_name.lead_collection_for }} )  {% endif %}
+            {% if select_emp %} &nbsp; {{ select_emp.emp_name }}   {% endif %}
+            {% if start_date %} - ( {{ start_date }} ) {% endif %}
+            {% if end_date %} ( {{ end_date}} ) , {% endif %}
+            {% if select_telecaller_emp %} &nbsp;&nbsp; HR - &nbsp; {{ select_telecaller_emp.emp_name }}  {% endif %}
+            {% if d3 %} - ( {{ d3 }} ) {% endif %}
+            {% if d4 %} ( {{ d4}} ) {% endif %}
+            
+        </p>
+    </div>
+
+   
+
+          
+    <div style="padding: 0.50rem;">
+        <table >
+            <thead >
+                <tr style="background-color: rgba(224, 224, 224, 0.789); padding-top:.40rem;
+                padding-bottom:0.30rem;
+                font-size: 11px; margin-bottom:1rem">
+                   
+                    
+                    <th> Marked Date</th>
+                    <th>Lead Name</th>
+                    <th>Phone Number </th>
+                    <th>Email</th>
+    
+                </tr>
+            </thead>
+        
+            <tbody style="background-color: rgba(237, 237, 237, 0.721);">
+               <tr></tr>
+               
+                {% for lead in leads_obj %}
+                <tr style="padding-top: .25rem;">
+                    
+                    <td  style="font-size: 11.5px; ">
+                        
+                        <p>{{ lead.waste_marked_Date  }} </p>
+                     </td> 
+                    <td style="font-size: 11.5px;">{{ lead.leadId.lead_name }}</td>
+                    <td style="font-size: 11.5px;">{{ lead.leadId.lead_contact }}</td>
+                    <td style="font-size: 11.5px;">{{ lead.leadId.lead_email }}</td>
+            
+            
+                </tr>
+                {% endfor %}
+           
+            
+            </tbody>
+        </table>
+    
+    </div>
+
+
+</body>
+</html>

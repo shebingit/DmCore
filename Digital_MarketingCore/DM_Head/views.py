@@ -22,6 +22,8 @@ from openpyxl.workbook import Workbook
 from django.http import HttpResponse
 
 from django.contrib import messages
+from django.template.loader import get_template
+from xhtml2pdf import pisa
 
 #---------new-------
 
@@ -1418,7 +1420,6 @@ def datamanager_wasteLead(request):
         page_number = request.GET.get('page')
        
         leads = paginator.get_page(page_number)
-        
         content = {'emp_dash':emp_dash,
                     'dash_details':dash_details,
                     'notifications':notifications,
@@ -5386,93 +5387,6 @@ def leadFollwup_data(request,lead_id):
 
 
 
-#29/04/24 -- Repeated Lead
-
-
-def head_repeated_lead(request):
-    if 'emp_id' in request.session:
-        if request.session.has_key('emp_id'):
-            emp_id = request.session['emp_id']
-           
-        else:
-            return redirect('/')
-        
-        emp_dash = LogRegister_Details.objects.get(id=emp_id)
-        dash_details = EmployeeRegister_Details.objects.get(logreg_id=emp_dash)
-
-        # Notification-----------
-        notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
-
-
-
-        works_obj = WorkRegister.objects.filter(wcompId=dash_details.emp_comp_id)
-
-
-        # Get leads with duplicate email addresses
-        duplicate_email_leads = Leads.objects.values('lead_email').annotate(email_count=Count('lead_email')).filter(email_count__gt=1)
-
-        # Get leads with duplicate phone numbers
-        duplicate_phone_leads = Leads.objects.values('lead_contact').annotate(phone_count=Count('lead_contact')).filter(phone_count__gt=1)
-
-        for item in duplicate_phone_leads:
-            leads_with_phone = Leads.objects.filter(lead_contact__exact=item['lead_contact'])
-            if len(leads_with_phone) > 1:
-                for lead in leads_with_phone:
-                    l = Leads.objects.get(id=lead.id)
-                    l.repeated_status=1
-                    #l.save()
-                
-
-        LCR = LeadCategory_Register.objects.filter(cTaskId__cTcompId=dash_details.emp_comp_id)
-        executive_data  = EmployeeRegister_Details.objects.filter(Q(emp_designation_id__dashboard_id=1) | Q(emp_designation_id__dashboard_id=2) | Q(emp_designation_id__dashboard_id=3),emp_comp_id=dash_details.emp_comp_id,emp_active_status=1)
-
-
-        repeated_leads_obj = Leads.objects.filter(lead_work_regId__in=works_obj,repeated_status=1).order_by('-lead_contact')
-
-        if request.POST:
-            category = request.POST['select_category']
-            emp = request.POST['select_emp']
-
-            if category:
-                repeated_leads_obj = repeated_leads_obj.filter(lead_category_id__id=category)
-
-            if emp:
-                repeated_leads_obj = repeated_leads_obj.filter(lead_collect_Emp_id=emp)
-       
-        repeated_leads_obj_count = repeated_leads_obj.count()
-
-        content = {'emp_dash':emp_dash,
-                    'dash_details':dash_details,
-                    'notifications':notifications,
-                    'repeated_leads_obj':repeated_leads_obj,
-                    'repeated_leads_obj_count':repeated_leads_obj_count,
-                    'executive_data':executive_data,
-                    'LCR':LCR
-                    
-        }
-
-        return render(request,'HD_Repeated.html',content)
-
-    else:
-            return redirect('/')    
-
-
-def lead_repeat_delete(request):
-    checked_values = request.POST.get('checked_values')
-
-    id_list = checked_values.split(',') 
-    count_val = 0
-
-    for ids in id_list:
-
-        try:
-            leads_obj = Leads.objects.get(id=ids)
-            leads_obj.delete() 
-            count_val = count_val + 1
-        except Leads.DoesNotExist:
-            continue
-    return JsonResponse({'message': f'Data deleted {count_val} successfully .'})
-
 
 
 
@@ -5839,6 +5753,96 @@ def head_TaskkAssign_Executive(request):
 
 
 
+
+def generate_pdf(request):
+
+    if 'emp_id' in request.session:
+        if request.session.has_key('emp_id'):
+            emp_id = request.session['emp_id']
+           
+        else:
+            return redirect('/')
+        
+        emp_dash = LogRegister_Details.objects.get(id=emp_id)
+        dash_details = EmployeeRegister_Details.objects.get(logreg_id=emp_dash)
+
+    
+    leads_obj = Waste_Leads.objects.filter(leadId__lead_work_regId__wcompId__id=dash_details.emp_comp_id.id,confirmation=0)
+   
+    d1 = None
+    d2 = None
+    d3 = None
+    d4 = None
+        
+    client_name = None
+    category_name = None
+    select_emp = None
+    select_telecaller_emp = None
+
+    if request.GET:
+        Cl_ID = request.GET.get('cl_ID')
+        Ct_ID = request.GET.get('ct_ID')
+        emp = request.GET.get('employee')
+        d1 = request.GET.get('start_date')
+        d2 = request.GET.get('end_date')
+        d3 = request.GET.get('wsdate')
+        d4 = request.GET.get('wedate')
+        telecaller_emp = request.GET.get('telecaller')
+
+        
+        
+        if Cl_ID and Ct_ID:
+            leads_obj = leads_obj.filter(leadId__lead_work_regId__clientId__id=Cl_ID,leadId__lead_category_id__id=Ct_ID)
+            client_name = ClientRegister.objects.get(id=Cl_ID)
+            category_name = LeadCategory_Register.objects.get(id=Ct_ID)
+
+        if d1:
+          
+            leads_obj = leads_obj.filter(leadId__lead_add_date__gte=d1)
+        if d2:
+            leads_obj = leads_obj.filter(leadId__lead_add_date__lte=d2)
+
+            
+        if d3:
+            leads_obj = leads_obj.filter(waste_marked_Date__gte=d3)
+
+        if d4:
+            leads_obj = leads_obj.filter(waste_marked_Date__lte=d4)
+
+        if emp:
+            leads_obj = leads_obj.filter(leadId__lead_collect_Emp_id__id=emp)
+            select_emp = EmployeeRegister_Details.objects.get(id=emp)
+
+        if telecaller_emp:
+            leads_obj = leads_obj.filter(TC_Id__id=telecaller_emp)
+            select_telecaller_emp = EmployeeRegister_Details.objects.get(id=telecaller_emp)
+    
+    context = {'leads_obj': leads_obj,
+               'start_date':d1,'end_date':d2,
+                    'd3':d3,'d4':d4,'telecaller_emp':telecaller_emp,'select_telecaller_emp':select_telecaller_emp,
+                    'select_emp':select_emp,'client_name':client_name,'category_name':category_name}
+
+    template_path = 'leadsListPDF.html'
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="leads.pdf"'
+
+    template = get_template(template_path)
+    html = template.render(context)
+
+ # create a pdf
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    if pisa_status.err:
+        return HttpResponse('We had some errors <pre>' + html + '</pre>')
+
+   
+    return response
+
+  
 def head_logout(request):
     request.session.pop('emp_id', None)
     return redirect('login_page')
+
+
+

@@ -372,7 +372,7 @@ def DAM_Dashboard_allocation(request):
 
         # Notification-----------
         notifications = Notification.objects.filter(emp_id=dash_details,notific_status=0).order_by('-notific_date')
-
+        clients_objs = ClientTask_Register.objects.filter(task_name='Lead Collection',cTcompId__id=dash_details.emp_comp_id.id)
         employees = EmployeeRegister_Details.objects.filter(emp_designation_id__dashboard_id=4)
         executives = EmployeeRegister_Details.objects.filter(Q(emp_designation_id__dashboard_id=3) | Q(emp_designation_id__dashboard_id=2) | Q(emp_designation_id__dashboard_id=1))
 
@@ -387,12 +387,21 @@ def DAM_Dashboard_allocation(request):
        
 
         if request.POST:
+            cl = request.POST['client_id']
+            ct = request.POST['category']
             emp = request.POST['executive_id']
             d1 = request.POST['sdate']
             d2 = request.POST['edate']
             pgnum = request.POST['pgnum']
 
-           
+            if cl:
+                # cl_name = ClientRegister.objects.filter(id=cl).values('client_name').first()
+                dataBank_objs = dataBank_objs.filter(lead_Id__lead_work_regId__clientId__id=cl)
+
+            if ct:
+                # ct_name =LeadCategory_Register.objects.filter(id=ct).values('lead_collection_for').first()
+                dataBank_objs = dataBank_objs.filter(lead_Id__lead_category_id__id=ct)
+
             
             if d1:
 
@@ -417,6 +426,7 @@ def DAM_Dashboard_allocation(request):
                    'employees':employees,
                    'executives':executives,
                    'notifications':notifications,
+                   'clients_objs':clients_objs,
                    'dataBank_count':dataBank_count,'dataBank_objs':dataBank_objs,
                    'selected_emp':selected_emp,'d1':d1,'d2':d2,'pg_num':pgnum}
         
@@ -3299,3 +3309,5 @@ def lead_track(request,dbid):
                    }
         
         return render(request,'DAM_leadTrack.html',content)
+    
+

@@ -7,6 +7,20 @@
 
 <!-- Other Styling -->
 <style>
+    #repeatedBox .modal-content
+    {
+        background-color: rgb(11, 15, 23) !important;
+        padding: 10px;
+        border: none;
+        outline: none;
+    }
+    #repeatedBox .modal-title
+    {
+        font-size: 13.2px;
+        padding: .35rem .30rem;
+         color: #9e9e9e;
+         letter-spacing: 0.06rem;
+    }
     
    .filter-values
    {
@@ -600,20 +614,7 @@ grid-template-columns: 1fr 1fr;
                     <div class="heading">
                         <h6> Leads List ( {{ leads_obj_count }} ) </h6>
                     </div>
-                    <!-- <div class="convertion-Box">
-                        
-                        <button type="button" class="btn  btn-dark" title="Covert leads to excel">
-                            <span class="mdi mdi-file-excel"></span>
-                            <span class="small mr-1">Excel</span>
-                        </button>
-                        <button type="button" class="btn  btn-dark" title="Covert leads to PDF">
-                            <span class="mdi mdi-file-pdf text-danger"></span>
-                            <span class="small mr-1">PDF</span>
-                        </button>
-                        
-
-                    </div> -->
-
+                  
                 </div>
 
                 <!----- Search Section ------>
@@ -621,9 +622,9 @@ grid-template-columns: 1fr 1fr;
                     
                     <div class="search-section2_2" id="search-section2_2">
                         
-                        <form class="search-form" action="#" method="post" >
+                        <form class="search-form" action="{% url 'executive_allleads' %}" method="post" >
                             {% csrf_token %}
-                            <div class="select-Box">
+                            <div class="select-Box" data-toggle="tooltip" data-placement="top" title="Number of data per page">
                                 <select class="select-tag" name="pgnum" id="select-count">
                                     {% if pg_num %}
                                     <option value="{{ pg_num }}" selected>{{ pg_num }}</option>   
@@ -639,7 +640,7 @@ grid-template-columns: 1fr 1fr;
                                 </select>
                             </div>
                             
-                            <div class="select-Box">
+                            <div class="select-Box" data-toggle="tooltip" data-placement="top" title="Client Name">
                                 <select class="select-tag"  id="client-change" name="client_change">
                                     <option value="">Client</option>
                                     {% for client in clients_objs %}
@@ -648,21 +649,32 @@ grid-template-columns: 1fr 1fr;
                                     
                                 </select>
                             </div>
-                            <!-- <div class="select-Box">
+                            <div class="select-Box" data-toggle="tooltip" data-placement="top" title="Lead collected category ">
                                 <select class="select-tag" id="lead-category" name="category_name">
                                     <option value="">Category</option>
                                     
                                 </select>
 
-                            </div> -->
-                           
+                            </div>
+                            <div class="select-Box" data-toggle="tooltip" data-placement="top" title="Lead status  ">
+                                <select class="select-tag" name="select_status">
+                                    <option value="">Lead status</option>
+                                    <option value="Unverify"> Unverify </option>
+                                    <option value="Reapted"> Reapted </option>
+                                    <option value="Transfered"> Transfered </option>
+                                    <option value="Waste"> Waste </option>
+                                    <!-- <option value="Incompleted"> Incompleted </option> -->
+                                    
+                                </select>
+
+                            </div>
                            
                             
-                            <div class="">
-                                <input type="date" class="input-date"  name="sdate" title="Lead collected from ">
+                            <div class="" data-toggle="tooltip" data-placement="top" title="Lead collected  from   ">
+                                <input type="date" class="input-date"  name="sdate" >
                             </div>
-                            <div class=" ">
-                                <input type="date" class="input-date"  name="edate" title="Lead collected to ">
+                            <div class=" "data-toggle="tooltip" data-placement="top" title="Lead collected to">
+                                <input type="date" class="input-date"  name="edate">
                             </div>
                            
                             <div>
@@ -678,6 +690,9 @@ grid-template-columns: 1fr 1fr;
                     <p class="filter-values mt-2">
                         {% if client_name %}  {{ client_name.client_name }} -  {% endif %}
                         {% if category_name %} ( {{ category_name.lead_collection_for }} )  {% endif %}
+                        
+                        &nbsp;
+                        {% if select_val %} {{ select_val}} - Lead List {% endif %}
                         {% if select_emp %} &nbsp; {{ select_emp.emp_name }}   {% endif %}
                         {% if start_date %} - ( {{ start_date }} ) {% endif %}
                         {% if end_date %} ( {{ end_date}} ){% endif %}
@@ -700,15 +715,7 @@ grid-template-columns: 1fr 1fr;
                             <thead>
                                 <tr class="table-active">
                                     <th>
-                                        <div class="d-flex justify-content-center">
-                                            <div class="form-check form-check-primary m-0 p-0">
-                                            <label class="form-check-label">
-                                                <input type="checkbox" class="form-check-input check-all">
-                                                
-                                            </label>
-                                            </div>
-                                            
-                                        </div>
+                                        No
                                     </th>
                                     <th>Collected By | Created On</th>
                                     <th>Name</th> 
@@ -727,13 +734,7 @@ grid-template-columns: 1fr 1fr;
                                     <tr>
 
                                         <td >
-                                            <div class="d-flex justify-content-center">
-                                                <div class="form-check form-check-primary ">
-                                                    <label class="form-check-label ">
-                                                        <input class="checkbox check-single" name="lead_check" value="{{ lead.id }}" id="" type="checkbox">
-                                                    </label>
-                                                </div>
-                                            </div>
+                                            {{forloop.counter}}
                                         </td>
                                         <td>
                                             <p>
@@ -748,11 +749,33 @@ grid-template-columns: 1fr 1fr;
                                         <td><p><span class="mdi mdi-email"> </span> {{ lead.lead_email }}</p>      </td>
                                         <td><p><span class="mdi mdi-phone "> </span> {{ lead.lead_contact }} </p></td>
                                         <td>
-                                            {% if lead.lead_status == 1 %}
-                                            <p class="badge badge-pill badge-success"><span class="mdi mdi-check-all small"> Verifird</span></p>
-                                            {% else %}
-                                            <p class="badge badge-pill badge-info"><span class="mdi mdi-check-circle small"> New</span></p>
+                                         
+                                           
+                                                <p class="badge badge-pill
+                                                {% if select_val == 'Transfered' or lead.lead_transfer_status == 1 %}  badge-success
+                                                {% elif select_val == 'Reapted'  or lead.repeated_status == 1 %}  badge-info
+                                                {% elif select_val == 'Waste' or lead.waste_data == 1  %}  badge-danger
+                                                {% elif select_val == 'Unverify' or lead.lead_status == 0 %} badge-primary 
+                                                {% endif %}">
+                                                {% if select_val %}
+                                                <span class="small">{{ select_val }}</span>
+                                                {% elif lead.waste_data == 1  %}
+                                                    <span class="small"> Waste </span>
+                                                {% elif lead.lead_status == 0  %}
+                                                    <span class="small"> Unverify </span>
+                                                {% elif lead.lead_transfer_status == 1  %}
+                                                    <span class="small"> Transfered </span>
+                                                {% endif %}
+                                            </p>
+                                          
+                                            {% if lead.repeated_status == 1  and select_val == 'Reapted' %}
+                                                <button type="button" class="btn btn-danger rounded-pill fetch-reapeted-lead-details"  data-reptlead-id="{{ lead.id }}">
+                                                    <span class="mdi mdi-file-document small"> list </span>
+                                                </button>
+                                              
+                                                  
                                             {% endif %}
+                                                
                                         </td>
                                         <td>
                                             <a class="small ml-2 detailsBox-icon btn btn-sm btn-outline-info" data-lead-id="{{ lead.id }}" title="Basic Details of Lead">
@@ -776,19 +799,19 @@ grid-template-columns: 1fr 1fr;
                     <div class=" paginationBox ">
                         <ul class="pagination">
                             {% if leads.has_previous %}
-                            <li><a href="?page=1{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-double-left"></span></a></li>
-                            <li><a href="?page={{ leads.previous_page_number }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-left"></span></a></li>
+                            <li><a href="?page=1{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}{% if select_val %}&sele_val={{ select_val }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-double-left"></span></a></li>
+                            <li><a href="?page={{ leads.previous_page_number }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}{% if select_val %}&sele_val={{ select_val }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-left"></span></a></li>
                             {% endif %}
                             {% for num in leads.paginator.page_range %}
                                 {% if num <= 4 or num == leads.paginator.num_pages or leads.number == num %}
                                     <li {% if leads.number == num %} class="active" {% endif %}>
-                                        <a href="?page={{ num }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span>{{ num }}</span></a></li>
+                                        <a href="?page={{ num }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}{% if select_val %}&sele_val={{ select_val }}{% endif %}" class="btn btn-dark"><span>{{ num }}</span></a></li>
                                 {% endif %}
                                
                             {% endfor %}
                             {% if leads.has_next %}
-                            <li><a href="?page={{ leads.next_page_number }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-right"></span></a></li>
-                            <li><a href="?page={{ leads.paginator.num_pages }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-double-right"></span></a></li>
+                            <li><a href="?page={{ leads.next_page_number }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}{% if select_val %}&sele_val={{ select_val }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-right"></span></a></li>
+                            <li><a href="?page={{ leads.paginator.num_pages }}{% if Cl_ID %}&Cl_ID={{ Cl_ID }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if pg_num %}&pg_num={{ pg_num }}{% endif %}{% if select_val %}&sele_val={{ select_val }}{% endif %}" class="btn btn-dark"><span class="mdi mdi-chevron-double-right"></span></a></li>
                             {% endif %}
                         </ul>
                     </div>
@@ -847,6 +870,14 @@ grid-template-columns: 1fr 1fr;
 <!-- Modal Follow up Details  -->
 <div class="modal fade" id="activityPanel" tabindex="-1" aria-labelledby="activityPanelLable" aria-hidden="true">
     <div class="modal-dialog modal-xl" id="activityBox" >
+      
+    </div>
+</div>
+
+<!-- Modal repeated up Details  -->
+<!-- Modal -->
+<div class="modal fade" id="repeatedPanel" tabindex="-1" aria-labelledby="repeatedPanelLable" aria-hidden="true">
+    <div class="modal-dialog modal-xl" id="repeatedBox" >
       
     </div>
 </div>
@@ -1021,6 +1052,33 @@ grid-template-columns: 1fr 1fr;
                 success: function(response) {
                     $('#activityBox').html(response);  // Place the result in activityBox
                     $('#activityPanel').modal('show');  // Show the modal
+                },
+                error: function(xhr, errmsg, err) {
+                    console.log(xhr.status + ": " + xhr.responseText);
+                }
+            });
+        }
+    });
+
+</script>
+
+<script>
+    $(document).ready(function() {
+        $(document).on("click", ".fetch-reapeted-lead-details", function(e) {
+       
+            e.preventDefault();
+            var leadId = $(this).data('reptlead-id');
+            console.log(leadId)
+            fetchLeadDetails(leadId);
+        });
+
+        function fetchLeadDetails(leadId) {
+            $.ajax({
+                url: '/leadrepeated_data/' + leadId + '/',  // URL to fetch lead data
+                type: 'GET',
+                success: function(response) {
+                    $('#repeatedBox').html(response);  // Place the result in activityBox
+                    $('#repeatedPanel').modal('show');  // Show the modal
                 },
                 error: function(xhr, errmsg, err) {
                     console.log(xhr.status + ": " + xhr.responseText);
